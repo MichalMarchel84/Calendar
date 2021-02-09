@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class AppWindow {
 
-
+    int language = 0;
     JFrame frame = new JFrame();
 
     public AppWindow() {
