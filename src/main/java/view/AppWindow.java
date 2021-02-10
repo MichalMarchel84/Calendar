@@ -1,19 +1,23 @@
 package view;
 
 import javax.swing.*;
-import java.awt.*;
+import java.io.UnsupportedEncodingException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
-public class AppWindow {
+public class AppWindow extends JFrame{
 
-    int language = 0;
-    JFrame frame = new JFrame();
+    private static ResourceBundle lang = ResourceBundle.getBundle("i18n.language", Locale.getDefault());
 
     public AppWindow() {
-        frame.setSize(800, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.add(new LoginPanel(0));
-        frame.setVisible(true);
+        this.setSize(800, 600);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLocationRelativeTo(null);
+        this.add(new LoginPanel());
+        this.setVisible(true);
     }
 
+    public static String getPhrase(String key){
+        return lang.getString(key);
+    }
 }
