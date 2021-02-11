@@ -9,7 +9,8 @@ import java.awt.event.ActionListener;
 
 public class AppWindow extends JFrame implements ActionListener{
 
-    JComboBox box;
+    JComboBox<String> box;
+    LoginPanel login = new LoginPanel();
 
     public AppWindow() {
 
@@ -20,12 +21,13 @@ public class AppWindow extends JFrame implements ActionListener{
         lay.setHGap(10);
         this.getContentPane().setLayout(lay);
 
-        box = new JComboBox(I18n.getAvailableLangs());
+        box = new JComboBox<>(I18n.getAvailableLangs());
         box.setRenderer(new FlagListRenderer());
         box.setSelectedIndex(I18n.getLangIndex());
         box.addActionListener(this);
 
-        this.add(new LoginPanel(), "1 1");
+        //this.add(new LoginPanel(), "1 1");
+        this.add(login, "1 1");
         this.add(box, "2 0 c c");
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -37,7 +39,7 @@ public class AppWindow extends JFrame implements ActionListener{
         this.setVisible(true);
     }
 
-    private class FlagListRenderer extends DefaultListCellRenderer{
+    private static class FlagListRenderer extends DefaultListCellRenderer{
 
         public FlagListRenderer(){}
 
@@ -53,6 +55,16 @@ public class AppWindow extends JFrame implements ActionListener{
     public void actionPerformed(ActionEvent e){
         if(e.getSource().equals(box)){
             I18n.setLang(box.getSelectedIndex());
+            Component[] comp = this.getContentPane().getComponents();
+            for(Component c : comp){
+                if(c.equals(login)){
+                    this.remove(c);
+                    login = new LoginPanel();
+                    this.add(login, "1 1");
+                }
+            }
+            this.revalidate();
+            this.repaint();
         }
     }
 }
