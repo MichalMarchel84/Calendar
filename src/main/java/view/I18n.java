@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 class I18n {
 
     private static final String defaultLang = "en";
+    private static final String defaultFlag = "src/main/resources/flag_icons/gb.gif";
 
     private static final String[] langs = getLangs();
 
@@ -36,9 +37,11 @@ class I18n {
         File file = new File("src/main/resources/i18n");
         String[] fileList = file.list();
         for(String fl : fileList){
-            int index = fl.indexOf('_');
-            if(index > -1) {
-                list.add(fl.substring(fl.indexOf('_') + 1, fl.indexOf('_') + 3));
+            if(fl.substring(0, 4).equalsIgnoreCase("lang")) {
+                int index = fl.indexOf('_');
+                if (index > -1) {
+                    list.add(fl.substring(fl.indexOf('_') + 1, fl.indexOf('_') + 3));
+                }
             }
         }
         return list.toArray(new String[0]);
@@ -61,29 +64,57 @@ class I18n {
         }
     }
 
-    static String getFlagForLanguage(int langNum){
-        if((langNum < langs.length) && (langNum > -1)) {
-            String url = "src/main/resources/flag_icons/" + langs[langNum] + ".gif";
-            File file = new File(url);
-            if(file.exists()) {
-                return url;
-            }
-            else{
-                return null;
-            }
+    static String getFlagForLanguage(String code){
+        String url;
+        if(code.equalsIgnoreCase(defaultLang)){
+            url = defaultFlag;
         }
-        else return null;
+        else {
+            url = "src/main/resources/flag_icons/" + code + ".gif";
+        }
+        File file = new File(url);
+        if(file.exists()) {
+            return url;
+        }
+        else{
+            return null;
+        }
     }
 
-    static void setLang(String l){
-        for(String pattern : langs){
-            if(l.equals(pattern)){
-                if(l.equals(defaultLang)){
-                    l = "";
+    static int getLangIndex(){
+        int index = -1;
+        if(lang.getLocale().getLanguage().equals("")){
+            index = 0;
+        }
+        else {
+            for (int i = 0; i < langs.length; i++) {
+                if (langs[i].equalsIgnoreCase(lang.getLocale().getLanguage())) {
+                    index = i;
+                    break;
                 }
-                lang = ResourceBundle.getBundle("i18n.language", new Locale(l));
+            }
+        }
+        return index;
+    }
+
+    static void setLang(String code){
+        for(String pattern : langs){
+            if(code.equals(pattern)){
+                if(code.equals(defaultLang)){
+                    code = "";
+                }
+                lang = ResourceBundle.getBundle("i18n.language", new Locale(code));
                 break;
             }
+        }
+    }
+
+    static void setLang(int index){
+        if((index < langs.length) && (index > 0)){
+            lang = ResourceBundle.getBundle("i18n.language", new Locale(langs[index]));
+        }
+        else if(index == 0){
+            lang = ResourceBundle.getBundle("i18n.language", new Locale(""));
         }
     }
 }

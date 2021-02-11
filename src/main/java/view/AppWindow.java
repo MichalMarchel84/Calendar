@@ -4,13 +4,12 @@ import info.clearthought.layout.TableLayout;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class AppWindow extends JFrame{
+public class AppWindow extends JFrame implements ActionListener{
+
+    JComboBox box;
 
     public AppWindow() {
 
@@ -21,11 +20,10 @@ public class AppWindow extends JFrame{
         lay.setHGap(10);
         this.getContentPane().setLayout(lay);
 
-        /*JButton language = new JButton(Locale.getDefault().getLanguage().toUpperCase(Locale.ROOT));
-        String flagURL = "src/main/resources/flag_icons/" + lang.getLocale().getLanguage() + ".gif";
-        language.setIcon(new ImageIcon(flagURL));
-        this.add(language, "2 0 c c");*/
-        JComboBox box = new JComboBox(I18n.getAvailableLangs());
+        box = new JComboBox(I18n.getAvailableLangs());
+        box.setRenderer(new FlagListRenderer());
+        box.setSelectedIndex(I18n.getLangIndex());
+        box.addActionListener(this);
 
         this.add(new LoginPanel(), "1 1");
         this.add(box, "2 0 c c");
@@ -37,5 +35,24 @@ public class AppWindow extends JFrame{
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+    }
+
+    private class FlagListRenderer extends DefaultListCellRenderer{
+
+        public FlagListRenderer(){}
+
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index,boolean isSelected, boolean cellHasFocus) {
+            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            Icon icon = new ImageIcon(I18n.getFlagForLanguage((String)value));
+            label.setIcon(icon);
+            return label;
+        }
+    }
+
+    public void actionPerformed(ActionEvent e){
+        if(e.getSource().equals(box)){
+            I18n.setLang(box.getSelectedIndex());
+        }
     }
 }
