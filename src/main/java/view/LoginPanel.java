@@ -22,26 +22,26 @@ class LoginPanel extends JPanel{
         lay.setVGap(10);
         this.setLayout(lay);
 
-        JLabel msg = new JLabel(AppWindow.getPhrase("login_message"));
+        JLabel msg = new JLabel(I18n.getPhrase("login_message"));
         msg.setPreferredSize(new Dimension(200, 200));
         msg.setHorizontalAlignment(JLabel.CENTER);
         this.add(msg, "0 0 1 0");
 
-        this.add(new JLabel(AppWindow.getPhrase("username_label")), "0 1 1 1");
+        this.add(new JLabel(I18n.getPhrase("username_label")), "0 1 1 1");
 
         userName.setPreferredSize(txtFieldSize);
         this.add(userName, "0 2 1 2 c c");
 
-        this.add(new JLabel(AppWindow.getPhrase("pass_label")), "0 3 1 3");
+        this.add(new JLabel(I18n.getPhrase("pass_label")), "0 3 1 3");
 
         pass.setPreferredSize(txtFieldSize);
         this.add(pass, "0 4 1 4 c c");
 
-        signIn.setText(AppWindow.getPhrase("login_button"));
+        signIn.setText(I18n.getPhrase("login_button"));
         signIn.setPreferredSize(buttonSize);
         this.add(signIn, "0 5");
 
-        newUser.setText(AppWindow.getPhrase("new_user_button"));
+        newUser.setText(I18n.getPhrase("new_user_button"));
         newUser.setPreferredSize(buttonSize);
         this.add(newUser, "1 5");
     }
