@@ -1,21 +1,26 @@
 package view;
 
+import controller.LoginRequest;
+import controller.NewUserRequest;
 import info.clearthought.layout.TableLayout;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-class LoginPanel extends JPanel implements LanguageListener{
+class LoginPanel extends JPanel implements ActionListener, LanguageListener{
 
-    private JTextField userName = new JTextField(20);
-    private JPasswordField pass = new JPasswordField(20);
-    private JButton signIn = new JButton();
-    private JButton newUser = new JButton();
-    private JLabel msg = new JLabel();
-    private JLabel username_label = new JLabel();
-    private JLabel pass_label = new JLabel();
-    private Dimension txtFieldSize = new Dimension(100, 30);
-    private Dimension buttonSize = new Dimension(80, 40);
+    private final JTextField userName = new JTextField(20);
+    private final JPasswordField pass = new JPasswordField(20);
+    private final JButton signIn = new JButton();
+    private final JButton newUser = new JButton();
+    private final JLabel msg = new JLabel();
+    private final JLabel username_label = new JLabel();
+    private final JLabel pass_label = new JLabel();
+    private final JLabel errorMessage = new JLabel();
+    private final Dimension txtFieldSize = new Dimension(100, 30);
+    private final Dimension buttonSize = new Dimension(80, 40);
 
     public LoginPanel() {
 
@@ -23,7 +28,10 @@ class LoginPanel extends JPanel implements LanguageListener{
         I18n.addLanguageListener(this);
 
         double[] cols = {TableLayout.PREFERRED, TableLayout.PREFERRED};
-        double[] rows = {TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED};
+        double[] rows = new double[7];
+        for(int i = 0; i < rows.length; i++){
+            rows[i] = TableLayout.PREFERRED;
+        }
         TableLayout lay = new TableLayout(cols, rows);
         lay.setHGap(10);
         lay.setVGap(10);
@@ -43,13 +51,15 @@ class LoginPanel extends JPanel implements LanguageListener{
         pass.setPreferredSize(txtFieldSize);
         this.add(pass, "0 4 1 4 c c");
 
-        //signIn.setText(I18n.getPhrase("login_button"));
         signIn.setPreferredSize(buttonSize);
+        signIn.addActionListener(this);
         this.add(signIn, "0 5");
 
-        //newUser.setText(I18n.getPhrase("new_user_button"));
         newUser.setPreferredSize(buttonSize);
+        newUser.addActionListener(this);
         this.add(newUser, "1 5");
+
+        this.add(errorMessage, "0 6 1 6");
     }
 
     private void setTexts(){
@@ -58,11 +68,22 @@ class LoginPanel extends JPanel implements LanguageListener{
         msg.setText(I18n.getPhrase("login_message"));
         username_label.setText(I18n.getPhrase("username_label"));
         pass_label.setText(I18n.getPhrase("pass_label"));
+        errorMessage.setText("");
     }
 
     @Override
     public void languageChanged() {
         setTexts();
         this.repaint();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource().equals(signIn)){
+            Comm.fireRequestEvent(new LoginRequest(userName.getText(), pass.getPassword(), errorMessage));
+        }
+        else if(e.getSource().equals(newUser)){
+            Comm.fireRequestEvent(new NewUserRequest(userName.getText(), pass.getPassword(), errorMessage));
+        }
     }
 }

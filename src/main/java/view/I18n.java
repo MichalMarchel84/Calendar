@@ -3,11 +3,11 @@ package view;
 import java.io.File;
 import java.util.*;
 
-class I18n {
+public class I18n {
 
     private static final String defaultLang = "en";
     private static final String defaultFlag = "src/main/resources/flag_icons/gb.gif";
-    private static Set<LanguageListener> langListeners = new HashSet<>();
+    private static final Set<LanguageListener> langListeners = new HashSet<>();
 
     private static final String[] langs = getLangs();
 
@@ -53,7 +53,7 @@ class I18n {
         return res;
     }
 
-    static String getPhrase(String key){
+    public static String getPhrase(String key){
         try {
             return lang.getString(key);
         }
@@ -131,9 +131,8 @@ class I18n {
     }
 
     static void fireLanguageChangedEvent(){
-        Iterator<LanguageListener> iter = langListeners.iterator();
-        while(iter.hasNext()){
-            iter.next().languageChanged();
+        for (LanguageListener langListener : langListeners) {
+            langListener.languageChanged();
         }
     }
 }
