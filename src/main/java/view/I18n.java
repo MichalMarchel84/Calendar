@@ -1,15 +1,13 @@
 package view;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 class I18n {
 
     private static final String defaultLang = "en";
     private static final String defaultFlag = "src/main/resources/flag_icons/gb.gif";
+    private static Set<LanguageListener> langListeners = new HashSet<>();
 
     private static final String[] langs = getLangs();
 
@@ -107,6 +105,7 @@ class I18n {
                 break;
             }
         }
+        fireLanguageChangedEvent();
     }
 
     static void setLang(int index){
@@ -115,6 +114,26 @@ class I18n {
         }
         else if(index == 0){
             lang = ResourceBundle.getBundle("i18n.language", new Locale(""));
+        }
+        fireLanguageChangedEvent();
+    }
+
+    static void addLanguageListener(LanguageListener listener){
+        langListeners.add(listener);
+    }
+
+    static LanguageListener[] getLanguageListeners(){
+        return (LanguageListener[]) langListeners.toArray();
+    }
+
+    static void removeLanguageListener(LanguageListener listener){
+        langListeners.remove(listener);
+    }
+
+    static void fireLanguageChangedEvent(){
+        Iterator<LanguageListener> iter = langListeners.iterator();
+        while(iter.hasNext()){
+            iter.next().languageChanged();
         }
     }
 }

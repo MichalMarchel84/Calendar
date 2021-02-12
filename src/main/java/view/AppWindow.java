@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class AppWindow extends JFrame implements ActionListener{
+public class AppWindow extends JFrame implements ActionListener, LanguageListener{
 
     JComboBox<String> box;
     LoginPanel login = new LoginPanel();
@@ -25,8 +25,8 @@ public class AppWindow extends JFrame implements ActionListener{
         box.setRenderer(new FlagListRenderer());
         box.setSelectedIndex(I18n.getLangIndex());
         box.addActionListener(this);
+        I18n.addLanguageListener(this);
 
-        //this.add(new LoginPanel(), "1 1");
         this.add(login, "1 1");
         this.add(box, "2 0 c c");
 
@@ -55,16 +55,11 @@ public class AppWindow extends JFrame implements ActionListener{
     public void actionPerformed(ActionEvent e){
         if(e.getSource().equals(box)){
             I18n.setLang(box.getSelectedIndex());
-            Component[] comp = this.getContentPane().getComponents();
-            for(Component c : comp){
-                if(c.equals(login)){
-                    this.remove(c);
-                    login = new LoginPanel();
-                    this.add(login, "1 1");
-                }
-            }
-            this.revalidate();
-            this.repaint();
         }
+    }
+
+    @Override
+    public void languageChanged() {
+        //this.repaint();
     }
 }
