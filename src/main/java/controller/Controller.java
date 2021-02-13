@@ -1,5 +1,6 @@
 package controller;
 
+import model.dao;
 import org.mindrot.jbcrypt.BCrypt;
 import view.LoginPanel;
 
@@ -27,11 +28,17 @@ public class Controller implements RequestListener{
         else if(req instanceof NewUserRequest){
             NewUserRequest request = (NewUserRequest) req;
             String passwordHash = hash(new String(request.pass));
-            System.out.println("Login: " + request.login);
-            System.out.println("Hash: " + passwordHash);
+            dao.connect();
+            int result = 1;
+            if(dao.isLoginFree(request.login)){
+                result = dao.addUser(request.login, passwordHash);
+            }
+            dao.disconnect();
             if(request.source instanceof LoginPanel){
                 LoginPanel p = (LoginPanel)request.source;
-                p.setErrorMessage("error_not_implemented");
+                if(result > 0) {
+                    p.setErrorMessage("error_not_implemented");
+                }
             }
         }
         else{
