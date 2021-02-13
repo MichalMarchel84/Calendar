@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
 
 public class AppWindow extends JFrame implements ActionListener, LanguageListener{
 
-    JComboBox<String> box;
+    JComboBox<String> languageSelection;
     LoginPanel login = new LoginPanel();
 
     public AppWindow() {
@@ -21,19 +21,18 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
         lay.setHGap(10);
         this.getContentPane().setLayout(lay);
 
-        box = new JComboBox<>(I18n.getAvailableLangs());
-        box.setRenderer(new FlagListRenderer());
-        box.setSelectedIndex(I18n.getLangIndex());
-        box.addActionListener(this);
+        languageSelection = new JComboBox<>(I18n.getAvailableLangs());
+        languageSelection.setRenderer(new FlagListRenderer());
+        languageSelection.setSelectedIndex(I18n.getLangIndex());
+        languageSelection.addActionListener(this);
         I18n.addLanguageListener(this);
 
         this.add(login, "1 1");
-        this.add(box, "2 0 c c");
+        this.add(languageSelection, "2 0 c c");
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setPreferredSize(new Dimension(800, 600));
         this.setMinimumSize(new Dimension(300, 600));
-        //this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
@@ -53,8 +52,8 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
     }
 
     public void actionPerformed(ActionEvent e){
-        if(e.getSource().equals(box)){
-            I18n.setLang(box.getSelectedIndex());
+        if(e.getSource().equals(languageSelection)){
+            I18n.setLang(languageSelection.getSelectedIndex());
         }
     }
 

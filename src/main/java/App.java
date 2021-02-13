@@ -1,4 +1,5 @@
 import controller.Controller;
+import model.Connect;
 import view.AppWindow;
 import view.Comm;
 

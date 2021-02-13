@@ -3,13 +3,12 @@ package view;
 import controller.LoginRequest;
 import controller.NewUserRequest;
 import info.clearthought.layout.TableLayout;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-class LoginPanel extends JPanel implements ActionListener, LanguageListener{
+public class LoginPanel extends JPanel implements ActionListener, LanguageListener{
 
     private final JTextField userName = new JTextField(20);
     private final JPasswordField pass = new JPasswordField(20);
@@ -59,6 +58,7 @@ class LoginPanel extends JPanel implements ActionListener, LanguageListener{
         newUser.addActionListener(this);
         this.add(newUser, "1 5");
 
+        errorMessage.setForeground(Color.RED);
         this.add(errorMessage, "0 6 1 6");
     }
 
@@ -69,21 +69,26 @@ class LoginPanel extends JPanel implements ActionListener, LanguageListener{
         username_label.setText(I18n.getPhrase("username_label"));
         pass_label.setText(I18n.getPhrase("pass_label"));
         errorMessage.setText("");
+        this.repaint();
+    }
+
+    public void setErrorMessage(String errMsg){
+        errorMessage.setText(I18n.getPhrase(errMsg));
+        this.repaint();
     }
 
     @Override
     public void languageChanged() {
         setTexts();
-        this.repaint();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource().equals(signIn)){
-            Comm.fireRequestEvent(new LoginRequest(userName.getText(), pass.getPassword(), errorMessage));
+            Comm.fireRequestEvent(new LoginRequest(userName.getText(), pass.getPassword(), this));
         }
         else if(e.getSource().equals(newUser)){
-            Comm.fireRequestEvent(new NewUserRequest(userName.getText(), pass.getPassword(), errorMessage));
+            Comm.fireRequestEvent(new NewUserRequest(userName.getText(), pass.getPassword(), this));
         }
     }
 }

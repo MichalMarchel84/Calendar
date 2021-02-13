@@ -1,9 +1,7 @@
 package controller;
 
-import view.I18n;
-
-import javax.swing.*;
-import java.awt.*;
+import org.mindrot.jbcrypt.BCrypt;
+import view.LoginPanel;
 
 public class Controller implements RequestListener{
 
@@ -13,33 +11,38 @@ public class Controller implements RequestListener{
     @Override
     public void requestReceived(Request req) {
         if(req instanceof LoginRequest){
+            LoginRequest request = (LoginRequest)req;
             System.out.print("Login: ");
-            System.out.println(((LoginRequest) req).login);
+            System.out.println(request.login);
             System.out.print("pass: ");
-            char[] chars = ((LoginRequest) req).pass;
+            char[] chars = request.pass;
             for(char c : chars){
                 System.out.print(c);
             }
-            JLabel l = ((LoginRequest) req).err;
-            l.setText(I18n.getPhrase("error_not_implemented"));
-            l.setForeground(Color.RED);
-            l.repaint();
+            if(request.source instanceof LoginPanel){
+                LoginPanel p = (LoginPanel)request.source;
+                p.setErrorMessage("error_not_implemented");
+            }
         }
         else if(req instanceof NewUserRequest){
-            System.out.print("New user: ");
-            System.out.println(((NewUserRequest) req).login);
-            System.out.print("pass: ");
-            char[] chars = ((NewUserRequest) req).pass;
-            for(char c : chars){
-                System.out.print(c);
+            NewUserRequest request = (NewUserRequest) req;
+            String passwordHash = hash(new String(request.pass));
+            System.out.println("Login: " + request.login);
+            System.out.println("Hash: " + passwordHash);
+            if(request.source instanceof LoginPanel){
+                LoginPanel p = (LoginPanel)request.source;
+                p.setErrorMessage("error_not_implemented");
             }
-            JLabel l = ((NewUserRequest) req).err;
-            l.setText(I18n.getPhrase("error_not_implemented"));
-            l.setForeground(Color.RED);
-            l.repaint();
         }
         else{
             System.out.println("Unknown request");
         }
+    }
+    private String hash(String pass){
+        return BCrypt.hashpw(pass, BCrypt.gensalt(10));
+    }
+
+    private boolean verifyHash(String pass, String hash){
+        return BCrypt.checkpw(pass, hash);
     }
 }

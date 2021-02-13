@@ -5,11 +5,11 @@ import javax.swing.*;
 public class NewUserRequest extends Request{
     String login;
     char[] pass;
-    JLabel err;
+    JPanel source;
 
-    public NewUserRequest(String login, char[] pass, JLabel err) {
+    public NewUserRequest(String login, char[] pass, JPanel source) {
         this.login = login;
         this.pass = pass;
-        this.err = err;
+        this.source = source;
     }
 }

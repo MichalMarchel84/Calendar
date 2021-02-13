@@ -3,7 +3,7 @@ package view;
 import java.io.File;
 import java.util.*;
 
-public class I18n {
+class I18n {
 
     private static final String defaultLang = "en";
     private static final String defaultFlag = "src/main/resources/flag_icons/gb.gif";
@@ -53,7 +53,7 @@ public class I18n {
         return res;
     }
 
-    public static String getPhrase(String key){
+    static String getPhrase(String key){
         try {
             return lang.getString(key);
         }
@@ -95,19 +95,6 @@ public class I18n {
         return index;
     }
 
-    static void setLang(String code){
-        for(String pattern : langs){
-            if(code.equals(pattern)){
-                if(code.equals(defaultLang)){
-                    code = "";
-                }
-                lang = ResourceBundle.getBundle("i18n.language", new Locale(code));
-                break;
-            }
-        }
-        fireLanguageChangedEvent();
-    }
-
     static void setLang(int index){
         if((index < langs.length) && (index > 0)){
             lang = ResourceBundle.getBundle("i18n.language", new Locale(langs[index]));
@@ -120,14 +107,6 @@ public class I18n {
 
     static void addLanguageListener(LanguageListener listener){
         langListeners.add(listener);
-    }
-
-    static LanguageListener[] getLanguageListeners(){
-        return (LanguageListener[]) langListeners.toArray();
-    }
-
-    static void removeLanguageListener(LanguageListener listener){
-        langListeners.remove(listener);
     }
 
     static void fireLanguageChangedEvent(){
