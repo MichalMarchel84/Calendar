@@ -1,8 +1,10 @@
 package controller;
 
-import model.dao;
+import model.Model;
 import org.mindrot.jbcrypt.BCrypt;
 import view.LoginPanel;
+
+import java.sql.SQLException;
 
 public class Controller implements RequestListener{
 
@@ -13,31 +15,40 @@ public class Controller implements RequestListener{
     public void requestReceived(Request req) {
         if(req instanceof LoginRequest){
             LoginRequest request = (LoginRequest)req;
-            System.out.print("Login: ");
-            System.out.println(request.login);
-            System.out.print("pass: ");
-            char[] chars = request.pass;
-            for(char c : chars){
-                System.out.print(c);
+            String passwordHashed = Model.getPasswordHash(request.login);
+            if(passwordHashed.equals("")) {
+                if (request.source instanceof LoginPanel) {
+                    LoginPanel p = (LoginPanel) request.source;
+                    p.setErrorMessage("error_wrong_login");
+                }
             }
-            if(request.source instanceof LoginPanel){
-                LoginPanel p = (LoginPanel)request.source;
-                p.setErrorMessage("error_not_implemented");
+            else if(!verifyHash(new String(request.pass), passwordHashed)){
+                if (request.source instanceof LoginPanel) {
+                    LoginPanel p = (LoginPanel) request.source;
+                    p.setErrorMessage("error_wrong_password");
+                }
+            }
+            else{
+                System.out.println("All correct");
             }
         }
         else if(req instanceof NewUserRequest){
             NewUserRequest request = (NewUserRequest) req;
             String passwordHash = hash(new String(request.pass));
-            dao.connect();
-            int result = 1;
-            if(dao.isLoginFree(request.login)){
-                result = dao.addUser(request.login, passwordHash);
+            try {
+                Model model = new Model(request.login, passwordHash, true);
+                System.out.println("Id: " + model.clientId);
             }
-            dao.disconnect();
-            if(request.source instanceof LoginPanel){
-                LoginPanel p = (LoginPanel)request.source;
-                if(result > 0) {
-                    p.setErrorMessage("error_not_implemented");
+            catch (SQLException e) {
+                if(request.source instanceof LoginPanel){
+                    LoginPanel p = (LoginPanel)request.source;
+                    if(e.getErrorCode() == 19){
+                        p.setErrorMessage("error_login_in_use");
+                    }
+                    else{
+                        p.setErrorMessage("error_unknown");
+                        e.printStackTrace();
+                    }
                 }
             }
         }
