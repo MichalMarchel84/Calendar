@@ -1,7 +1,6 @@
 package view;
 
 import controller.LoginRequest;
-import controller.NewUserRequest;
 import info.clearthought.layout.TableLayout;
 import javax.swing.*;
 import java.awt.*;
@@ -88,7 +87,8 @@ public class LoginPanel extends JPanel implements ActionListener, LanguageListen
             Comm.fireRequestEvent(new LoginRequest(userName.getText(), pass.getPassword(), this));
         }
         else if(e.getSource().equals(newUser)){
-            Comm.fireRequestEvent(new NewUserRequest(userName.getText(), pass.getPassword(), this));
+            AppWindow app = (AppWindow) this.getTopLevelAncestor();
+            app.displayPanel(AppWindow.panels.newUser);
         }
     }
 }

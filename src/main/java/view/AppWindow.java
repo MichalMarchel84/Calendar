@@ -7,8 +7,11 @@ import java.awt.event.*;
 
 public class AppWindow extends JFrame implements ActionListener, LanguageListener{
 
+    public enum panels {login, newUser, monthView, dayView};
+    private JPanel onDisplay;
     JComboBox<String> languageSelection;
     LoginPanel login = new LoginPanel();
+    NewUserPanel newUser = new NewUserPanel();
 
     public AppWindow() {
 
@@ -25,7 +28,7 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
         languageSelection.addActionListener(this);
         I18n.addLanguageListener(this);
 
-        this.add(login, "1 1");
+        this.displayPanel(panels.login);
         this.add(languageSelection, "2 0 c c");
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,6 +50,23 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
             label.setIcon(icon);
             return label;
         }
+    }
+
+    public void displayPanel(panels panelName){
+        if(onDisplay != null){
+            this.remove(onDisplay);
+        }
+        switch (panelName){
+            case login:
+                onDisplay = login;
+                break;
+            case newUser:
+                onDisplay = newUser;
+                break;
+        }
+        this.add(onDisplay, "1 1");
+        this.revalidate();
+        this.repaint();
     }
 
     public void actionPerformed(ActionEvent e){

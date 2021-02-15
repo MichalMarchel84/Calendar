@@ -1,7 +1,5 @@
 package model;
 
-import java.sql.SQLException;
-
 public class Model {
 
     public int clientId;
@@ -10,7 +8,7 @@ public class Model {
 
     }
 
-    public Model(String login, String pass, boolean newUser) throws SQLException {
+    public Model(String login, String pass, boolean newUser) throws LoginPanelException {
         if(newUser){
             clientId = Dao.addUser(login, pass);
         }
@@ -24,7 +22,7 @@ public class Model {
         Dao.disconnect();
     }
 
-    public static String getPasswordHash(String login){
+    public static String getPasswordHash(String login) throws LoginPanelException {
         return Dao.getPasswordHash(login);
     }
 }

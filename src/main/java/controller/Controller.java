@@ -1,10 +1,10 @@
 package controller;
 
+import model.LoginPanelException;
 import model.Model;
 import org.mindrot.jbcrypt.BCrypt;
 import view.LoginPanel;
-
-import java.sql.SQLException;
+import view.NewUserPanel;
 
 public class Controller implements RequestListener{
 
@@ -13,25 +13,30 @@ public class Controller implements RequestListener{
 
     @Override
     public void requestReceived(Request req) {
+
         if(req instanceof LoginRequest){
             LoginRequest request = (LoginRequest)req;
-            String passwordHashed = Model.getPasswordHash(request.login);
-            if(passwordHashed.equals("")) {
-                if (request.source instanceof LoginPanel) {
-                    LoginPanel p = (LoginPanel) request.source;
-                    p.setErrorMessage("error_wrong_login");
+            try {
+                String passwordHashed = Model.getPasswordHash(request.login);
+                if(!verifyHash(new String(request.pass), passwordHashed)){
+                    if (request.source instanceof LoginPanel) {
+                        LoginPanel p = (LoginPanel) request.source;
+                        p.setErrorMessage("error_wrong_password");
+                    }
+                }
+                else{
+                    System.out.println("All correct");
                 }
             }
-            else if(!verifyHash(new String(request.pass), passwordHashed)){
-                if (request.source instanceof LoginPanel) {
-                    LoginPanel p = (LoginPanel) request.source;
-                    p.setErrorMessage("error_wrong_password");
+            catch (LoginPanelException e){
+                if(request.source instanceof LoginPanel){
+                    LoginPanel p = (LoginPanel)request.source;
+                    p.setErrorMessage(e.getMessage());
                 }
-            }
-            else{
-                System.out.println("All correct");
             }
         }
+
+
         else if(req instanceof NewUserRequest){
             NewUserRequest request = (NewUserRequest) req;
             String passwordHash = hash(new String(request.pass));
@@ -39,19 +44,15 @@ public class Controller implements RequestListener{
                 Model model = new Model(request.login, passwordHash, true);
                 System.out.println("Id: " + model.clientId);
             }
-            catch (SQLException e) {
-                if(request.source instanceof LoginPanel){
-                    LoginPanel p = (LoginPanel)request.source;
-                    if(e.getErrorCode() == 19){
-                        p.setErrorMessage("error_login_in_use");
-                    }
-                    else{
-                        p.setErrorMessage("error_unknown");
-                        e.printStackTrace();
-                    }
+            catch (LoginPanelException e) {
+                if(request.source instanceof NewUserPanel){
+                    NewUserPanel p = (NewUserPanel) request.source;
+                    p.setErrorMessage(e.getMessage());
                 }
             }
         }
+
+
         else{
             System.out.println("Unknown request");
         }
