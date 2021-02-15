@@ -6,8 +6,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
-public class LoginPanel extends JPanel implements ActionListener, LanguageListener{
+class LoginPanel extends JPanel implements ActionListener, LanguageListener, ErrorDisplaying{
 
     private final JTextField userName = new JTextField(20);
     private final JPasswordField pass = new JPasswordField(20);
@@ -20,16 +21,14 @@ public class LoginPanel extends JPanel implements ActionListener, LanguageListen
     private final Dimension txtFieldSize = new Dimension(100, 30);
     private final Dimension buttonSize = new Dimension(80, 40);
 
-    public LoginPanel() {
+    LoginPanel() {
 
         setTexts();
         I18n.addLanguageListener(this);
 
         double[] cols = {TableLayout.PREFERRED, TableLayout.PREFERRED};
         double[] rows = new double[7];
-        for(int i = 0; i < rows.length; i++){
-            rows[i] = TableLayout.PREFERRED;
-        }
+        Arrays.fill(rows, TableLayout.PREFERRED);
         TableLayout lay = new TableLayout(cols, rows);
         lay.setHGap(10);
         lay.setVGap(10);
@@ -71,6 +70,7 @@ public class LoginPanel extends JPanel implements ActionListener, LanguageListen
         this.repaint();
     }
 
+    @Override
     public void setErrorMessage(String errMsg){
         errorMessage.setText(I18n.getPhrase(errMsg));
         this.repaint();
@@ -84,7 +84,7 @@ public class LoginPanel extends JPanel implements ActionListener, LanguageListen
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource().equals(signIn)){
-            Comm.fireRequestEvent(new LoginRequest(userName.getText(), pass.getPassword(), this));
+            Comm.fireRequestEvent(new LoginRequest(userName.getText(), pass.getPassword()));
         }
         else if(e.getSource().equals(newUser)){
             AppWindow app = (AppWindow) this.getTopLevelAncestor();

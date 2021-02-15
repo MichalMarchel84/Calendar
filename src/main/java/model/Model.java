@@ -4,14 +4,12 @@ public class Model {
 
     public int clientId;
 
-    public Model(String login, String pass){
-
+    public Model(String login){
+        clientId = Dao.getUserId(login);
     }
 
-    public Model(String login, String pass, boolean newUser) throws LoginPanelException {
-        if(newUser){
-            clientId = Dao.addUser(login, pass);
-        }
+    public Model(String login, String pass) throws LoginPanelException {
+        clientId = Dao.addUser(login, pass);
     }
 
     public static void connectToDB(){

@@ -12,8 +12,7 @@ public class App {
     };
 
     public static void main(String[] args){
-        new AppWindow();
-        Controller controller = new Controller();
+        Controller controller = new Controller(new AppWindow());
         Comm.addRequestListener(controller);
         Model.connectToDB();
         Runtime.getRuntime().addShutdownHook(onExit);

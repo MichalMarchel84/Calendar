@@ -3,12 +3,15 @@ package controller;
 import model.LoginPanelException;
 import model.Model;
 import org.mindrot.jbcrypt.BCrypt;
-import view.LoginPanel;
-import view.NewUserPanel;
+import view.AppWindow;
 
 public class Controller implements RequestListener{
 
-    public Controller() {
+    Model model;
+    AppWindow window;
+
+    public Controller(AppWindow window) {
+        this.window = window;
     }
 
     @Override
@@ -19,20 +22,15 @@ public class Controller implements RequestListener{
             try {
                 String passwordHashed = Model.getPasswordHash(request.login);
                 if(!verifyHash(new String(request.pass), passwordHashed)){
-                    if (request.source instanceof LoginPanel) {
-                        LoginPanel p = (LoginPanel) request.source;
-                        p.setErrorMessage("error_wrong_password");
-                    }
+                    window.displayError("error_wrong_password");
                 }
                 else{
-                    System.out.println("All correct");
+                    model = new Model(request.login);
+                    window.displayPanel(AppWindow.panels.monthView);
                 }
             }
             catch (LoginPanelException e){
-                if(request.source instanceof LoginPanel){
-                    LoginPanel p = (LoginPanel)request.source;
-                    p.setErrorMessage(e.getMessage());
-                }
+                window.displayError(e.getMessage());
             }
         }
 
@@ -41,14 +39,11 @@ public class Controller implements RequestListener{
             NewUserRequest request = (NewUserRequest) req;
             String passwordHash = hash(new String(request.pass));
             try {
-                Model model = new Model(request.login, passwordHash, true);
-                System.out.println("Id: " + model.clientId);
+                model = new Model(request.login, passwordHash);
+                window.displayPanel(AppWindow.panels.monthView);
             }
             catch (LoginPanelException e) {
-                if(request.source instanceof NewUserPanel){
-                    NewUserPanel p = (NewUserPanel) request.source;
-                    p.setErrorMessage(e.getMessage());
-                }
+                window.displayError(e.getMessage());
             }
         }
 

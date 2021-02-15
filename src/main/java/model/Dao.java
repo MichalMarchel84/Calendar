@@ -51,20 +51,7 @@ class Dao {
                 throw new LoginPanelException("error_unknown");
             }
         }
-        sql = "SELECT client_id FROM clients WHERE login = ?";
-        int id = -1;
-        try {
-            PreparedStatement s = conn.prepareStatement(sql);
-            s.setString(1, login);
-            ResultSet res = s.executeQuery();
-            res.next();
-            id = res.getInt("client_id");
-        }
-        catch (SQLException e){
-            e.printStackTrace();
-            throw new LoginPanelException("error_unknown");
-        }
-        return id;
+        return Dao.getUserId(login);
     }
 
     static String getPasswordHash(String login) throws LoginPanelException {
@@ -86,5 +73,22 @@ class Dao {
             throw new LoginPanelException("error_unknown");
         }
         return hash;
+    }
+
+    static int getUserId(String login){
+        int id = -1;
+        String sql = "SELECT client_id FROM clients WHERE login=?";
+        try{
+            PreparedStatement s = conn.prepareStatement(sql);
+            s.setString(1, login);
+            ResultSet res = s.executeQuery();
+            if(res.next()){
+                id = res.getInt("client_id");
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return id;
     }
 }

@@ -7,8 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
-public class NewUserPanel extends JPanel implements LanguageListener, ActionListener {
+class NewUserPanel extends JPanel implements LanguageListener, ActionListener, ErrorDisplaying {
 
     private final JTextField userName = new JTextField(20);
     private final JPasswordField pass = new JPasswordField(20);
@@ -22,15 +23,13 @@ public class NewUserPanel extends JPanel implements LanguageListener, ActionList
     private final Dimension txtFieldSize = new Dimension(100, 30);
     private final Dimension buttonSize = new Dimension(80, 40);
 
-    public NewUserPanel() {
+    NewUserPanel() {
         setTexts();
         I18n.addLanguageListener(this);
 
         double[] cols = {TableLayout.PREFERRED, TableLayout.PREFERRED};
         double[] rows = new double[8];
-        for(int i = 0; i < rows.length; i++){
-            rows[i] = TableLayout.PREFERRED;
-        }
+        Arrays.fill(rows, TableLayout.PREFERRED);
         TableLayout lay = new TableLayout(cols, rows);
         lay.setHGap(10);
         lay.setVGap(10);
@@ -73,6 +72,7 @@ public class NewUserPanel extends JPanel implements LanguageListener, ActionList
         this.repaint();
     }
 
+    @Override
     public void setErrorMessage(String errMsg){
         errorMessage.setText(I18n.getPhrase(errMsg));
         this.repaint();
@@ -84,7 +84,7 @@ public class NewUserPanel extends JPanel implements LanguageListener, ActionList
             String p1 = new String(pass.getPassword());
             String p2 = new String(repeatPass.getPassword());
             if(p1.equals(p2)) {
-                Comm.fireRequestEvent(new NewUserRequest(userName.getText(), pass.getPassword(), this));
+                Comm.fireRequestEvent(new NewUserRequest(userName.getText(), pass.getPassword()));
             }
             else{
                 this.setErrorMessage("error_on_pass_set");

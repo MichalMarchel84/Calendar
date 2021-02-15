@@ -7,11 +7,13 @@ import java.awt.event.*;
 
 public class AppWindow extends JFrame implements ActionListener, LanguageListener{
 
-    public enum panels {login, newUser, monthView, dayView};
+    public enum panels {login, newUser, monthView, dayView}
     private JPanel onDisplay;
     JComboBox<String> languageSelection;
     LoginPanel login = new LoginPanel();
     NewUserPanel newUser = new NewUserPanel();
+    MonthViewPanel monthView = new MonthViewPanel();
+    DayViewPanel dayView = new DayViewPanel();
 
     public AppWindow() {
 
@@ -37,6 +39,7 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+
     }
 
     private static class FlagListRenderer extends DefaultListCellRenderer{
@@ -63,12 +66,28 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
             case newUser:
                 onDisplay = newUser;
                 break;
+            case dayView:
+                onDisplay = dayView;
+                break;
+            case monthView:
+                onDisplay = monthView;
+                break;
+            default:
+                onDisplay = login;
+                login.setErrorMessage("Unknown panel call");
         }
         this.add(onDisplay, "1 1");
         this.revalidate();
         this.repaint();
     }
 
+    public void displayError(String error){
+        if(onDisplay instanceof ErrorDisplaying){
+            ((ErrorDisplaying) onDisplay).setErrorMessage(error);
+        }
+    }
+
+    @Override
     public void actionPerformed(ActionEvent e){
         if(e.getSource().equals(languageSelection)){
             I18n.setLang(languageSelection.getSelectedIndex());
