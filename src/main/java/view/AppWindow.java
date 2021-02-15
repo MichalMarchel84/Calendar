@@ -17,11 +17,9 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
 
     public AppWindow() {
 
-        double[] mainCols = {TableLayout.FILL, TableLayout.PREFERRED, TableLayout.FILL};
-        double[] mainRows = {TableLayout.FILL, TableLayout.PREFERRED, TableLayout.FILL};
+        double[] mainCols = {TableLayout.FILL};
+        double[] mainRows = {30, TableLayout.FILL};
         TableLayout lay = new TableLayout(mainCols, mainRows);
-        lay.setVGap(10);
-        lay.setHGap(10);
         this.getContentPane().setLayout(lay);
 
         languageSelection = new JComboBox<>(I18n.getAvailableLangs());
@@ -31,11 +29,10 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
         I18n.addLanguageListener(this);
 
         this.displayPanel(panels.login);
-        this.add(languageSelection, "2 0 c c");
+        this.add(languageSelection, "0 0 r c");
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setPreferredSize(new Dimension(800, 600));
-        this.setMinimumSize(new Dimension(300, 600));
+        this.setMinimumSize(new Dimension(300, 500));
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
@@ -71,12 +68,14 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
                 break;
             case monthView:
                 onDisplay = monthView;
+                this.setSize(new Dimension(1000, 700));
+                this.setLocationRelativeTo(null);
                 break;
             default:
                 onDisplay = login;
                 login.setErrorMessage("Unknown panel call");
         }
-        this.add(onDisplay, "1 1");
+        this.add(onDisplay, "0 1 f f");
         this.revalidate();
         this.repaint();
     }

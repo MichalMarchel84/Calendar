@@ -19,16 +19,18 @@ class LoginPanel extends JPanel implements ActionListener, LanguageListener, Err
     private final JLabel pass_label = new JLabel();
     private final JLabel errorMessage = new JLabel();
     private final Dimension txtFieldSize = new Dimension(100, 30);
-    private final Dimension buttonSize = new Dimension(80, 40);
+    private final Dimension buttonSize = new Dimension(120, 40);
 
     LoginPanel() {
 
         setTexts();
         I18n.addLanguageListener(this);
 
-        double[] cols = {TableLayout.PREFERRED, TableLayout.PREFERRED};
-        double[] rows = new double[7];
+        double[] cols = {TableLayout.FILL, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.FILL};
+        double[] rows = new double[9];
         Arrays.fill(rows, TableLayout.PREFERRED);
+        rows[0] = TableLayout.FILL;
+        rows[8] = TableLayout.FILL;
         TableLayout lay = new TableLayout(cols, rows);
         lay.setHGap(10);
         lay.setVGap(10);
@@ -36,28 +38,28 @@ class LoginPanel extends JPanel implements ActionListener, LanguageListener, Err
 
         msg.setPreferredSize(new Dimension(200, 200));
         msg.setHorizontalAlignment(JLabel.CENTER);
-        this.add(msg, "0 0 1 0");
+        this.add(msg, "1 1 2 1");
 
-        this.add(username_label, "0 1 1 1");
+        this.add(username_label, "1 2 2 2 c c");
 
         userName.setPreferredSize(txtFieldSize);
-        this.add(userName, "0 2 1 2 c c");
+        this.add(userName, "1 3 2 3 c c");
 
-        this.add(pass_label, "0 3 1 3");
+        this.add(pass_label, "1 4 2 4 c c");
 
         pass.setPreferredSize(txtFieldSize);
-        this.add(pass, "0 4 1 4 c c");
+        this.add(pass, "1 5 2 5 c c");
 
         signIn.setPreferredSize(buttonSize);
         signIn.addActionListener(this);
-        this.add(signIn, "0 5");
+        this.add(signIn, "1 6 r c");
 
         newUser.setPreferredSize(buttonSize);
         newUser.addActionListener(this);
-        this.add(newUser, "1 5");
+        this.add(newUser, "2 6 l c");
 
         errorMessage.setForeground(Color.RED);
-        this.add(errorMessage, "0 6 1 6");
+        this.add(errorMessage, "1 7 2 7 c c");
     }
 
     private void setTexts(){
