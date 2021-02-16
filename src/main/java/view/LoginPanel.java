@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.Arrays;
 
 class LoginPanel extends JPanel implements ActionListener, LanguageListener, ErrorDisplaying{
@@ -60,6 +62,19 @@ class LoginPanel extends JPanel implements ActionListener, LanguageListener, Err
 
         errorMessage.setForeground(Color.RED);
         this.add(errorMessage, "1 7 2 7 c c");
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    Thread.sleep(300);
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+                userName.requestFocus();
+            }
+        });
     }
 
     private void setTexts(){

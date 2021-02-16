@@ -7,6 +7,8 @@ import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Locale;
 
 class MonthViewPanel extends JPanel implements LanguageListener{
 
@@ -58,12 +60,7 @@ class MonthViewPanel extends JPanel implements LanguageListener{
             lay.setVGap(vGap);
             lay.setHGap(hGap);
             content.setLayout(lay);
-            for (int i = 0; i < rows.length; i++) {
-                for (int j = 0; j < cols.length; j++) {
-                    JButton day = new JButton(Integer.toString(i * cols.length + j + 1));
-                    content.add(day, Integer.toString(j) + " " + Integer.toString(i) + " f f");
-                }
-            }
+            this.setContent(7);
             JScrollPane scroll = new JScrollPane(content);
             scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
             scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -71,8 +68,8 @@ class MonthViewPanel extends JPanel implements LanguageListener{
                 @Override
                 public void componentResized(ComponentEvent e) {
                     super.componentResized(e);
-                    content.setPreferredSize(new Dimension(e.getComponent().getWidth() - scroll.getVerticalScrollBar().getWidth(),
-                            e.getComponent().getHeight() * weeksInBuffer / weeksOnDisplay));
+                    content.setPreferredSize(new Dimension(scroll.getWidth() - scroll.getVerticalScrollBar().getWidth() - 2,
+                                                            (scroll.getHeight() * weeksInBuffer) / weeksOnDisplay));
                 }
             });
             return scroll;
@@ -97,6 +94,75 @@ class MonthViewPanel extends JPanel implements LanguageListener{
                 panel.add(daysOfWeekLabels[i], i + " 0 c c");
             }
             return panel;
+        }
+
+        void setContent(int weekOfYear){
+            content.removeAll();
+            int positionY = weeksInBuffer/2;
+            Calendar calendar = Calendar.getInstance(Locale.getDefault());
+            calendar.set(Calendar.WEEK_OF_YEAR, weekOfYear);
+            calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+            int startDay = calendar.get(Calendar.DAY_OF_MONTH);
+            int month = calendar.get(Calendar.MONTH);
+            int year = calendar.get(Calendar.YEAR);
+            int positionX = 0;
+            while(weeksInBuffer > positionY){
+                content.add(new JButton(Integer.toString(calendar.get(Calendar.DAY_OF_MONTH))), positionX + " " + positionY);
+                positionX++;
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                if(calendar.get(Calendar.MONTH) != month){
+                    if(calendar.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
+                        positionY += 2;
+                    }
+                    else{
+                        positionY += 1;
+                    }
+                    if(calendar.get(Calendar.YEAR) != year){
+                        month = 0;
+                        year++;
+                        content.add(new JLabel("======= " + year + " ======="), "0 " + (positionY - 1) + " 6 " + (positionY - 1) + " c c");
+                    }
+                    else {
+                        month++;
+                    }
+                }
+                if(positionX > 6){
+                    positionY++;
+                    positionX = 0;
+                }
+            }
+            calendar.set(Calendar.WEEK_OF_YEAR, weekOfYear);
+            calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+            calendar.add(Calendar.DAY_OF_MONTH, -1);
+            positionY = (weeksInBuffer/2) - 1;
+            positionX = 6;
+            month = calendar.get(Calendar.MONTH);
+            year = calendar.get(Calendar.YEAR);
+            while(positionY > -1){
+                content.add(new JButton(Integer.toString(calendar.get(Calendar.DAY_OF_MONTH))), positionX + " " + positionY);
+                positionX--;
+                calendar.add(Calendar.DAY_OF_MONTH, -1);
+                if(calendar.get(Calendar.MONTH) != month){
+                    if(calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+                        positionY -= 2;
+                    }
+                    else{
+                        positionY -= 1;
+                    }
+                    if(calendar.get(Calendar.YEAR) != year){
+                        month = 11;
+                        year--;
+                        content.add(new JLabel("======= " + year + " ======="), "0 " + (positionY + 1) + " 6 " + (positionY + 1) + " c c");
+                    }
+                    else {
+                        month--;
+                    }
+                }
+                if(positionX < 0){
+                    positionY--;
+                    positionX = 6;
+                }
+            }
         }
 
     }
