@@ -16,7 +16,7 @@ class MonthViewPanel extends JPanel implements LanguageListener{
     private JLabel daysOfWeekLabels[] = new JLabel[7];
     private static final int weeksInBuffer = 20;
     private static final int weeksOnDisplay = 6;
-    private final JPanel days = new DaysPanel();
+    private final DaysPanel days = new DaysPanel();
 
     MonthViewPanel(){
 
@@ -70,6 +70,13 @@ class MonthViewPanel extends JPanel implements LanguageListener{
                     super.componentResized(e);
                     content.setPreferredSize(new Dimension(scroll.getWidth() - scroll.getVerticalScrollBar().getWidth() - 2,
                                                             (scroll.getHeight() * weeksInBuffer) / weeksOnDisplay));
+                }
+            });
+            content.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    super.componentResized(e);
+                    days.setCenter();
                 }
             });
             return scroll;
@@ -165,6 +172,10 @@ class MonthViewPanel extends JPanel implements LanguageListener{
             }
         }
 
+        void setCenter(){
+            int h = (int)(content.getHeight() - scroll.getVisibleRect().getHeight())/2;
+            scroll.getVerticalScrollBar().setValue(h);
+        }
     }
 
     private void setTexts(){
