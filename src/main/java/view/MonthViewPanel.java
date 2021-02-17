@@ -63,7 +63,16 @@ class MonthViewPanel extends JPanel implements LanguageListener{
         double[] rows = new double[2*monthsInBuffer + 1];
         Arrays.fill(rows, TableLayout.PREFERRED);
         TableLayout lay = new TableLayout(cols, rows);
+        lay.setVGap(50);
         panel.setLayout(lay);
+        panel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
+                scroll.getVerticalScrollBar().setValue(sv);
+            }
+        });
         return panel;
     }
 

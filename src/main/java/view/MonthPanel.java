@@ -3,6 +3,7 @@ package view;
 import info.clearthought.layout.TableLayout;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -31,11 +32,19 @@ class MonthPanel extends JPanel {
         lay.setHGap(10);
         lay.setVGap(10);
         this.setLayout(lay);
+
+        int week = 0;
         while(calendar.get(Calendar.MONTH) == (m - 1)){
-            JButton b = new JButton(calendar.get(Calendar.DAY_OF_MONTH) + "." + (calendar.get(Calendar.MONTH) + 1) + "." + calendar.get(Calendar.YEAR));
+            JButton b = new JButton(Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));
             dayList.add(b);
-            this.add(b, getDayOfWeek(calendar) + " " + (calendar.get(Calendar.WEEK_OF_MONTH) - 1));
+            if(calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
+                b.setForeground(Color.RED);
+            }
+            this.add(b, getDayOfWeek(calendar) + " " + week + " f f");
             calendar.add(Calendar.DAY_OF_MONTH, 1);
+            if(calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY){
+                week++;
+            }
         }
     }
 
