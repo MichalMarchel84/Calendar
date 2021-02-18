@@ -21,7 +21,7 @@ class MonthPanel extends JPanel {
     MonthPanel(int m, int y) {
         this.month = m;
         this.year = y;
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, y);
         calendar.set(Calendar.MONTH, m - 1);
         calendar.set(Calendar.DAY_OF_MONTH, 1);
@@ -52,6 +52,13 @@ class MonthPanel extends JPanel {
             if(calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY){
                 week++;
             }
+        }
+        Calendar today = Calendar.getInstance();
+        int todayYear = today.get(Calendar.YEAR);
+        int todayMonth = today.get(Calendar.MONTH);
+        int todayDay = today.get(Calendar.DAY_OF_MONTH);
+        if((todayMonth + 1 == month) && (todayYear == year)){
+            dayList.get(todayDay - 1).setBorder(BorderFactory.createLineBorder(Color.RED, 5));
         }
 
         this.add(days, "1 0 f f");
@@ -84,11 +91,15 @@ class MonthPanel extends JPanel {
 
     int getWeeksInMonth(Calendar calendar){
         int num = 1;
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        num += calendar.get(Calendar.WEEK_OF_YEAR);
+        int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         calendar.set(Calendar.DAY_OF_MONTH, 1);
-        if(calendar.get(Calendar.MONTH) != Calendar.JANUARY){
-            num -= calendar.get(Calendar.WEEK_OF_YEAR);
+        int dayOfWeek = getDayOfWeek(calendar);
+        for(int i = 1; i < lastDay; i++){
+            dayOfWeek++;
+            if(dayOfWeek > 6){
+                dayOfWeek = 0;
+                num++;
+            }
         }
         return num;
     }

@@ -19,8 +19,9 @@ class MonthViewPanel extends JPanel implements LanguageListener{
     private final ArrayList<MonthPanel> monthList = new ArrayList<>();
 
     private final int monthsInBuffer = 3;   //amount before and after presented month (total 2*monthsInBuffer + 1)
-    private final int weeksOnDisplay = 6;
+    private final int weeksOnDisplay = 8;
     private final int gapBetweenMonths = 50;
+    private final int bufferUpdate = 2;     //amount of months buffer shifts when reach end
 
     MonthViewPanel(){
 
@@ -59,10 +60,10 @@ class MonthViewPanel extends JPanel implements LanguageListener{
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
                 if(e.getValue() == 0){
-                    changeBufferUp(2);
+                    changeBufferUp(bufferUpdate);
                 }
                 else if(e.getValue() == (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())){
-                    changeBufferDown(2);
+                    changeBufferDown(bufferUpdate);
                 }
             }
         });
@@ -106,7 +107,7 @@ class MonthViewPanel extends JPanel implements LanguageListener{
     void setContent(){
         content.removeAll();
         monthList.clear();
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MONTH, -monthsInBuffer);
         for(int i = 0; i < (2*monthsInBuffer + 1); i++){
             MonthPanel p = new MonthPanel(calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
@@ -114,11 +115,6 @@ class MonthViewPanel extends JPanel implements LanguageListener{
             content.add(p, "0 " + i + " f f");
             calendar.add(Calendar.MONTH, 1);
         }
-        monthList.get(monthsInBuffer)
-                    .getDayList()
-                    .get(Calendar.getInstance(Locale.getDefault())
-                    .get(Calendar.DAY_OF_MONTH) - 1)
-                    .setBorder(BorderFactory.createLineBorder(Color.RED, 5));
     }
 
     private void changeBufferUp(int val){
