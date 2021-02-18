@@ -62,7 +62,7 @@ class MonthPanel extends JPanel {
             @Override
             public void paintComponent(Graphics g){
                 Graphics2D g2d = (Graphics2D) g;
-                String txt = I18n.getPhrase(monthNames[month - 1]);
+                String txt = I18n.getPhrase(monthNames[month - 1]) + " " + year;
                 g2d.setFont(new Font(g2d.getFont().getName(), Font.BOLD, label.getWidth()/3));
                 g2d.rotate(-Math.PI/2);
                 int x = label.getHeight()/2 + g2d.getFontMetrics().stringWidth(txt)/2;
