@@ -4,8 +4,6 @@ import info.clearthought.layout.TableLayout;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -13,11 +11,11 @@ import java.util.Locale;
 
 class MonthPanel extends JPanel {
 
-    private int month;
-    private int year;
-    private int weeks;
-    private ArrayList<JButton> dayList = new ArrayList<>();
-    private JPanel label;
+    private final int month;
+    private final int year;
+    private final int weeks;
+    private final ArrayList<JButton> dayList = new ArrayList<>();
+    private final JPanel label;
     private static final String[] monthNames = {"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"};
 
     MonthPanel(int m, int y) {

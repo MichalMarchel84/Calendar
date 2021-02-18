@@ -3,7 +3,6 @@ package view;
 import info.clearthought.layout.TableLayout;
 
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ class MonthViewPanel extends JPanel implements LanguageListener{
 
     private static final String[] daysOfWeek=  {"mon", "tue", "wed", "thu", "fri", "sat", "sun"};
     private final ArrayList<JLabel> dayList = new ArrayList<>();
-    private final JPanel dayLabels = createDayLabels();
     private final JPanel content = createContent();
     private final JScrollPane scroll = createScrollPanel();
     private final ArrayList<MonthPanel> monthList = new ArrayList<>();
@@ -32,7 +30,7 @@ class MonthViewPanel extends JPanel implements LanguageListener{
         double[] rows = {30, TableLayout.FILL};
         this.setLayout(new TableLayout(cols, rows));
 
-        this.add(dayLabels, "0 0 f f");
+        this.add(createDayLabels(), "0 0 f f");
         this.add(scroll, "0 1");
         setContent();
     }
@@ -42,18 +40,30 @@ class MonthViewPanel extends JPanel implements LanguageListener{
         panel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         panel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         panel.getVerticalScrollBar().setUnitIncrement(10);
+        panel.getVerticalScrollBar().setValue(50);
         panel.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
-                int w = panel.getViewport().getWidth();
-                int h = panel.getViewport().getHeight()/weeksOnDisplay;
-                int totalRows = 0;
-                for(MonthPanel m : monthList){
-                    m.setPreferredSize(new Dimension(w, h*m.getWeeks()));
-                    totalRows += m.getWeeks();
+                resizeContent();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
+                        scroll.getVerticalScrollBar().setValue(sv);
+                    }
+                });
+            }
+        });
+        panel.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+            @Override
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                if(e.getValue() == 0){
+                    changeBufferUp(2);
                 }
-                content.setPreferredSize(new Dimension(w, totalRows*h + 2*monthsInBuffer*gapBetweenMonths));
+                else if(e.getValue() == (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())){
+                    changeBufferDown(2);
+                }
             }
         });
         return panel;
@@ -67,14 +77,6 @@ class MonthViewPanel extends JPanel implements LanguageListener{
         TableLayout lay = new TableLayout(cols, rows);
         lay.setVGap(gapBetweenMonths);
         panel.setLayout(lay);
-        panel.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                super.componentResized(e);
-                int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
-                scroll.getVerticalScrollBar().setValue(sv);
-            }
-        });
         return panel;
     }
 
@@ -102,6 +104,8 @@ class MonthViewPanel extends JPanel implements LanguageListener{
     }
 
     void setContent(){
+        content.removeAll();
+        monthList.clear();
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.add(Calendar.MONTH, -monthsInBuffer);
         for(int i = 0; i < (2*monthsInBuffer + 1); i++){
@@ -117,6 +121,68 @@ class MonthViewPanel extends JPanel implements LanguageListener{
                     .setBorder(BorderFactory.createLineBorder(Color.RED, 5));
     }
 
+    private void changeBufferUp(int val){
+        int month = monthList.get(0).getMonth();
+        int year = monthList.get(0).getYear();
+        for (int i = 0; i < val; i++){
+            month--;
+            if(month < 1){
+                month = 12;
+                year--;
+            }
+            monthList.add(0, new MonthPanel(month, year));
+            monthList.remove(monthList.size() - 1);
+        }
+        content.removeAll();
+        for(int i = 0; i < (2*monthsInBuffer + 1); i++){
+            content.add(monthList.get(i), "0 " + i + " f f");
+        }
+        resizeContent();
+        int offsetY = 0;
+        for (int i = 0; i < val; i++){
+            offsetY += monthList.get(i).getPreferredSize().getHeight();
+            offsetY += gapBetweenMonths;
+        }
+        scroll.getVerticalScrollBar().setValue(offsetY);
+    }
+
+    private void changeBufferDown(int val){
+        int month = monthList.get(monthList.size() - 1).getMonth();
+        int year = monthList.get(monthList.size() - 1).getYear();
+        for (int i = 0; i < val; i++){
+            month++;
+            if(month > 12){
+                month = 1;
+                year++;
+            }
+            monthList.add(new MonthPanel(month, year));
+            monthList.remove(0);
+        }
+        content.removeAll();
+        for(int i = 0; i < (2*monthsInBuffer + 1); i++){
+            content.add(monthList.get(i), "0 " + i + " f f");
+        }
+        resizeContent();
+        int offsetY = -gapBetweenMonths;
+        for(int i = 0; i < (monthList.size() - val); i++){
+            offsetY += monthList.get(i).getPreferredSize().getHeight();
+            offsetY += gapBetweenMonths;
+        }
+        offsetY -= scroll.getViewport().getHeight();
+        scroll.getVerticalScrollBar().setValue(offsetY);
+    }
+
+    private void resizeContent(){
+        int w = scroll.getViewport().getWidth();
+        int h = scroll.getViewport().getHeight()/weeksOnDisplay;
+        int totalRows = 0;
+        for(MonthPanel m : monthList){
+            m.setPreferredSize(new Dimension(w, h*m.getWeeks()));
+            totalRows += m.getWeeks();
+        }
+        content.setPreferredSize(new Dimension(w, totalRows*h + 2*monthsInBuffer*gapBetweenMonths));
+    }
+
     private void setTexts(){
         for (int i = 0; i < 7; i++){
             dayList.get(i).setText(I18n.getPhrase(daysOfWeek[i]));
@@ -125,7 +191,7 @@ class MonthViewPanel extends JPanel implements LanguageListener{
 
     @Override
     public void languageChanged() {
-        monthList.forEach((m) -> m.repaint());
+        monthList.forEach(Component::repaint);
         setTexts();
     }
 }
