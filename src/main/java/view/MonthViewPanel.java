@@ -96,6 +96,7 @@ class MonthViewPanel extends JPanel implements LanguageListener{
 
     @Override
     public void languageChanged() {
+        monthList.forEach((m) -> m.repaint());
         setTexts();
     }
 }
