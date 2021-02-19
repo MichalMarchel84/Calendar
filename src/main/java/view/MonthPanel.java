@@ -4,11 +4,13 @@ import info.clearthought.layout.TableLayout;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
-class MonthPanel extends JPanel {
+class MonthPanel extends JPanel implements ActionListener {
 
     private final int month;
     private final int year;
@@ -42,6 +44,7 @@ class MonthPanel extends JPanel {
         int week = 0;
         while(calendar.get(Calendar.MONTH) == (m - 1)){
             JButton b = new JButton(Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));
+            b.addActionListener(this);
             dayList.add(b);
             if(calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
                 b.setForeground(Color.RED);
@@ -117,5 +120,15 @@ class MonthPanel extends JPanel {
 
     public ArrayList<JButton> getDayList() {
         return dayList;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        AppWindow app = (AppWindow) this.getTopLevelAncestor();
+        JButton b = (JButton) e.getSource();
+        int d = Integer.parseInt(b.getText());
+        System.out.println(d);
+        //app.displayPanel(AppWindow.panels.dayView);
+
     }
 }

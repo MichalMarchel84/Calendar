@@ -29,8 +29,8 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
         I18n.addLanguageListener(this);
 
         this.add(languageSelection, "0 0 r c");
-        //this.displayPanel(panels.login);
-        this.displayPanel(panels.monthView);
+        this.displayPanel(panels.login);
+        //this.displayPanel(panels.dayView);
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setMinimumSize(new Dimension(300, 500));
