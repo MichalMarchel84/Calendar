@@ -5,6 +5,7 @@ import info.clearthought.layout.TableLayout;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -100,26 +101,17 @@ class MonthViewPanel extends JPanel implements LanguageListener{
     void setContent(){
         content.removeAll();
         monthList.clear();
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, -monthsInBuffer);
         for(int i = 0; i < (2*monthsInBuffer + 1); i++){
-            MonthPanel p = new MonthPanel(calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
+            MonthPanel p = new MonthPanel(LocalDate.now().minusMonths(monthsInBuffer - i));
             monthList.add(p);
             content.add(p, "0 " + i + " f f");
-            calendar.add(Calendar.MONTH, 1);
         }
     }
 
     private void changeBufferUp(){
-        int month = monthList.get(0).getMonth();
-        int year = monthList.get(0).getYear();
+        LocalDate date = monthList.get(0).getDate();
         for (int i = 0; i < bufferUpdate; i++){
-            month--;
-            if(month < 1){
-                month = 12;
-                year--;
-            }
-            monthList.add(0, new MonthPanel(month, year));
+            monthList.add(0, new MonthPanel(date.minusMonths(i + 1)));
             monthList.remove(monthList.size() - 1);
         }
         content.removeAll();
@@ -136,15 +128,9 @@ class MonthViewPanel extends JPanel implements LanguageListener{
     }
 
     private void changeBufferDown(){
-        int month = monthList.get(monthList.size() - 1).getMonth();
-        int year = monthList.get(monthList.size() - 1).getYear();
+        LocalDate date = monthList.get(monthList.size() - 1).getDate();
         for (int i = 0; i < bufferUpdate; i++){
-            month++;
-            if(month > 12){
-                month = 1;
-                year++;
-            }
-            monthList.add(new MonthPanel(month, year));
+            monthList.add(new MonthPanel(date.plusMonths(i + 1)));
             monthList.remove(0);
         }
         content.removeAll();

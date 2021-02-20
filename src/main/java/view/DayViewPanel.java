@@ -18,6 +18,9 @@ class DayViewPanel extends JPanel implements LanguageListener{
     private final JScrollPane scroll = createScroll();
 
     DayViewPanel(){
+
+        I18n.addLanguageListener(this);
+
         this.setLayout(new BorderLayout());
         this.add(scroll, BorderLayout.CENTER);
         SwingUtilities.invokeLater(new Runnable() {
@@ -38,11 +41,9 @@ class DayViewPanel extends JPanel implements LanguageListener{
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
                 resizeContent();
-                SwingUtilities.invokeLater(() -> {
-                    int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
-                    scroll.getVerticalScrollBar().setValue(sv);
-                    resizeContent();
-                });
+                int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
+                scroll.getVerticalScrollBar().setValue(sv);
+                resizeContent();
             }
         });
 
@@ -75,6 +76,21 @@ class DayViewPanel extends JPanel implements LanguageListener{
         int w = scroll.getViewport().getWidth();
         double h = scroll.getViewport().getHeight()/hoursOnDisplay;
         content.setPreferredSize(new Dimension(w, (int)(24*(2*DayPanel.daysInBuffer + 1)*h)));
+    }
+
+    void setDate(LocalDate date){
+        Thread t = new Thread(() -> {
+            try {
+                Thread.sleep(100);
+                content.setDate(date);
+                int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
+                scroll.getVerticalScrollBar().setValue(sv);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+        t.start();
     }
 
     @Override

@@ -6,25 +6,24 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
 class MonthPanel extends JPanel implements ActionListener {
 
-    private final int month;
-    private final int year;
+    private LocalDate date;
     private final int weeks;
     private final ArrayList<JButton> dayList = new ArrayList<>();
     private final JPanel label;
     private static final String[] monthNames = {"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"};
 
-    MonthPanel(int m, int y) {
-        this.month = m;
-        this.year = y;
+    MonthPanel(LocalDate date) {
+        this.date = date;
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, y);
-        calendar.set(Calendar.MONTH, m - 1);
+        calendar.set(Calendar.YEAR, date.getYear());
+        calendar.set(Calendar.MONTH, date.getMonthValue() - 1);
         calendar.set(Calendar.DAY_OF_MONTH, 1);
         weeks = getWeeksInMonth(calendar);
         double[] c = {0.1, TableLayout.FILL};
@@ -42,7 +41,7 @@ class MonthPanel extends JPanel implements ActionListener {
         days.setLayout(lay);
 
         int week = 0;
-        while(calendar.get(Calendar.MONTH) == (m - 1)){
+        while(calendar.get(Calendar.MONTH) == (date.getMonthValue() - 1)){
             JButton b = new JButton(Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));
             b.addActionListener(this);
             dayList.add(b);
@@ -59,7 +58,7 @@ class MonthPanel extends JPanel implements ActionListener {
         int todayYear = today.get(Calendar.YEAR);
         int todayMonth = today.get(Calendar.MONTH);
         int todayDay = today.get(Calendar.DAY_OF_MONTH);
-        if((todayMonth + 1 == month) && (todayYear == year)){
+        if((todayMonth + 1 == date.getMonthValue()) && (todayYear == date.getYear())){
             dayList.get(todayDay - 1).setBorder(BorderFactory.createLineBorder(Color.RED, 5));
         }
 
@@ -69,7 +68,7 @@ class MonthPanel extends JPanel implements ActionListener {
             @Override
             public void paintComponent(Graphics g){
                 Graphics2D g2d = (Graphics2D) g;
-                String txt = I18n.getPhrase(monthNames[month - 1]) + " " + year;
+                String txt = I18n.getPhrase(monthNames[date.getMonthValue() - 1]) + " " + date.getYear();
                 g2d.setFont(new Font(g2d.getFont().getName(), Font.BOLD, label.getWidth()/3));
                 g2d.rotate(-Math.PI/2);
                 int x = label.getHeight()/2 + g2d.getFontMetrics().stringWidth(txt)/2;
@@ -105,13 +104,8 @@ class MonthPanel extends JPanel implements ActionListener {
         }
         return num;
     }
-
-    public int getMonth() {
-        return month;
-    }
-
-    public int getYear() {
-        return year;
+    public LocalDate getDate(){
+        return date;
     }
 
     public int getWeeks() {
@@ -127,8 +121,7 @@ class MonthPanel extends JPanel implements ActionListener {
         AppWindow app = (AppWindow) this.getTopLevelAncestor();
         JButton b = (JButton) e.getSource();
         int d = Integer.parseInt(b.getText());
-        System.out.println(d);
-        //app.displayPanel(AppWindow.panels.dayView);
-
+        app.displayPanel(AppWindow.panels.dayView);
+        app.dayView.setDate(date.withDayOfMonth(Integer.parseInt(b.getText())));
     }
 }
