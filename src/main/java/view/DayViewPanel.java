@@ -1,13 +1,9 @@
 package view;
 
-import info.clearthought.layout.TableLayout;
-
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.time.LocalDate;
@@ -71,15 +67,12 @@ class DayViewPanel extends JPanel implements LanguageListener{
             }
         });
 
-        scroll.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
-            @Override
-            public void adjustmentValueChanged(AdjustmentEvent e) {
-                if(!inhibit) {
-                    if (e.getValue() == 0) {
-                        changeBufferUp();
-                    } else if (e.getValue() == (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())) {
-                        changeBufferDown();
-                    }
+        scroll.getVerticalScrollBar().addAdjustmentListener(e -> {
+            if(!inhibit) {
+                if (e.getValue() == 0) {
+                    changeBufferUp();
+                } else if (e.getValue() == (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())) {
+                    changeBufferDown();
                 }
             }
         });
@@ -99,7 +92,7 @@ class DayViewPanel extends JPanel implements LanguageListener{
 
     private void resizeContent(){
         int w = scroll.getViewport().getWidth();
-        double h = scroll.getViewport().getHeight()/hoursOnDisplay;
+        double h = (double) scroll.getViewport().getHeight()/hoursOnDisplay;
         content.setPreferredSize(new Dimension(w, (int)(24*(2*DayPanel.daysInBuffer + 1)*h)));
     }
 

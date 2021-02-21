@@ -13,7 +13,7 @@ import java.util.Calendar;
 
 class MonthPanel extends JPanel implements ActionListener {
 
-    private LocalDate date;
+    private final LocalDate date;
     private final int weeks;
     private final ArrayList<JButton> dayList = new ArrayList<>();
     private final JPanel label;
@@ -120,7 +120,6 @@ class MonthPanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         AppWindow app = (AppWindow) this.getTopLevelAncestor();
         JButton b = (JButton) e.getSource();
-        int d = Integer.parseInt(b.getText());
         app.displayPanel(AppWindow.panels.dayView);
         app.dayView.setDate(date.withDayOfMonth(Integer.parseInt(b.getText())));
     }

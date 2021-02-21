@@ -8,7 +8,6 @@ import java.awt.event.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 
 class MonthViewPanel extends JPanel implements LanguageListener{
 
@@ -17,6 +16,7 @@ class MonthViewPanel extends JPanel implements LanguageListener{
     private final JPanel content = createContent();
     private final JScrollPane scroll = createScrollPanel();
     private final ArrayList<MonthPanel> monthList = new ArrayList<>();
+    boolean inhibit = true;
 
     private final int monthsInBuffer = 3;   //amount before and after presented month (total 2*monthsInBuffer + 1)
     private final int weeksOnDisplay = 8;
@@ -47,18 +47,16 @@ class MonthViewPanel extends JPanel implements LanguageListener{
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
                 resizeContent();
-                SwingUtilities.invokeLater(() -> {
-                    int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
-                    scroll.getVerticalScrollBar().setValue(sv);
-                });
+                centerContent();
             }
         });
         panel.getVerticalScrollBar().addAdjustmentListener(e -> {
-            if(e.getValue() == 0){
-                changeBufferUp();
-            }
-            else if(e.getValue() == (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())){
-                changeBufferDown();
+            if(!inhibit) {
+                if (e.getValue() == 0) {
+                    changeBufferUp();
+                } else if (e.getValue() == (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())) {
+                    changeBufferDown();
+                }
             }
         });
         return panel;
@@ -106,6 +104,7 @@ class MonthViewPanel extends JPanel implements LanguageListener{
             monthList.add(p);
             content.add(p, "0 " + i + " f f");
         }
+        resizeContent();
     }
 
     private void changeBufferUp(){
@@ -156,6 +155,11 @@ class MonthViewPanel extends JPanel implements LanguageListener{
             totalRows += m.getWeeks();
         }
         content.setPreferredSize(new Dimension(w, totalRows*h + 2*monthsInBuffer*gapBetweenMonths));
+    }
+
+    void centerContent(){
+        int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
+        scroll.getVerticalScrollBar().setValue(sv);
     }
 
     private void setTexts(){

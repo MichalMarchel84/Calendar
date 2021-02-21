@@ -5,7 +5,6 @@ import javax.swing.*;
 import javax.swing.plaf.basic.BasicArrowButton;
 import java.awt.*;
 import java.awt.event.*;
-import java.time.LocalDate;
 
 public class AppWindow extends JFrame implements ActionListener, LanguageListener{
 
@@ -17,6 +16,7 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
     private final MonthViewPanel monthView = new MonthViewPanel();
     final DayViewPanel dayView = new DayViewPanel();
     private final JButton returnButton = new BasicArrowButton(BasicArrowButton.WEST);
+    private final JButton logout = new JButton(I18n.getPhrase("logout"));
     private final JPanel topMenu = new JPanel();
 
     public AppWindow() {
@@ -32,15 +32,15 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
         languageSelection.addActionListener(this);
         I18n.addLanguageListener(this);
 
-        double[] cols = {0.2, TableLayout.FILL, TableLayout.PREFERRED};
+        double[] cols = {0.2, TableLayout.FILL, 0.2, TableLayout.PREFERRED};
         double[] rows = {TableLayout.FILL};
         topMenu.setLayout(new TableLayout(cols, rows));
         returnButton.addActionListener(this);
-        topMenu.add(languageSelection, "2 0 c c");
+        logout.addActionListener(this);
+        topMenu.add(languageSelection, "3 0 c c");
 
         this.add(topMenu, "0 0 f f");
         this.displayPanel(panels.login);
-        //this.displayPanel(panels.monthView);
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setMinimumSize(new Dimension(300, 500));
@@ -62,6 +62,23 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
         }
     }
 
+    public void login(){
+        monthView.inhibit = true;
+        monthView.setContent();
+        displayPanel(panels.monthView);
+        Thread t = new Thread(() -> {
+            try {
+                Thread.sleep(200);
+                monthView.centerContent();
+                monthView.inhibit = false;
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+        t.start();
+    }
+
     public void displayPanel(panels panelName){
         if(onDisplay != null){
             this.remove(onDisplay);
@@ -69,6 +86,8 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
         switch (panelName){
             case login:
                 onDisplay = login;
+                this.setSize(new Dimension(300, 500));
+                this.setLocationRelativeTo(null);
                 break;
             case newUser:
                 onDisplay = newUser;
@@ -79,6 +98,7 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
                 break;
             case monthView:
                 onDisplay = monthView;
+                topMenu.add(logout, "2 0 f f");
                 this.setSize(new Dimension(1000, 700));
                 this.setLocationRelativeTo(null);
                 break;
@@ -106,10 +126,15 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
             displayPanel(panels.monthView);
             topMenu.remove(returnButton);
         }
+        else if(e.getSource().equals(logout)){
+            displayPanel(panels.login);
+            topMenu.remove(logout);
+            topMenu.remove(returnButton);
+        }
     }
 
     @Override
     public void languageChanged() {
-        //this.repaint();
+        logout.setText(I18n.getPhrase("logout"));
     }
 }

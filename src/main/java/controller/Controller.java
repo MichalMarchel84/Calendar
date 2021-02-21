@@ -26,7 +26,7 @@ public class Controller implements RequestListener{
                 }
                 else{
                     model = new Model(request.login);
-                    window.displayPanel(AppWindow.panels.monthView);
+                    window.login();
                 }
             }
             catch (LoginPanelException e){
