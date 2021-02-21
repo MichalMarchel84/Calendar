@@ -3,6 +3,8 @@ package view;
 import info.clearthought.layout.TableLayout;
 
 import javax.swing.*;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
@@ -11,6 +13,8 @@ import java.awt.event.ComponentEvent;
 import java.time.LocalDate;
 
 class DayViewPanel extends JPanel implements LanguageListener{
+
+    private boolean inhibit = true;
 
     private static final int hoursOnDisplay = 12;
     private static final int bufferUpdate = 2;
@@ -23,10 +27,31 @@ class DayViewPanel extends JPanel implements LanguageListener{
 
         this.setLayout(new BorderLayout());
         this.add(scroll, BorderLayout.CENTER);
-        SwingUtilities.invokeLater(new Runnable() {
+        this.addAncestorListener(new AncestorListener() {
             @Override
-            public void run() {
-                content.setDate(LocalDate.now());
+            public void ancestorAdded(AncestorEvent event) {
+                Thread t = new Thread(() -> {
+                    try {
+                        Thread.sleep(200);
+                        int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
+                        scroll.getVerticalScrollBar().setValue(sv);
+                        inhibit = false;
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
+                });
+                t.start();
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                inhibit = true;
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {
+
             }
         });
     }
@@ -43,18 +68,18 @@ class DayViewPanel extends JPanel implements LanguageListener{
                 resizeContent();
                 int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
                 scroll.getVerticalScrollBar().setValue(sv);
-                resizeContent();
             }
         });
 
         scroll.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
-                if(e.getValue() == 0){
-                    changeBufferUp();
-                }
-                else if(e.getValue() == (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())){
-                    changeBufferDown();
+                if(!inhibit) {
+                    if (e.getValue() == 0) {
+                        changeBufferUp();
+                    } else if (e.getValue() == (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())) {
+                        changeBufferDown();
+                    }
                 }
             }
         });
@@ -79,18 +104,9 @@ class DayViewPanel extends JPanel implements LanguageListener{
     }
 
     void setDate(LocalDate date){
-        Thread t = new Thread(() -> {
-            try {
-                Thread.sleep(100);
-                content.setDate(date);
-                int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
-                scroll.getVerticalScrollBar().setValue(sv);
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-        });
-        t.start();
+        content.setDate(date);
+        int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
+        scroll.getVerticalScrollBar().setValue(sv);
     }
 
     @Override
