@@ -9,13 +9,14 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
-class DayPanel extends JPanel {
+class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
 
     private LocalDateTime time;
 
     static final int daysInBuffer = 2;
 
     private ArrayList<Reminder> reminders = new ArrayList<>();
+    private JPanel selected = null;
 
     private static final double timelineOffset = 0.15;
     private static final double timelineWidth = 0.07;
@@ -25,22 +26,15 @@ class DayPanel extends JPanel {
 
     DayPanel(){
         setDate(LocalDate.now());
-        this.addMouseListener(ml);
+        this.addMouseListener(this);
+        this.addMouseMotionListener(this);
         this.setLayout(null);
 
-        reminders.add(new Reminder(time.plusHours(3)));
-        reminders.add(new Reminder(time.plusHours(12)));
-        for (Reminder r : reminders){
-            this.add(r);
-        }
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
-                for(Reminder r : reminders){
-                    r.setSize(new Dimension((int) (DayPanel.super.getWidth()*timelineWidth) + 20, 20));
-                    r.setLocation((int)(DayPanel.super.getWidth()*timelineOffset), positionOf(r.getTime()) - r.getHeight()/2);
-                }
+                resize();
             }
         });
     }
@@ -53,6 +47,7 @@ class DayPanel extends JPanel {
 
     void moveBuffer(int val){
         time = time.plusDays(val);
+        updatePositions();
         this.repaint();
     }
 
@@ -68,25 +63,55 @@ class DayPanel extends JPanel {
         return res;
     }
 
+    private void resize(){
+        for(Reminder r : reminders){
+            r.setSize(new Dimension((int) (DayPanel.super.getWidth()*timelineWidth) + 20, 20));
+            r.setLocation((int)(DayPanel.super.getWidth()*timelineOffset), positionOf(r.getTime()) - r.getHeight()/2);
+        }
+    }
+
+    private void updatePositions(){
+        for(Reminder r : reminders){
+            r.setLocation(r.getX(), positionOf(r.getTime()) - r.getHeight()/2);
+        }
+    }
+
+    private void setPosition(Reminder r, int y){
+        r.setTime(timeOf(y));
+        r.setLocation(r.getX(), y - r.getHeight()/2);
+    }
+
     MouseListener ml = new MouseAdapter() {
 
         int y;
+        Component c;
 
         @Override
         public void mousePressed(MouseEvent e) {
             super.mousePressed(e);
             y = e.getY();
+            c = DayPanel.super.getComponentAt(e.getPoint());
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
             super.mouseReleased(e);
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-            if(Math.abs(y - e.getY()) < 2) {
-                System.out.println("reminder, time: " + timeOf(y).format(dtf));
+            if(c instanceof Reminder){
+                Reminder r = (Reminder) c;
+                r.setTime(timeOf(e.getY()));
+                r.setLocation(r.getX(), positionOf(r.getTime()) - r.getHeight() / 2);
             }
-            else{
-                System.out.println("event, from: " + timeOf(y).format(dtf) + " to: " + timeOf(e.getY()).format(dtf));
+            else {
+                if (Math.abs(y - e.getY()) < 2) {
+                    Reminder r = new Reminder(timeOf(y));
+                    reminders.add(r);
+                    DayPanel.super.add(r);
+                    r.setSize(new Dimension((int) (DayPanel.super.getWidth() * timelineWidth) + 20, 20));
+                    r.setLocation((int) (DayPanel.super.getWidth() * timelineOffset), positionOf(r.getTime()) - r.getHeight() / 2);
+                } else {
+                    System.out.println("event, from: " + timeOf(y).format(dtf) + " to: " + timeOf(e.getY()).format(dtf));
+                }
             }
         }
     };
@@ -150,5 +175,53 @@ class DayPanel extends JPanel {
             g2d.drawString(dow, -x - (int)(12 * hourHeight) - g2d.getFontMetrics().stringWidth(dow)/2, g2d.getFontMetrics().getAscent());
         }
         g2d.rotate(Math.PI/2);
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        Component c = this.getComponentAt(e.getPoint());
+        if(c instanceof DayPanel) {
+            Reminder r = new Reminder(timeOf(e.getY()));
+            reminders.add(r);
+            this.add(r);
+            r.setSize(new Dimension((int) (DayPanel.super.getWidth() * timelineWidth) + 20, 20));
+            r.setLocation((int) (DayPanel.super.getWidth() * timelineOffset), positionOf(r.getTime()) - r.getHeight() / 2);
+        }
+        else{
+            System.out.println("On component");
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        selected = (JPanel) this.getComponentAt(e.getPoint());
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        if(selected instanceof Reminder){
+            Reminder r = (Reminder) selected;
+            setPosition(r, e.getY());
+        }
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+
     }
 }
