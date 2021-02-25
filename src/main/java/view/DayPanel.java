@@ -2,15 +2,20 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 
 class DayPanel extends JPanel {
 
     private LocalDateTime time;
 
     static final int daysInBuffer = 2;
+
+    private ArrayList<Reminder> reminders = new ArrayList<>();
 
     private static final double timelineOffset = 0.15;
     private static final double timelineWidth = 0.07;
@@ -19,7 +24,25 @@ class DayPanel extends JPanel {
     private static final int auxLineThickness = 1;
 
     DayPanel(){
-        setDate(LocalDate.now().minusYears(5));
+        setDate(LocalDate.now());
+        this.addMouseListener(ml);
+        this.setLayout(null);
+
+        reminders.add(new Reminder(time.plusHours(3)));
+        reminders.add(new Reminder(time.plusHours(12)));
+        for (Reminder r : reminders){
+            this.add(r);
+        }
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                for(Reminder r : reminders){
+                    r.setSize(new Dimension((int) (DayPanel.super.getWidth()*timelineWidth) + 20, 20));
+                    r.setLocation((int)(DayPanel.super.getWidth()*timelineOffset), positionOf(r.getTime()) - r.getHeight()/2);
+                }
+            }
+        });
     }
 
     void setDate(LocalDate time){
@@ -29,10 +52,44 @@ class DayPanel extends JPanel {
     }
 
     void moveBuffer(int val){
-
         time = time.plusDays(val);
         this.repaint();
     }
+
+    LocalDateTime timeOf(int y){
+        int min = (int)((double)(2*daysInBuffer + 1)*1440*y/this.getHeight());
+        LocalDateTime t = time.plusMinutes(min);
+        return t;
+    }
+
+    int positionOf(LocalDateTime t){
+        long min = time.until(t, ChronoUnit.MINUTES);
+        int res = (int)((double)min*this.getHeight()/((2*daysInBuffer + 1)*1440));
+        return res;
+    }
+
+    MouseListener ml = new MouseAdapter() {
+
+        int y;
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            super.mousePressed(e);
+            y = e.getY();
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            super.mouseReleased(e);
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+            if(Math.abs(y - e.getY()) < 2) {
+                System.out.println("reminder, time: " + timeOf(y).format(dtf));
+            }
+            else{
+                System.out.println("event, from: " + timeOf(y).format(dtf) + " to: " + timeOf(e.getY()).format(dtf));
+            }
+        }
+    };
 
     @Override
     public void paintComponent(Graphics g){
