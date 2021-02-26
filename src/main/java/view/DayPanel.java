@@ -16,7 +16,10 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     static final int daysInBuffer = 2;
 
     private ArrayList<Reminder> reminders = new ArrayList<>();
+    private ArrayList<Event> events = new ArrayList<>();
     private JPanel selected = null;
+    private int startPoint = 0;
+    private int endPoint = -1;
 
     private static final double timelineOffset = 0.15;
     private static final double timelineWidth = 0.07;
@@ -68,11 +71,18 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
             r.setSize(new Dimension((int) (DayPanel.super.getWidth()*timelineWidth) + 20, 20));
             r.setLocation((int)(DayPanel.super.getWidth()*timelineOffset), positionOf(r.getTime()) - r.getHeight()/2);
         }
+        for(Event e : events){
+            e.setSize(new Dimension((int) (this.getWidth() * timelineWidth), positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
+            e.setLocation((int) (this.getWidth() * timelineOffset), positionOf(e.getTimeStart()));
+        }
     }
 
     private void updatePositions(){
         for(Reminder r : reminders){
             r.setLocation(r.getX(), positionOf(r.getTime()) - r.getHeight()/2);
+        }
+        for(Event e : events){
+            e.setLocation(e.getX(), positionOf(e.getTimeStart()));
         }
     }
 
@@ -81,52 +91,42 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         r.setLocation(r.getX(), y - r.getHeight()/2);
     }
 
-    MouseListener ml = new MouseAdapter() {
+    private void addReminder(int y){
+        Reminder r = new Reminder(timeOf(y));
+        reminders.add(r);
+        this.add(r);
+        r.setSize(new Dimension((int) (this.getWidth() * timelineWidth) + 20, 20));
+        r.setLocation((int) (this.getWidth() * timelineOffset), positionOf(r.getTime()) - r.getHeight() / 2);
+    }
 
-        int y;
-        Component c;
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            super.mousePressed(e);
-            y = e.getY();
-            c = DayPanel.super.getComponentAt(e.getPoint());
+    private void addEvent(int y1, int y2){
+        Event e;
+        if(y1 < y2){
+            e = new Event(timeOf(y1), timeOf(y2));
         }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            super.mouseReleased(e);
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-            if(c instanceof Reminder){
-                Reminder r = (Reminder) c;
-                r.setTime(timeOf(e.getY()));
-                r.setLocation(r.getX(), positionOf(r.getTime()) - r.getHeight() / 2);
-            }
-            else {
-                if (Math.abs(y - e.getY()) < 2) {
-                    Reminder r = new Reminder(timeOf(y));
-                    reminders.add(r);
-                    DayPanel.super.add(r);
-                    r.setSize(new Dimension((int) (DayPanel.super.getWidth() * timelineWidth) + 20, 20));
-                    r.setLocation((int) (DayPanel.super.getWidth() * timelineOffset), positionOf(r.getTime()) - r.getHeight() / 2);
-                } else {
-                    System.out.println("event, from: " + timeOf(y).format(dtf) + " to: " + timeOf(e.getY()).format(dtf));
-                }
-            }
+        else {
+            e = new Event(timeOf(y2), timeOf(y1));
         }
-    };
+        events.add(e);
+        this.add(e);
+        e.setSize(new Dimension((int) (this.getWidth() * timelineWidth), positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
+        if(y1 > y2){
+            y1 = y2;
+        }
+        e.setLocation((int) (this.getWidth() * timelineOffset), y1);
+    }
 
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
+        int xTimelineStart = (int)(this.getWidth()*timelineOffset);
+        int xTimelineEnd = (int)(this.getWidth()*(timelineOffset + timelineWidth));
         Graphics2D g2d = (Graphics2D) g;
         //vertical left line
         g2d.setStroke(new BasicStroke(4));
-        g2d.drawLine((int)(this.getWidth()*timelineOffset), 0,
-                        (int)(this.getWidth()*timelineOffset), this.getHeight());
+        g2d.drawLine(xTimelineStart, 0, xTimelineStart, this.getHeight());
         //vertical right line
-        g2d.drawLine((int)(this.getWidth()*(timelineOffset + timelineWidth)), 0,
-                        (int)(this.getWidth()*(timelineOffset + timelineWidth)), this.getHeight());
+        g2d.drawLine(xTimelineEnd, 0, xTimelineEnd, this.getHeight());
 
         double hourHeight = (double) this.getHeight()/(24*(2*daysInBuffer + 1));
         DateTimeFormatter dtm = DateTimeFormatter.ofPattern("HH:mm");
@@ -134,20 +134,18 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         for(int i = 0; i < (24*(2*daysInBuffer + 1)); i++){
             //horizontal main lines
             g2d.setStroke(new BasicStroke(mainLineThickness));
-            g2d.drawLine((int)(this.getWidth()*timelineOffset), (int)(i*hourHeight),
-                        (int)(this.getWidth()*(timelineOffset + timelineWidth)), (int)(i*hourHeight));
+            g2d.drawLine(xTimelineStart, (int)(i*hourHeight), xTimelineEnd, (int)(i*hourHeight));
             //auxiliary lines
             g2d.setStroke(new BasicStroke(auxLineThickness));
             for(int j = 1; j < 4; j++){
                 int y1 = (int) (i * hourHeight + j * hourHeight / 4);
-                g2d.drawLine((int)(this.getWidth()*timelineOffset), y1,
-                        (int)(this.getWidth()*(timelineOffset + timelineWidth)), y1);
+                g2d.drawLine(xTimelineStart, y1, xTimelineEnd, y1);
             }
             //time labels
             String t = time.plusHours(i).format(dtm);
             g2d.setFont(new Font(g2d.getFont().getName(), Font.BOLD, (int) (this.getVisibleRect().getHeight()*fontSize)));
             g2d.drawString(t,
-                    (int)(this.getWidth()*timelineOffset) - g2d.getFontMetrics().stringWidth(t) - 5,
+                    xTimelineStart - g2d.getFontMetrics().stringWidth(t) - 5,
                     (int)((i*hourHeight) + 0.75*g2d.getFontMetrics().getAscent()/2));
         }
         //day separators
@@ -158,7 +156,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
             g2d.drawLine(0, y1,
                     (int)(this.getWidth() * timelineOffset * 0.9 - g2d.getFontMetrics().stringWidth(time.format(dtm))), y1);
             //right horizontal line
-            g2d.drawLine((int)(this.getWidth() * (timelineOffset + timelineWidth)), y1, this.getWidth(), y1);
+            g2d.drawLine(xTimelineEnd, y1, this.getWidth(), y1);
         }
         //day labels
         g2d.rotate(-Math.PI/2);
@@ -175,17 +173,23 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
             g2d.drawString(dow, -x - (int)(12 * hourHeight) - g2d.getFontMetrics().stringWidth(dow)/2, g2d.getFontMetrics().getAscent());
         }
         g2d.rotate(Math.PI/2);
+        //draw selected area
+        if(endPoint > -1){
+            g2d.setColor(new Color(0, 0, 255, 100));
+            if(endPoint > startPoint) {
+                g2d.fillRect(xTimelineStart, startPoint, xTimelineEnd - xTimelineStart, endPoint - startPoint);
+            }
+            else {
+                g2d.fillRect(xTimelineStart, endPoint, xTimelineEnd - xTimelineStart, startPoint - endPoint);
+            }
+        }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
         Component c = this.getComponentAt(e.getPoint());
         if(c instanceof DayPanel) {
-            Reminder r = new Reminder(timeOf(e.getY()));
-            reminders.add(r);
-            this.add(r);
-            r.setSize(new Dimension((int) (DayPanel.super.getWidth() * timelineWidth) + 20, 20));
-            r.setLocation((int) (DayPanel.super.getWidth() * timelineOffset), positionOf(r.getTime()) - r.getHeight() / 2);
+            addReminder(e.getY());
         }
         else{
             System.out.println("On component");
@@ -195,11 +199,16 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     @Override
     public void mousePressed(MouseEvent e) {
         selected = (JPanel) this.getComponentAt(e.getPoint());
+        startPoint = e.getY();
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
+        if(endPoint > -1){
+            addEvent(startPoint, endPoint);
+            endPoint = -1;
+            this.repaint();
+        }
     }
 
     @Override
@@ -217,6 +226,10 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         if(selected instanceof Reminder){
             Reminder r = (Reminder) selected;
             setPosition(r, e.getY());
+        }
+        else if(selected instanceof DayPanel){
+            endPoint = e.getY();
+            this.repaint();
         }
     }
 
