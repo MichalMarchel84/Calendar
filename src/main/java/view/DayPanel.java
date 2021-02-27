@@ -235,7 +235,18 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
             addReminder(e.getY());
         }
         else{
-            System.out.println("On component");
+            if(c instanceof Event){
+                Event event = (Event) c;
+                this.setComponentZOrder(event.label, 0);
+            }
+            else if(c instanceof Reminder){
+                Reminder r = (Reminder) c;
+                this.setComponentZOrder(r.label, 0);
+            }
+            else if(c instanceof EntryLabel){
+                this.setComponentZOrder(c, 0);
+            }
+            this.repaint();
         }
     }
 
