@@ -91,6 +91,28 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         r.setLocation(r.getX(), y - r.getHeight()/2);
     }
 
+    private void setPosition(Event e, int y){
+        long diff = timeOf(y).until(e.getTimeStart(), ChronoUnit.MINUTES);
+        e.setTimeStart(e.getTimeStart().minusMinutes(diff));
+        e.setTimeEnd(e.getTimeEnd().minusMinutes(diff));
+        e.setLocation(e.getX(), y);
+    }
+
+    private void setTimeStart(Event e, int y){
+        if(timeOf(y).until(e.getTimeEnd(), ChronoUnit.MINUTES) > 5) {
+            e.setTimeStart(timeOf(y));
+            e.setLocation(e.getX(), y);
+            e.setSize(new Dimension((int) (this.getWidth() * timelineWidth), positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
+        }
+    }
+
+    private void setTimeEnd(Event e, int y){
+        if(e.getTimeStart().until(timeOf(y), ChronoUnit.MINUTES) > 5) {
+            e.setTimeEnd(timeOf(y));
+            e.setSize(new Dimension((int) (this.getWidth() * timelineWidth), positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
+        }
+    }
+
     private void addReminder(int y){
         Reminder r = new Reminder(timeOf(y));
         reminders.add(r);
@@ -199,7 +221,15 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     @Override
     public void mousePressed(MouseEvent e) {
         selected = (JPanel) this.getComponentAt(e.getPoint());
-        startPoint = e.getY();
+        if(selected instanceof Event){
+            startPoint = e.getY() - selected.getY();
+            if((selected.getHeight() - startPoint) < 10){
+                startPoint = startPoint - selected.getHeight();
+            }
+        }
+        else {
+            startPoint = e.getY();
+        }
     }
 
     @Override
@@ -230,6 +260,18 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         else if(selected instanceof DayPanel){
             endPoint = e.getY();
             this.repaint();
+        }
+        else if(selected instanceof Event){
+            Event event = (Event) selected;
+            if(startPoint < 0){
+                setTimeEnd(event, e.getY());
+            }
+            else if(startPoint < 10){
+                setTimeStart(event, e.getY());
+            }
+            else {
+                setPosition(event, e.getY() - startPoint);
+            }
         }
     }
 
