@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 class Reminder extends JPanel {
 
     private LocalDateTime time;
+    final EntryLabel label = new EntryLabel();
 
     public Reminder(LocalDateTime time) {
         this.time = time;

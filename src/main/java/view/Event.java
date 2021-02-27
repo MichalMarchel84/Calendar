@@ -8,6 +8,7 @@ class Event extends JPanel {
 
     private LocalDateTime timeStart;
     private LocalDateTime timeEnd;
+    final EntryLabel label = new EntryLabel();
 
     Event(LocalDateTime timeStart, LocalDateTime timeEnd) {
         this.timeStart = timeStart;
