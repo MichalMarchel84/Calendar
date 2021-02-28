@@ -21,10 +21,9 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     private int startPoint = 0;
     private int endPoint = -1;
 
-    private static final double timelineOffset = 0.15;
+    private static final double timelineOffset = 0.12;
     private static final double timelineWidth = 0.07;
     private static final double labelOffset = 0.03;
-    private static final int labelHeight = 200;
     private static final double fontSize = 0.04;
     private static final int mainLineThickness = 3;
     private static final int auxLineThickness = 1;
@@ -72,13 +71,13 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         for(Reminder r : reminders){
             r.setSize(new Dimension((int) (DayPanel.super.getWidth()*timelineWidth) + 20, 20));
             r.setLocation((int)(DayPanel.super.getWidth()*timelineOffset), positionOf(r.getTime()) - r.getHeight()/2);
-            r.label.setSize(new Dimension((int)(this.getWidth()*(1 - timelineOffset - timelineWidth - labelOffset)), labelHeight));
+            r.label.setSize(new Dimension((int)(this.getWidth()*(1 - timelineOffset - timelineWidth - labelOffset)), r.getHeight()));
             r.label.setLocation((int) (this.getWidth() * (timelineOffset + timelineWidth + labelOffset)), r.getY());
         }
         for(Event e : events){
             e.setSize(new Dimension((int) (this.getWidth() * timelineWidth), positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
             e.setLocation((int) (this.getWidth() * timelineOffset), positionOf(e.getTimeStart()));
-            e.label.setSize(new Dimension((int)(this.getWidth()*(1 - timelineOffset - timelineWidth - labelOffset)), labelHeight));
+            e.label.setSize(new Dimension((int)(this.getWidth()*(1 - timelineOffset - timelineWidth - labelOffset)), e.getHeight()));
             e.label.setLocation((int) (this.getWidth() * (timelineOffset + timelineWidth + labelOffset)), e.getY());
         }
     }
@@ -114,6 +113,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
             e.setLocation(e.getX(), y);
             e.setSize(new Dimension((int) (this.getWidth() * timelineWidth), positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
             e.label.setLocation(e.label.getX(), e.getY());
+            e.label.setSize(new Dimension(e.label.getWidth(), e.getHeight()));
         }
     }
 
@@ -121,6 +121,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         if(e.getTimeStart().until(timeOf(y), ChronoUnit.MINUTES) > 5) {
             e.setTimeEnd(timeOf(y));
             e.setSize(new Dimension((int) (this.getWidth() * timelineWidth), positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
+            e.label.setSize(new Dimension(e.label.getWidth(), e.getHeight()));
         }
     }
 
@@ -130,7 +131,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         this.add(r);
         this.add(r.label);
         r.setSize(new Dimension((int) (this.getWidth() * timelineWidth) + 20, 20));
-        r.label.setSize(new Dimension((int)(this.getWidth()*(1 - timelineOffset - timelineWidth - labelOffset)), labelHeight));
+        r.label.setSize(new Dimension((int)(this.getWidth()*(1 - timelineOffset - timelineWidth - labelOffset)), r.getHeight()));
         r.setLocation((int) (this.getWidth() * timelineOffset), positionOf(r.getTime()) - r.getHeight() / 2);
         r.label.setLocation((int) (this.getWidth() * (timelineOffset + timelineWidth + labelOffset)), r.getY());
         r.label.revalidate();
@@ -149,7 +150,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         this.add(e);
         this.add(e.label);
         e.setSize(new Dimension((int) (this.getWidth() * timelineWidth), positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
-        e.label.setSize(new Dimension((int)(this.getWidth()*(1 - timelineOffset - timelineWidth - labelOffset)), labelHeight));
+        e.label.setSize(new Dimension((int)(this.getWidth()*(1 - timelineOffset - timelineWidth - labelOffset)), e.getHeight()));
         if(y1 > y2){
             y1 = y2;
         }

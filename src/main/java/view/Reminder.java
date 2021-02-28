@@ -12,6 +12,7 @@ class Reminder extends JPanel {
 
     public Reminder(LocalDateTime time) {
         this.time = time;
+        label.setTime(time);
         this.setOpaque(true);
         this.setBackground(new Color(0,0,0,0));
     }
@@ -22,6 +23,7 @@ class Reminder extends JPanel {
 
     void setTime(LocalDateTime time) {
         this.time = time;
+        label.setTime(time);
     }
 
     @Override

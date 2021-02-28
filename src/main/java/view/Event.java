@@ -13,6 +13,7 @@ class Event extends JPanel {
     Event(LocalDateTime timeStart, LocalDateTime timeEnd) {
         this.timeStart = timeStart;
         this.timeEnd = timeEnd;
+        label.setTime(this.timeStart, this.timeEnd);
         this.setBackground(Color.BLUE);
         this.setBorder(BorderFactory.createLineBorder(Color.RED));
     }
@@ -23,6 +24,7 @@ class Event extends JPanel {
 
     public void setTimeStart(LocalDateTime timeStart) {
         this.timeStart = timeStart;
+        label.setTime(this.timeStart, this.timeEnd);
     }
 
     public LocalDateTime getTimeEnd() {
@@ -31,6 +33,7 @@ class Event extends JPanel {
 
     public void setTimeEnd(LocalDateTime timeEnd) {
         this.timeEnd = timeEnd;
+        label.setTime(this.timeStart, this.timeEnd);
     }
 
 }
