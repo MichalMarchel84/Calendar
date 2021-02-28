@@ -160,6 +160,22 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         e.label.repaint();
     }
 
+    void removeEntry(JPanel entry){
+        if(entry instanceof Reminder){
+            Reminder r = (Reminder) entry;
+            reminders.remove(r);
+            this.remove(r);
+            this.remove(r.label);
+        }
+        else if(entry instanceof Event){
+            Event e = (Event) entry;
+            reminders.remove(e);
+            this.remove(e);
+            this.remove(e.label);
+        }
+        this.repaint();
+    }
+
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
