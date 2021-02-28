@@ -5,26 +5,13 @@ import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.time.LocalDateTime;
 
-class Reminder extends JPanel {
-
-    private LocalDateTime time;
-    final EntryLabel label;
+class Reminder extends Entry {
 
     public Reminder(LocalDateTime time) {
-        label = new EntryLabel(this);
-        this.time = time;
+        super(time);
         label.setTime(time);
         this.setOpaque(true);
         this.setBackground(new Color(0,0,0,0));
-    }
-
-    LocalDateTime getTime() {
-        return time;
-    }
-
-    void setTime(LocalDateTime time) {
-        this.time = time;
-        label.setTime(time);
     }
 
     @Override

@@ -13,11 +13,11 @@ class EntryLabel extends JPanel implements ActionListener {
 
     private final JLabel time = new JLabel();
     private final JLabel title = new JLabel();
-    private final JPanel target;
+    private final Entry target;
     private final JButton edit = new JButton("E");
     private final JButton delete = new JButton("D");
 
-    EntryLabel(JPanel target){
+    EntryLabel(Entry target){
         this.target = target;
         double[] cols = {0.15, TableLayout.FILL, 50, 50};
         double[] rows = {TableLayout.FILL};
@@ -28,6 +28,7 @@ class EntryLabel extends JPanel implements ActionListener {
         this.add(title, "1 0 l c");
         this.add(edit, "2 0 c t");
         this.add(delete, "3 0 c t");
+        edit.addActionListener(this);
         delete.addActionListener(this);
         this.setBackground(new Color(100, 100, 255, 50));
     }
@@ -42,11 +43,18 @@ class EntryLabel extends JPanel implements ActionListener {
         time.setText(tStart.format(dtf) + " - " + tEnd.format(dtf));
     }
 
+    void setTitle(String txt){
+        title.setText(txt);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource().equals(delete)){
             DayPanel parent = (DayPanel)this.getParent();
             parent.removeEntry(target);
+        }
+        else if(e.getSource().equals(edit)){
+            new EditWindow(target);
         }
     }
 }
