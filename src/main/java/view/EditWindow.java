@@ -20,7 +20,7 @@ class EditWindow extends JFrame implements ActionListener {
         title.setFont(new Font(title.getFont().getName(), Font.BOLD, 20));
         description.setText(entry.getDescription());
         double[] cols = {10, 0.3, TableLayout.FILL, TableLayout.FILL, 10};
-        double[] rows = {10, 0.07, 0.15, 0.07, TableLayout.FILL, 0.1, 10};
+        double[] rows = {10, 0.07, 0.15, 0.07, TableLayout.FILL, 0.15, 10};
         TableLayout lay = new TableLayout(cols, rows);
         lay.setHGap(5);
         lay.setVGap(10);
@@ -33,16 +33,19 @@ class EditWindow extends JFrame implements ActionListener {
         p.add(title, "2 2 3 2 f c");
         p.add(new JLabel("Description"), "2 3 l c");
         p.add(description, "2 4 3 4 f f");
-        p.add(accept, "2 5 c c");
-        p.add(cancel, "3 5 c c");
+        p.add(accept, "2 5 f f");
+        p.add(cancel, "3 5 f f");
         accept.addActionListener(this);
         cancel.addActionListener(this);
+        accept.setFont(new Font(accept.getFont().getName(), Font.BOLD, 15));
+        cancel.setFont(new Font(accept.getFont().getName(), Font.BOLD, 15));
         this.add(p);
         this.setSize(new Dimension(500, 300));
         this.setResizable(false);
         this.setVisible(true);
         this.setLocationRelativeTo(entry.label);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setAlwaysOnTop(true);
     }
 
     @Override
