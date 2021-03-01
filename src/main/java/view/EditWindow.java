@@ -19,6 +19,9 @@ class EditWindow extends JFrame implements ActionListener {
     JButton cancel = new JButton(I18n.getPhrase("cancel_button"));
     JTextField from = new JTextField(5);
     JTextField to = new JTextField(5);
+    JPanel options = new JPanel();
+    JCheckBox repetitive = new JCheckBox();
+    JPanel repetitiveOptions = new JPanel();
 
     EditWindow(Entry entry){
         this.entry = entry;
@@ -32,7 +35,6 @@ class EditWindow extends JFrame implements ActionListener {
         lay.setVGap(10);
         JPanel p = new JPanel();
         p.setLayout(lay);
-        JPanel options = new JPanel();
         double[] c = {0.45, 0.1, 0.45};
         double[] r = new double[3];
         Arrays.fill(r, TableLayout.PREFERRED);
@@ -57,7 +59,8 @@ class EditWindow extends JFrame implements ActionListener {
             to.setHorizontalAlignment(SwingConstants.CENTER);
         }
         options.add(new JLabel("Repetitive"), "0 1 1 1 c c");
-        options.add(new JCheckBox(), "2 1 c c");
+        repetitive.addActionListener(this);
+        options.add(repetitive, "2 1 c c");
         p.add(options, "1 1 1 5 f f");
         p.add(new JLabel("Title"), "2 1 l c");
         p.add(title, "2 2 3 2 f c");
@@ -113,6 +116,28 @@ class EditWindow extends JFrame implements ActionListener {
         }
         else if(e.getSource().equals(cancel)){
             this.dispose();
+        }
+        else if(e.getSource().equals(repetitive)){
+            if(repetitive.isSelected()){
+                double[] cols = {0.5, 0.5};
+                double[] rows = new double[3];
+                Arrays.fill(rows, TableLayout.PREFERRED);
+                TableLayout lay = new TableLayout(cols, rows);
+                lay.setHGap(5);
+                lay.setVGap(5);
+                repetitiveOptions.setLayout(lay);
+                repetitiveOptions.add(new JLabel("Repeat every"), "0 0 1 0 c c");
+                String[] types = {"Month", "Year", "Period"};
+                JComboBox<String> type = new JComboBox<>(types);
+                repetitiveOptions.add(type, "0 1 1 1 c c");
+                options.add(repetitiveOptions, "0 2 2 2 f f");
+                options.revalidate();
+                options.repaint();
+            }
+            else {
+                options.remove(repetitiveOptions);
+                options.repaint();
+            }
         }
     }
 }
