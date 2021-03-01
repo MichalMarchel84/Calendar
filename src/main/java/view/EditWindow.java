@@ -8,9 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 class EditWindow extends JFrame implements ActionListener {
-    private Entry entry;
-    private JTextField title = new JTextField(50);
-    private JTextArea description = new JTextArea();
+    private final Entry entry;
+    private final JTextField title = new JTextField(50);
+    private final JTextArea description = new JTextArea();
     JButton accept = new JButton("Accept");
     JButton cancel = new JButton("Cancel");
 
