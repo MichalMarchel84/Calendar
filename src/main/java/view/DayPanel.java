@@ -123,7 +123,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         }
     }
 
-    private void addReminder(LocalDateTime t){
+    private Reminder addReminder(LocalDateTime t){
         Reminder r = new Reminder(t);
         reminders.add(r);
         this.add(r);
@@ -134,9 +134,10 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         r.label.setLocation((int) (this.getWidth() * (timelineOffset + timelineWidth + labelOffset)), r.getY());
         r.label.revalidate();
         r.label.repaint();
+        return r;
     }
 
-    private void addEvent(LocalDateTime t1, LocalDateTime t2){
+    private Event addEvent(LocalDateTime t1, LocalDateTime t2){
         Event e;
         int y1 = positionOf(t1);
         int y2 = positionOf(t2);
@@ -158,6 +159,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         e.label.setLocation((int) (this.getWidth() * (timelineOffset + timelineWidth + labelOffset)), e.getY());
         e.label.revalidate();
         e.label.repaint();
+        return e;
     }
 
     void removeEntry(JPanel entry){
@@ -260,21 +262,8 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     public void mouseClicked(MouseEvent e) {
         Component c = this.getComponentAt(e.getPoint());
         if(c instanceof DayPanel) {
-            addReminder(round5min(timeOf(e.getY())));
-        }
-        else{
-            if(c instanceof Event){
-                Event event = (Event) c;
-                this.setComponentZOrder(event.label, 0);
-            }
-            else if(c instanceof Reminder){
-                Reminder r = (Reminder) c;
-                this.setComponentZOrder(r.label, 0);
-            }
-            else if(c instanceof EntryLabel){
-                this.setComponentZOrder(c, 0);
-            }
-            this.repaint();
+            Reminder r = addReminder(round5min(timeOf(e.getY())));
+            new EditWindow(r);
         }
     }
 
@@ -295,7 +284,8 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     @Override
     public void mouseReleased(MouseEvent e) {
         if(endPoint > -1){
-            addEvent(round5min(timeOf(startPoint)), round5min(timeOf(endPoint)));
+            Event event = addEvent(round5min(timeOf(startPoint)), round5min(timeOf(endPoint)));
+            new EditWindow(event);
             endPoint = -1;
             this.repaint();
         }

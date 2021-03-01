@@ -11,8 +11,8 @@ class EditWindow extends JFrame implements ActionListener {
     private final Entry entry;
     private final JTextField title = new JTextField(50);
     private final JTextArea description = new JTextArea();
-    JButton accept = new JButton("Accept");
-    JButton cancel = new JButton("Cancel");
+    JButton accept = new JButton(I18n.getPhrase("save_button"));
+    JButton cancel = new JButton(I18n.getPhrase("cancel_button"));
 
     EditWindow(Entry entry){
         this.entry = entry;
@@ -41,7 +41,7 @@ class EditWindow extends JFrame implements ActionListener {
         this.setSize(new Dimension(500, 300));
         this.setResizable(false);
         this.setVisible(true);
-        this.setLocationRelativeTo(null);
+        this.setLocationRelativeTo(entry.label);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 

@@ -2,7 +2,6 @@ package view;
 
 import info.clearthought.layout.TableLayout;
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicArrowButton;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -15,7 +14,7 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
     private final NewUserPanel newUser = new NewUserPanel();
     private final MonthViewPanel monthView = new MonthViewPanel();
     final DayViewPanel dayView = new DayViewPanel();
-    private final JButton returnButton = new BasicArrowButton(BasicArrowButton.WEST);
+    private final JButton returnButton = new JButton(I18n.getPhrase("return"));
     private final JButton logout = new JButton(I18n.getPhrase("logout"));
     private final JPanel topMenu = new JPanel();
 
@@ -136,6 +135,7 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
 
     @Override
     public void languageChanged() {
+        returnButton.setText(I18n.getPhrase("return"));
         logout.setText(I18n.getPhrase("logout"));
     }
 }

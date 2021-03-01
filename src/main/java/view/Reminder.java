@@ -12,6 +12,7 @@ class Reminder extends Entry {
         label.setTime(time);
         this.setOpaque(true);
         this.setBackground(new Color(0,0,0,0));
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
     @Override
