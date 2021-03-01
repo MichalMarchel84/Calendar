@@ -91,7 +91,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         }
     }
 
-    private void setPosition(Reminder r, LocalDateTime t){
+    void setPosition(Reminder r, LocalDateTime t){
         r.setTime(t);
         r.setLocation(r.getX(), positionOf(t) - r.getHeight()/2);
         r.label.setLocation(r.label.getX(), r.getY());
@@ -105,7 +105,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         e.label.setLocation(e.label.getX(), e.getY());
     }
 
-    private void setTimeStart(Event e, LocalDateTime t){
+    void setTimeStart(Event e, LocalDateTime t){
         if(t.until(e.getTimeEnd(), ChronoUnit.MINUTES) > 5) {
             e.setTimeStart(t);
             e.setLocation(e.getX(), positionOf(t));
@@ -115,7 +115,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         }
     }
 
-    private void setTimeEnd(Event e, LocalDateTime t){
+    void setTimeEnd(Event e, LocalDateTime t){
         if(e.getTimeStart().until(t, ChronoUnit.MINUTES) > 5) {
             e.setTimeEnd(t);
             e.setSize(new Dimension(timelineWidth, positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));

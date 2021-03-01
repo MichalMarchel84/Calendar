@@ -6,6 +6,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 
 class EditWindow extends JFrame implements ActionListener {
     private final Entry entry;
@@ -13,6 +17,8 @@ class EditWindow extends JFrame implements ActionListener {
     private final JTextArea description = new JTextArea();
     JButton accept = new JButton(I18n.getPhrase("save_button"));
     JButton cancel = new JButton(I18n.getPhrase("cancel_button"));
+    JTextField from = new JTextField(5);
+    JTextField to = new JTextField(5);
 
     EditWindow(Entry entry){
         this.entry = entry;
@@ -26,9 +32,33 @@ class EditWindow extends JFrame implements ActionListener {
         lay.setVGap(10);
         JPanel p = new JPanel();
         p.setLayout(lay);
-        JPanel temp = new JPanel();
-        temp.setBorder(BorderFactory.createLineBorder(Color.RED, 3));
-        p.add(temp, "1 1 1 5 f f");
+        JPanel options = new JPanel();
+        double[] c = {0.45, 0.1, 0.45};
+        double[] r = new double[3];
+        Arrays.fill(r, TableLayout.PREFERRED);
+        TableLayout l = new TableLayout(c, r);
+        l.setVGap(5);
+        l.setHGap(5);
+        options.setLayout(l);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+        if(entry instanceof Reminder){
+            options.add(from, "0 0 2 0 c c");
+            from.setText(entry.getTime().format(dtf));
+            from.setHorizontalAlignment(SwingConstants.CENTER);
+        }
+        else if(entry instanceof Event){
+            Event e = (Event) entry;
+            options.add(from, "0 0 c c");
+            from.setText(e.getTimeStart().format(dtf));
+            from.setHorizontalAlignment(SwingConstants.CENTER);
+            options.add(new JLabel("-"), "1 0 c c");
+            options.add(to, "2 0 c c");
+            to.setText(e.getTimeEnd().format(dtf));
+            to.setHorizontalAlignment(SwingConstants.CENTER);
+        }
+        options.add(new JLabel("Repetitive"), "0 1 1 1 c c");
+        options.add(new JCheckBox(), "2 1 c c");
+        p.add(options, "1 1 1 5 f f");
         p.add(new JLabel("Title"), "2 1 l c");
         p.add(title, "2 2 3 2 f c");
         p.add(new JLabel("Description"), "2 3 l c");
@@ -48,12 +78,38 @@ class EditWindow extends JFrame implements ActionListener {
         this.setAlwaysOnTop(true);
     }
 
+    LocalDateTime txtFieldTime(JTextField tf, LocalDateTime date) throws DateTimeParseException{
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String time = date.format(dtf) + " " + tf.getText();
+        tf.setForeground(Color.RED);
+        tf.requestFocus();
+        dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime t = LocalDateTime.parse(time, dtf);
+        tf.setForeground(Color.BLACK);
+        return t;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource().equals(accept)){
             entry.setTitle(title.getText());
             entry.setDescription(description.getText());
-            this.dispose();
+            try {
+                DayPanel parent = (DayPanel) entry.getParent();
+                if(entry instanceof Reminder){
+                    parent.setPosition((Reminder) entry, txtFieldTime(from, entry.getTime()));
+                }
+                else if(entry instanceof Event){
+                    Event event = (Event) entry;
+                    LocalDateTime t1 = txtFieldTime(from, event.getTimeStart());
+                    LocalDateTime t2 = txtFieldTime(to, event.getTimeEnd());
+                    parent.setTimeStart(event, t1);
+                    parent.setTimeEnd(event, t2);
+                }
+                this.dispose();
+            }
+            catch (DateTimeParseException ex){
+            }
         }
         else if(e.getSource().equals(cancel)){
             this.dispose();
