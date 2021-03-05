@@ -68,7 +68,7 @@ class I18n {
             url = defaultFlag;
         }
         else {
-            url = "src/main/resources/flag_icons/" + code + ".gif";
+            url = "src/main/resources/flag_icons/" + code.toLowerCase() + ".gif";
         }
         File file = new File(url);
         if(file.exists()) {

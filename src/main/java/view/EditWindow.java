@@ -22,6 +22,10 @@ class EditWindow extends JFrame implements ActionListener {
     JPanel options = new JPanel();
     JCheckBox repetitive = new JCheckBox();
     JPanel repetitiveOptions = new JPanel();
+    String[] types = {"Month", "Year", "Period"};
+    JComboBox<String> type = new JComboBox<>(types);
+    JTextField period = new JTextField(6);
+    JLabel periodLabel = new JLabel(I18n.getPhrase("days"));
 
     EditWindow(Entry entry){
         this.entry = entry;
@@ -43,6 +47,8 @@ class EditWindow extends JFrame implements ActionListener {
         l.setHGap(5);
         options.setLayout(l);
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+        from.setFont(new Font(from.getFont().getName(), Font.BOLD, 20));
+        to.setFont(new Font(from.getFont().getName(), Font.BOLD, 20));
         if(entry instanceof Reminder){
             options.add(from, "0 0 2 0 c c");
             from.setText(entry.getTime().format(dtf));
@@ -73,7 +79,7 @@ class EditWindow extends JFrame implements ActionListener {
         accept.setFont(new Font(accept.getFont().getName(), Font.BOLD, 15));
         cancel.setFont(new Font(accept.getFont().getName(), Font.BOLD, 15));
         this.add(p);
-        this.setSize(new Dimension(500, 300));
+        this.setSize(new Dimension(600, 400));
         this.setResizable(false);
         this.setVisible(true);
         this.setLocationRelativeTo(entry.label);
@@ -120,15 +126,14 @@ class EditWindow extends JFrame implements ActionListener {
         else if(e.getSource().equals(repetitive)){
             if(repetitive.isSelected()){
                 double[] cols = {0.5, 0.5};
-                double[] rows = new double[3];
+                double[] rows = new double[4];
                 Arrays.fill(rows, TableLayout.PREFERRED);
                 TableLayout lay = new TableLayout(cols, rows);
                 lay.setHGap(5);
                 lay.setVGap(5);
                 repetitiveOptions.setLayout(lay);
                 repetitiveOptions.add(new JLabel("Repeat every"), "0 0 1 0 c c");
-                String[] types = {"Month", "Year", "Period"};
-                JComboBox<String> type = new JComboBox<>(types);
+                type.addActionListener(this);
                 repetitiveOptions.add(type, "0 1 1 1 c c");
                 options.add(repetitiveOptions, "0 2 2 2 f f");
                 options.revalidate();
@@ -137,6 +142,21 @@ class EditWindow extends JFrame implements ActionListener {
             else {
                 options.remove(repetitiveOptions);
                 options.repaint();
+            }
+        }
+        else if(e.getSource().equals(type)){
+            if(type.getSelectedIndex() == 2){
+                repetitiveOptions.add(period, "0 3 c c");
+                repetitiveOptions.add(periodLabel, "1 3 l c");
+                type.requestFocus();
+                repetitiveOptions.revalidate();
+                repetitiveOptions.repaint();
+            }
+            else{
+                repetitiveOptions.remove(period);
+                repetitiveOptions.remove(periodLabel);
+                repetitiveOptions.revalidate();
+                repetitiveOptions.repaint();
             }
         }
     }

@@ -21,7 +21,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     private int startPoint = 0;
     private int endPoint = -1;
 
-    private static final int timelineOffset = 100;
+    private static final int timelineOffset = 120;
     private static final int fontSize = 20;
     private static final int timelineWidth = 60;
     private static final int labelOffset = 20;

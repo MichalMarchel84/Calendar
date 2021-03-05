@@ -4,12 +4,7 @@ import view.AppWindow;
 import view.Comm;
 
 public class App {
-    private static final Thread onExit = new Thread(){
-        @Override
-        public void run(){
-            Model.disconnectFromDB();
-        }
-    };
+    private static final Thread onExit = new Thread(Model::disconnectFromDB);
 
     public static void main(String[] args){
         Controller controller = new Controller(new AppWindow());
