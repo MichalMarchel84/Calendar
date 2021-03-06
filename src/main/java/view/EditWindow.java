@@ -137,27 +137,24 @@ class EditWindow extends JFrame implements ActionListener {
                 repetitiveOptions.add(type, "0 1 1 1 c c");
                 options.add(repetitiveOptions, "0 2 2 2 f f");
                 options.revalidate();
-                options.repaint();
             }
             else {
                 options.remove(repetitiveOptions);
-                options.repaint();
             }
+            options.repaint();
         }
         else if(e.getSource().equals(type)){
             if(type.getSelectedIndex() == 2){
                 repetitiveOptions.add(period, "0 3 c c");
                 repetitiveOptions.add(periodLabel, "1 3 l c");
                 type.requestFocus();
-                repetitiveOptions.revalidate();
-                repetitiveOptions.repaint();
             }
             else{
                 repetitiveOptions.remove(period);
                 repetitiveOptions.remove(periodLabel);
-                repetitiveOptions.revalidate();
-                repetitiveOptions.repaint();
             }
+            repetitiveOptions.revalidate();
+            repetitiveOptions.repaint();
         }
     }
 }

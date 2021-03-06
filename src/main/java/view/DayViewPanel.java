@@ -102,6 +102,10 @@ class DayViewPanel extends JPanel implements LanguageListener{
         scroll.getVerticalScrollBar().setValue(sv);
     }
 
+    void clearContent(){
+        content.clearContent();
+    }
+
     @Override
     public void languageChanged() {
         content.repaint();

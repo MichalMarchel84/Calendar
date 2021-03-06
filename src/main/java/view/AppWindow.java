@@ -130,6 +130,7 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
             displayPanel(panels.login);
             topMenu.remove(logout);
             topMenu.remove(returnButton);
+            dayView.clearContent();
         }
     }
 

@@ -162,7 +162,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         return e;
     }
 
-    void removeEntry(JPanel entry){
+    void removeEntry(Entry entry){
         if(entry instanceof Reminder){
             Reminder r = (Reminder) entry;
             reminders.remove(r);
@@ -176,6 +176,19 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
             this.remove(e.label);
         }
         this.repaint();
+    }
+
+    void clearContent(){
+        for(Reminder r : reminders){
+            this.remove(r);
+            this.remove(r.label);
+        }
+        for(Event e : events){
+            this.remove(e);
+            this.remove(e.label);
+        }
+        reminders.clear();
+        events.clear();
     }
 
     LocalDateTime round5min(LocalDateTime t){
