@@ -20,10 +20,9 @@ class EditWindow extends JFrame implements ActionListener {
     JTextField from = new JTextField(5);
     JTextField to = new JTextField(5);
     JPanel options = new JPanel();
-    JCheckBox repetitive = new JCheckBox();
     JPanel repetitiveOptions = new JPanel();
-    String[] types = {"Month", "Year", "Period"};
-    JComboBox<String> type = new JComboBox<>(types);
+    JCheckBox repetitive = new JCheckBox();
+    JComboBox<String> type = new JComboBox<>(Repetitive.types);
     JTextField period = new JTextField(6);
     JLabel periodLabel = new JLabel(I18n.getPhrase("days"));
 
@@ -32,6 +31,9 @@ class EditWindow extends JFrame implements ActionListener {
         title.setText(entry.getTitle());
         title.setFont(new Font(title.getFont().getName(), Font.BOLD, 20));
         description.setText(entry.getDescription());
+
+        createRepetitiveOptions();
+
         double[] cols = {10, 0.3, TableLayout.FILL, TableLayout.FILL, 10};
         double[] rows = {10, 0.07, 0.15, 0.07, TableLayout.FILL, 0.15, 10};
         TableLayout lay = new TableLayout(cols, rows);
@@ -39,6 +41,7 @@ class EditWindow extends JFrame implements ActionListener {
         lay.setVGap(10);
         JPanel p = new JPanel();
         p.setLayout(lay);
+
         double[] c = {0.45, 0.1, 0.45};
         double[] r = new double[3];
         Arrays.fill(r, TableLayout.PREFERRED);
@@ -46,6 +49,7 @@ class EditWindow extends JFrame implements ActionListener {
         l.setVGap(5);
         l.setHGap(5);
         options.setLayout(l);
+
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
         from.setFont(new Font(from.getFont().getName(), Font.BOLD, 20));
         to.setFont(new Font(from.getFont().getName(), Font.BOLD, 20));
@@ -67,6 +71,14 @@ class EditWindow extends JFrame implements ActionListener {
         options.add(new JLabel("Repetitive"), "0 1 1 1 c c");
         repetitive.addActionListener(this);
         options.add(repetitive, "2 1 c c");
+
+        if(entry.isRepetitive()){
+            repetitive.setSelected(true);
+            type.setSelectedIndex(entry.getRepetitive().getType());
+            period.setText(Integer.toString(entry.getRepetitive().getPeriod()));
+            options.add(repetitiveOptions, "0 2 2 2 f f");
+        }
+
         p.add(options, "1 1 1 5 f f");
         p.add(new JLabel("Title"), "2 1 l c");
         p.add(title, "2 2 3 2 f c");
@@ -85,6 +97,21 @@ class EditWindow extends JFrame implements ActionListener {
         this.setLocationRelativeTo(entry.label);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setAlwaysOnTop(true);
+    }
+
+    void createRepetitiveOptions(){
+        double[] cols = {0.5, 0.5};
+        double[] rows = new double[4];
+        Arrays.fill(rows, TableLayout.PREFERRED);
+        TableLayout lay = new TableLayout(cols, rows);
+        lay.setHGap(5);
+        lay.setVGap(5);
+        repetitiveOptions.setLayout(lay);
+        repetitiveOptions.add(new JLabel("Repeat every"), "0 0 1 0 c c");
+        type.addActionListener(this);
+        repetitiveOptions.add(type, "0 1 1 1 c c");
+        period.setText("7");
+        period.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
     LocalDateTime txtFieldTime(JTextField tf, LocalDateTime date) throws DateTimeParseException{
@@ -115,9 +142,24 @@ class EditWindow extends JFrame implements ActionListener {
                     parent.setTimeStart(event, t1);
                     parent.setTimeEnd(event, t2);
                 }
+                if(repetitive.isSelected()){
+                    if(!entry.isRepetitive()){
+                        entry.setRepetitive();
+                    }
+                    entry.getRepetitive().setPeriod(Integer.parseInt(period.getText()));
+                    entry.getRepetitive().setType(type.getSelectedIndex());
+                }
                 this.dispose();
             }
-            catch (DateTimeParseException ex){
+            catch (Exception ex){
+                if(ex instanceof DateTimeParseException) {}
+                else if(ex instanceof NumberFormatException){
+                    period.setForeground(Color.RED);
+                    period.requestFocus();
+                }
+                else {
+                    ex.printStackTrace();
+                }
             }
         }
         else if(e.getSource().equals(cancel)){
@@ -125,22 +167,12 @@ class EditWindow extends JFrame implements ActionListener {
         }
         else if(e.getSource().equals(repetitive)){
             if(repetitive.isSelected()){
-                double[] cols = {0.5, 0.5};
-                double[] rows = new double[4];
-                Arrays.fill(rows, TableLayout.PREFERRED);
-                TableLayout lay = new TableLayout(cols, rows);
-                lay.setHGap(5);
-                lay.setVGap(5);
-                repetitiveOptions.setLayout(lay);
-                repetitiveOptions.add(new JLabel("Repeat every"), "0 0 1 0 c c");
-                type.addActionListener(this);
-                repetitiveOptions.add(type, "0 1 1 1 c c");
                 options.add(repetitiveOptions, "0 2 2 2 f f");
-                options.revalidate();
             }
             else {
                 options.remove(repetitiveOptions);
             }
+            options.revalidate();
             options.repaint();
         }
         else if(e.getSource().equals(type)){

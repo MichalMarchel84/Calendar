@@ -8,6 +8,7 @@ class Entry extends JPanel {
     final EntryLabel label;
     private String title = "";
     private String description = "";
+    private Repetitive repetitive = null;
 
     Entry(LocalDateTime time){
         this.time = time;
@@ -38,5 +39,30 @@ class Entry extends JPanel {
 
     void setDescription(String description) {
         this.description = description;
+    }
+
+    void setRepetitive(){                   //used to set non-repetitive entry as repetitive
+        this.repetitive = new Repetitive(this);
+    }
+
+    void addRepetitive(Repetitive r){       //used to generate entries from repetitive
+        this.repetitive = r;
+    }
+
+    void removeRepetitive(){
+        this.repetitive = null;
+    }
+
+    Repetitive getRepetitive(){
+        return repetitive;
+    }
+
+    boolean isRepetitive(){
+        if(repetitive != null){
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }
