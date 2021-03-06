@@ -30,7 +30,7 @@ class Entry extends JPanel {
 
     void setTitle(String title) {
         this.title = title;
-        label.setTitle(this.title);
+        this.label.setTitle(title);
     }
 
     String getDescription() {
@@ -41,11 +41,7 @@ class Entry extends JPanel {
         this.description = description;
     }
 
-    void setRepetitive(){                   //used to set non-repetitive entry as repetitive
-        this.repetitive = new Repetitive(this);
-    }
-
-    void addRepetitive(Repetitive r){       //used to generate entries from repetitive
+    void addRepetitive(Repetitive r){
         this.repetitive = r;
     }
 

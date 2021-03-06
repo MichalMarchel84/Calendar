@@ -17,6 +17,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
 
     private final ArrayList<Reminder> reminders = new ArrayList<>();
     private final ArrayList<Event> events = new ArrayList<>();
+    private final ArrayList<Repetitive> repetitives = new ArrayList<>();
     private JPanel selected = null;
     private int startPoint = 0;
     private int endPoint = -1;
@@ -137,6 +138,18 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         return r;
     }
 
+    private void addReminder(Reminder r){
+        if(!r.isRepetitive()) {
+            reminders.add(r);
+        }
+        this.add(r);
+        this.add(r.label);
+        r.setSize(new Dimension(timelineWidth + 20, 20));
+        r.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, r.getHeight()));
+        r.setLocation(timelineOffset, positionOf(r.getTime()) - r.getHeight() / 2);
+        r.label.setLocation(timelineOffset + timelineWidth + labelOffset, r.getY());
+    }
+
     private Event addEvent(LocalDateTime t1, LocalDateTime t2){
         Event e;
         int y1 = positionOf(t1);
@@ -162,8 +175,53 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         return e;
     }
 
+    void addEvent(Event e){
+        if(!e.isRepetitive()) {
+            events.add(e);
+        }
+        this.add(e);
+        this.add(e.label);
+        e.setSize(new Dimension(timelineWidth, positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
+        e.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, e.getHeight()));
+        e.setLocation(timelineOffset, positionOf(e.getTimeStart()));
+        e.label.setLocation(timelineOffset + timelineWidth + labelOffset, e.getY());
+    }
+
+    void addRepetitive(Repetitive r){
+        repetitives.add(r);
+        displayRepetitive(r);
+    }
+
+    private void displayRepetitive(Repetitive r){
+        r.setEntriesFor(time, time.plusDays(2*daysInBuffer + 1));
+        ArrayList<Entry> elemnts = r.getEntries();
+        if(elemnts.size() > 0){
+            if(elemnts.get(0) instanceof Reminder){
+                for (Entry e : elemnts){
+                    Reminder reminder = (Reminder) e;
+                    this.addReminder(reminder);
+                }
+            }
+            else if(elemnts.get(0) instanceof Event){
+                for (Entry e : elemnts){
+                    Event event = (Event) e;
+                    this.addEvent(event);
+                }
+            }
+        }
+        this.revalidate();
+        this.repaint();
+    }
+
     void removeEntry(Entry entry){
-        if(entry instanceof Reminder){
+        if(entry.isRepetitive()){
+            for(Entry e : entry.getRepetitive().getEntries()){
+                this.remove(e);
+                this.remove(e.label);
+            }
+            repetitives.remove(entry.getRepetitive());
+        }
+        else if(entry instanceof Reminder){
             Reminder r = (Reminder) entry;
             reminders.remove(r);
             this.remove(r);

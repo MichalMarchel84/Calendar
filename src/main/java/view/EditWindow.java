@@ -74,6 +74,7 @@ class EditWindow extends JFrame implements ActionListener {
 
         if(entry.isRepetitive()){
             repetitive.setSelected(true);
+            repetitive.setEnabled(false);
             type.setSelectedIndex(entry.getRepetitive().getType());
             period.setText(Integer.toString(entry.getRepetitive().getPeriod()));
             options.add(repetitiveOptions, "0 2 2 2 f f");
@@ -128,8 +129,14 @@ class EditWindow extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource().equals(accept)){
-            entry.setTitle(title.getText());
-            entry.setDescription(description.getText());
+            if(entry.isRepetitive()){
+                entry.getRepetitive().setTitle(title.getText());
+                entry.getRepetitive().setDescription(description.getText());
+            }
+            else {
+                entry.setTitle(title.getText());
+                entry.setDescription(description.getText());
+            }
             try {
                 DayPanel parent = (DayPanel) entry.getParent();
                 if(entry instanceof Reminder){
@@ -144,10 +151,16 @@ class EditWindow extends JFrame implements ActionListener {
                 }
                 if(repetitive.isSelected()){
                     if(!entry.isRepetitive()){
-                        entry.setRepetitive();
+                        Repetitive r = new Repetitive(entry);
+                        r.setPeriod(Integer.parseInt(period.getText()));
+                        r.setType(type.getSelectedIndex());
+                        parent.addRepetitive(r);
+                        parent.removeEntry(entry);
                     }
-                    entry.getRepetitive().setPeriod(Integer.parseInt(period.getText()));
-                    entry.getRepetitive().setType(type.getSelectedIndex());
+                    else {
+                        entry.getRepetitive().setPeriod(Integer.parseInt(period.getText()));
+                        entry.getRepetitive().setType(type.getSelectedIndex());
+                    }
                 }
                 this.dispose();
             }
