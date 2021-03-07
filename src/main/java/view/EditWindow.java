@@ -78,6 +78,8 @@ class EditWindow extends JFrame implements ActionListener {
                 repetitive.setEnabled(false);
                 type.setEnabled(false);
                 period.setEnabled(false);
+                from.setEnabled(false);
+                to.setEnabled(false);
             }
             type.setSelectedIndex(entry.getRepetitive().getType());
             period.setText(Integer.toString(entry.getRepetitive().getPeriod()));
@@ -143,6 +145,7 @@ class EditWindow extends JFrame implements ActionListener {
             }
             try {
                 DayPanel parent = (DayPanel) entry.getParent();
+                boolean firstRepetitive = entry.isFirstRepetitive();
                 if(entry instanceof Reminder){
                     parent.setPosition((Reminder) entry, txtFieldTime(from, entry.getTime()));
                 }
@@ -162,8 +165,9 @@ class EditWindow extends JFrame implements ActionListener {
                         parent.removeEntry(entry);
                     }
                     else {
-                        int p = Integer.parseInt(period.getText());
-                        if((entry.getRepetitive().getPeriod() != p) || (entry.getRepetitive().getType() != type.getSelectedIndex())) {
+                        if(firstRepetitive) {
+                            int p = Integer.parseInt(period.getText());
+                            entry.getRepetitive().setContent(entry);
                             entry.getRepetitive().setPeriod(p);
                             entry.getRepetitive().setType(type.getSelectedIndex());
                             parent.displayRepetitive(entry.getRepetitive());

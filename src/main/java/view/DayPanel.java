@@ -21,6 +21,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     private JPanel selected = null;
     private int startPoint = 0;
     private int endPoint = -1;
+    private boolean modifyAllowed = true;
 
     private static final int timelineOffset = 120;
     private static final int fontSize = 20;
@@ -134,9 +135,9 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     }
 
     void setPosition(Reminder r, LocalDateTime t){
-        r.setTime(t);
-        r.setLocation(r.getX(), positionOf(t) - r.getHeight()/2);
-        r.label.setLocation(r.label.getX(), r.getY());
+            r.setTime(t);
+            r.setLocation(r.getX(), positionOf(t) - r.getHeight() / 2);
+            r.label.setLocation(r.label.getX(), r.getY());
     }
 
     private void setPosition(Event e, LocalDateTime t){
@@ -398,6 +399,15 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     @Override
     public void mousePressed(MouseEvent e) {
         selected = (JPanel) this.getComponentAt(e.getPoint());
+        if(selected instanceof Entry){
+            Entry sel = (Entry) selected;
+            if(sel.isFirstRepetitive() || !sel.isRepetitive()){
+                modifyAllowed = true;
+            }
+            else {
+                modifyAllowed = false;
+            }
+        }
         if(selected instanceof Event){
             startPoint = e.getY() - selected.getY();
             if((selected.getHeight() - startPoint) < 10){
@@ -417,6 +427,15 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
             endPoint = -1;
             this.repaint();
         }
+        if(selected instanceof Entry){
+            Entry sel = (Entry) selected;
+            if(sel.isRepetitive() && modifyAllowed){
+                sel.getRepetitive().setContent(sel);
+                this.displayRepetitive(sel.getRepetitive());
+                this.revalidate();
+                this.repaint();
+            }
+        }
     }
 
     @Override
@@ -433,9 +452,11 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     public void mouseDragged(MouseEvent e) {
         if(selected instanceof Reminder){
             Reminder r = (Reminder) selected;
-            LocalDateTime t = round5min(timeOf(e.getY()));
-            if(!r.getTime().equals(t)) {
-                setPosition(r, t);
+            if(modifyAllowed) {
+                LocalDateTime t = round5min(timeOf(e.getY()));
+                if (!r.getTime().equals(t)) {
+                    setPosition(r, t);
+                }
             }
         }
         else if(selected instanceof DayPanel){
@@ -444,21 +465,21 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         }
         else if(selected instanceof Event){
             Event event = (Event) selected;
-            LocalDateTime t = round5min(timeOf(e.getY()));
-            if(startPoint < 0){
-                if(!event.getTimeEnd().equals(t)) {
-                    setTimeEnd(event, t);
-                }
-            }
-            else if(startPoint < 10){
-                if(!event.getTimeStart().equals(t)) {
-                    setTimeStart(event, t);
-                }
-            }
-            else {
-                t = round5min(timeOf(e.getY() - startPoint));
-                if(!event.getTimeStart().equals(t)) {
-                    setPosition(event, t);
+            if(modifyAllowed) {
+                LocalDateTime t = round5min(timeOf(e.getY()));
+                if (startPoint < 0) {
+                    if (!event.getTimeEnd().equals(t)) {
+                        setTimeEnd(event, t);
+                    }
+                } else if (startPoint < 10) {
+                    if (!event.getTimeStart().equals(t)) {
+                        setTimeStart(event, t);
+                    }
+                } else {
+                    t = round5min(timeOf(e.getY() - startPoint));
+                    if (!event.getTimeStart().equals(t)) {
+                        setPosition(event, t);
+                    }
                 }
             }
         }

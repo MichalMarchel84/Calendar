@@ -1,6 +1,5 @@
 package view;
 
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -9,7 +8,7 @@ class Repetitive{
 
     static final String[] types = {"Month", "Year", "Period"};
     private LocalDateTime timeEnd = null;
-    private final Entry content;
+    private Entry content;
     private int type = 0;
     private int period = 7;
     private final ArrayList<Entry> entries = new ArrayList<>();
@@ -116,5 +115,9 @@ class Repetitive{
 
     Entry getContent(){
         return content;
+    }
+
+    void setContent(Entry e){
+        this.content = e;
     }
 }
