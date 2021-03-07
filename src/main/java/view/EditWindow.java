@@ -75,6 +75,8 @@ class EditWindow extends JFrame implements ActionListener {
         if(entry.isRepetitive()){
             repetitive.setSelected(true);
             repetitive.setEnabled(false);
+            type.setEnabled(false);
+            period.setEnabled(false);
             type.setSelectedIndex(entry.getRepetitive().getType());
             period.setText(Integer.toString(entry.getRepetitive().getPeriod()));
             options.add(repetitiveOptions, "0 2 2 2 f f");

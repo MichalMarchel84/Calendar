@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -18,15 +19,24 @@ class Repetitive{
     }
 
     void setEntriesFor(LocalDateTime t1, LocalDateTime t2){
-        if(t2.isAfter(content.getTime())){
-            if((timeEnd == null) || t1.isBefore(timeEnd)){
-                entries.add(getFirstAfter(t1));
-                while (entries.get(entries.size() - 1).getTime().isBefore(t2)){
-                    entries.add(getFirstAfter(entries.get(entries.size() - 1).getTime().plusMinutes(1)));
-                }
-                entries.remove(entries.size() - 1);
+        entries.clear();
+        if(isBetween(t1, t2)){
+            entries.add(getFirstAfter(t1));
+            while (entries.get(entries.size() - 1).getTime().isBefore(t2)){
+                entries.add(getFirstAfter(entries.get(entries.size() - 1).getTime().plusMinutes(1)));
+            }
+            entries.remove(entries.size() - 1);
+        }
+    }
+
+    boolean isBetween(LocalDateTime t1, LocalDateTime t2){
+        boolean res = false;
+        if(t2.isAfter(content.getTime())) {
+            if ((timeEnd == null) || t1.isBefore(timeEnd)) {
+                res = true;
             }
         }
+        return res;
     }
 
     ArrayList<Entry> getEntries(){
@@ -58,6 +68,7 @@ class Repetitive{
             Event e = (Event) entry;
             long p = e.getTimeStart().until(e.getTimeEnd(), ChronoUnit.MINUTES);
             res = new Event(time, time.plusMinutes(p));
+            res.setBackground(new Color(0, 255, 0, 100));
         }
         res.setTitle(content.getTitle());
         res.setDescription(content.getDescription());

@@ -19,7 +19,12 @@ class Reminder extends Entry {
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.ORANGE);
+        if(super.isRepetitive()) {
+            g2d.setColor(Color.GREEN);
+        }
+        else {
+            g2d.setColor(Color.BLUE);
+        }
         g2d.setStroke(new BasicStroke(4));
         g2d.drawLine(0, this.getHeight()/2, this.getWidth(), this.getHeight()/2);
         GeneralPath marker = new GeneralPath();

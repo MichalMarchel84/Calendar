@@ -47,12 +47,21 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     void setDate(LocalDate time){
         this.time = time.atStartOfDay();
         this.time = this.time.minusDays(daysInBuffer);
+        this.updatePositions();
+        for(Repetitive r : repetitives){
+            displayRepetitive(r);
+        }
+        this.revalidate();
         this.repaint();
     }
 
     void moveBuffer(int val){
         time = time.plusDays(val);
         updatePositions();
+        for(Repetitive r : repetitives){
+            displayRepetitive(r);
+        }
+        this.revalidate();
         this.repaint();
     }
 
@@ -82,13 +91,45 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     }
 
     private void updatePositions(){
+        ArrayList<Entry> forDisposal = new ArrayList<>();
         for(Reminder r : reminders){
             r.setLocation(r.getX(), positionOf(r.getTime()) - r.getHeight()/2);
             r.label.setLocation(r.label.getX(), r.getY());
+            if((r.getY() < 0)|| (r.getY() > this.getHeight())){
+                forDisposal.add(r);
+            }
         }
         for(Event e : events){
             e.setLocation(e.getX(), positionOf(e.getTimeStart()));
             e.label.setLocation(e.label.getX(), e.getY());
+            if((e.getY() + e.getHeight() < 0)|| (e.getY() > this.getHeight())){
+                forDisposal.add(e);
+            }
+        }
+        for(Entry e : forDisposal){
+            this.removeEntry(e);
+        }
+        ArrayList<Repetitive> repForDisposal = new ArrayList<>();
+        for(Repetitive r : repetitives){
+            if(r.isBetween(time, time.plusDays(2*daysInBuffer + 1))) {
+                for (Entry e : r.getEntries()) {
+                    if (e instanceof Reminder) {
+                        Reminder rem = (Reminder) e;
+                        rem.setLocation(rem.getX(), positionOf(rem.getTime()) - rem.getHeight() / 2);
+                        rem.label.setLocation(rem.label.getX(), rem.getY());
+                    } else if (e instanceof Event) {
+                        Event ev = (Event) e;
+                        ev.setLocation(ev.getX(), positionOf(ev.getTimeStart()));
+                        ev.label.setLocation(ev.label.getX(), ev.getY());
+                    }
+                }
+            }
+            else {
+                repForDisposal.add(r);
+            }
+        }
+        for (Repetitive r : repForDisposal){
+            this.removeRepetitive(r);
         }
     }
 
@@ -190,9 +231,15 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     void addRepetitive(Repetitive r){
         repetitives.add(r);
         displayRepetitive(r);
+        this.revalidate();
+        this.repaint();
     }
 
     private void displayRepetitive(Repetitive r){
+        for(Entry e : r.getEntries()){
+            this.remove(e);
+            this.remove(e.label);
+        }
         r.setEntriesFor(time, time.plusDays(2*daysInBuffer + 1));
         ArrayList<Entry> elemnts = r.getEntries();
         if(elemnts.size() > 0){
@@ -209,17 +256,19 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
                 }
             }
         }
-        this.revalidate();
-        this.repaint();
+    }
+
+    private void removeRepetitive(Repetitive r){
+        for (Entry e : r.getEntries()){
+            this.remove(e);
+            this.remove(e.label);
+        }
+        repetitives.remove(r);
     }
 
     void removeEntry(Entry entry){
         if(entry.isRepetitive()){
-            for(Entry e : entry.getRepetitive().getEntries()){
-                this.remove(e);
-                this.remove(e.label);
-            }
-            repetitives.remove(entry.getRepetitive());
+            removeRepetitive(entry.getRepetitive());
         }
         else if(entry instanceof Reminder){
             Reminder r = (Reminder) entry;
@@ -245,8 +294,15 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
             this.remove(e);
             this.remove(e.label);
         }
+        for(Repetitive r : repetitives){
+            for (Entry e : r.getEntries()){
+                this.remove(e);
+                this.remove(e.label);
+            }
+        }
         reminders.clear();
         events.clear();
+        repetitives.clear();
     }
 
     LocalDateTime round5min(LocalDateTime t){
