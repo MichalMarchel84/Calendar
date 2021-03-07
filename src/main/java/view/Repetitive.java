@@ -23,6 +23,11 @@ class Repetitive{
             entries.add(getFirstAfter(t1));
             while (entries.get(entries.size() - 1).getTime().isBefore(t2)){
                 entries.add(getFirstAfter(entries.get(entries.size() - 1).getTime().plusMinutes(1)));
+                if(timeEnd != null) {
+                    if (entries.get(entries.size() - 1).getTime().isAfter(timeEnd)) {
+                        break;
+                    }
+                }
             }
             entries.remove(entries.size() - 1);
         }

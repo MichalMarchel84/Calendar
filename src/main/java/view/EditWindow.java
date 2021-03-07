@@ -15,18 +15,23 @@ class EditWindow extends JFrame implements ActionListener {
     private final Entry entry;
     private final JTextField title = new JTextField(50);
     private final JTextArea description = new JTextArea();
-    JButton accept = new JButton(I18n.getPhrase("save_button"));
-    JButton cancel = new JButton(I18n.getPhrase("cancel_button"));
-    JTextField from = new JTextField(5);
-    JTextField to = new JTextField(5);
-    JPanel options = new JPanel();
-    JPanel repetitiveOptions = new JPanel();
-    JCheckBox repetitive = new JCheckBox();
-    JComboBox<String> type = new JComboBox<>(Repetitive.types);
-    JTextField period = new JTextField(6);
-    JLabel periodLabel = new JLabel(I18n.getPhrase("days"));
+    private final JButton accept = new JButton(I18n.getPhrase("save_button"));
+    private final JButton cancel = new JButton(I18n.getPhrase("cancel_button"));
+    private final JTextField from = new JTextField(5);
+    private final JTextField to = new JTextField(5);
+    private final JPanel options = new JPanel();
+    private final JPanel repetitiveOptions = new JPanel();
+    private final JCheckBox repetitive = new JCheckBox();
+    private final JComboBox<String> type = new JComboBox<>(Repetitive.types);
+    private final JTextField period = new JTextField(6);
+    private final JLabel periodLabel = new JLabel(I18n.getPhrase("days"));
+    private final JButton finish = new JButton();
+    private final JLabel beginLabel = new JLabel();
+    private final JLabel endLabel = new JLabel();
+    DayPanel parent;
 
     EditWindow(Entry entry){
+        parent = (DayPanel) entry.getParent();
         this.entry = entry;
         title.setText(entry.getTitle());
         title.setFont(new Font(title.getFont().getName(), Font.BOLD, 20));
@@ -37,7 +42,7 @@ class EditWindow extends JFrame implements ActionListener {
         double[] cols = {10, 0.3, TableLayout.FILL, TableLayout.FILL, 10};
         double[] rows = {10, 0.07, 0.15, 0.07, TableLayout.FILL, 0.15, 10};
         TableLayout lay = new TableLayout(cols, rows);
-        lay.setHGap(5);
+        lay.setHGap(10);
         lay.setVGap(10);
         JPanel p = new JPanel();
         p.setLayout(lay);
@@ -80,6 +85,24 @@ class EditWindow extends JFrame implements ActionListener {
                 period.setEnabled(false);
                 from.setEnabled(false);
                 to.setEnabled(false);
+                DateTimeFormatter dateDtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+                beginLabel.setText(I18n.getPhrase("startAt") + " " + entry.getRepetitive().getContent().getTime().format(dateDtf));
+                repetitiveOptions.add(beginLabel, "0 4 1 4 c c");
+                if(entry.getRepetitive().getTimeEnd() == null){
+                    endLabel.setText(I18n.getPhrase("ongoing"));
+                }
+                else {
+                    endLabel.setText(I18n.getPhrase("endAt") + " " + entry.getRepetitive().getTimeEnd().format(dateDtf));
+                }
+                repetitiveOptions.add(endLabel, "0 5 1 5 c c");
+                if(entry.getRepetitive().getTimeEnd() == null){
+                    finish.setText(I18n.getPhrase("finish"));
+                }
+                else {
+                    finish.setText(I18n.getPhrase("resume"));
+                }
+                finish.addActionListener(this);
+                repetitiveOptions.add(finish, "0 6 1 6 f f");
             }
             type.setSelectedIndex(entry.getRepetitive().getType());
             period.setText(Integer.toString(entry.getRepetitive().getPeriod()));
@@ -108,11 +131,11 @@ class EditWindow extends JFrame implements ActionListener {
 
     void createRepetitiveOptions(){
         double[] cols = {0.5, 0.5};
-        double[] rows = new double[4];
+        double[] rows = new double[7];
         Arrays.fill(rows, TableLayout.PREFERRED);
         TableLayout lay = new TableLayout(cols, rows);
         lay.setHGap(5);
-        lay.setVGap(5);
+        lay.setVGap(10);
         repetitiveOptions.setLayout(lay);
         repetitiveOptions.add(new JLabel("Repeat every"), "0 0 1 0 c c");
         type.addActionListener(this);
@@ -144,7 +167,6 @@ class EditWindow extends JFrame implements ActionListener {
                 entry.setDescription(description.getText());
             }
             try {
-                DayPanel parent = (DayPanel) entry.getParent();
                 boolean firstRepetitive = entry.isFirstRepetitive();
                 if(entry instanceof Reminder){
                     parent.setPosition((Reminder) entry, txtFieldTime(from, entry.getTime()));
@@ -231,6 +253,22 @@ class EditWindow extends JFrame implements ActionListener {
             }
             repetitiveOptions.revalidate();
             repetitiveOptions.repaint();
+        }
+        else if(e.getSource().equals(finish)){
+            if(entry.getRepetitive().getTimeEnd() == null){
+                entry.getRepetitive().setTimeEnd(entry.getTime());
+                finish.setText(I18n.getPhrase("resume"));
+                DateTimeFormatter dateDtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+                endLabel.setText(I18n.getPhrase("endAt") + " " + entry.getRepetitive().getTimeEnd().format(dateDtf));
+            }
+            else {
+                entry.getRepetitive().setTimeEnd(null);
+                finish.setText(I18n.getPhrase("finish"));
+                endLabel.setText(I18n.getPhrase("ongoing"));
+            }
+            parent.displayRepetitive(entry.getRepetitive());
+            parent.revalidate();
+            parent.repaint();
         }
     }
 }

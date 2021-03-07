@@ -76,18 +76,40 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         return (int)((double)min* this.getHeight()/((2*daysInBuffer + 1)*1440));
     }
 
+    private void resizeReminder(Reminder r){
+        r.setSize(new Dimension(timelineWidth + 20, 20));
+        r.setLocation(timelineOffset, positionOf(r.getTime()) - r.getHeight()/2);
+        r.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, r.getHeight()));
+        r.label.setLocation(timelineOffset + timelineWidth + labelOffset, r.getY());
+    }
+
+    private void resizeEvent(Event e){
+        e.setSize(new Dimension(timelineWidth, positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
+        e.setLocation(timelineOffset, positionOf(e.getTimeStart()));
+        e.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, e.getHeight()));
+        e.label.setLocation(timelineOffset + timelineWidth + labelOffset, e.getY());
+    }
+
     private void resize(){
         for(Reminder r : reminders){
-            r.setSize(new Dimension(timelineWidth + 20, 20));
-            r.setLocation(timelineOffset, positionOf(r.getTime()) - r.getHeight()/2);
-            r.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, r.getHeight()));
-            r.label.setLocation(timelineOffset + timelineWidth + labelOffset, r.getY());
+            resizeReminder(r);
         }
         for(Event e : events){
-            e.setSize(new Dimension(timelineWidth, positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
-            e.setLocation(timelineOffset, positionOf(e.getTimeStart()));
-            e.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, e.getHeight()));
-            e.label.setLocation(timelineOffset + timelineWidth + labelOffset, e.getY());
+            resizeEvent(e);
+        }
+        for(Repetitive rep : repetitives){
+            if(rep.getContent() instanceof Reminder){
+                for(Entry entry : rep.getEntries()){
+                    Reminder r = (Reminder) entry;
+                    resizeReminder(r);
+                }
+            }
+            else if(rep.getContent() instanceof Event){
+                for(Entry entry : rep.getEntries()){
+                    Event e = (Event) entry;
+                    resizeEvent(e);
+                }
+            }
         }
     }
 
@@ -171,10 +193,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         reminders.add(r);
         this.add(r);
         this.add(r.label);
-        r.setSize(new Dimension(timelineWidth + 20, 20));
-        r.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, r.getHeight()));
-        r.setLocation(timelineOffset, positionOf(r.getTime()) - r.getHeight() / 2);
-        r.label.setLocation(timelineOffset + timelineWidth + labelOffset, r.getY());
+        resizeReminder(r);
         r.label.revalidate();
         r.label.repaint();
         return r;
@@ -186,10 +205,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         }
         this.add(r);
         this.add(r.label);
-        r.setSize(new Dimension(timelineWidth + 20, 20));
-        r.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, r.getHeight()));
-        r.setLocation(timelineOffset, positionOf(r.getTime()) - r.getHeight() / 2);
-        r.label.setLocation(timelineOffset + timelineWidth + labelOffset, r.getY());
+        resizeReminder(r);
     }
 
     private Event addEvent(LocalDateTime t1, LocalDateTime t2){
@@ -401,12 +417,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         selected = (JPanel) this.getComponentAt(e.getPoint());
         if(selected instanceof Entry){
             Entry sel = (Entry) selected;
-            if(sel.isFirstRepetitive() || !sel.isRepetitive()){
-                modifyAllowed = true;
-            }
-            else {
-                modifyAllowed = false;
-            }
+            modifyAllowed = sel.isFirstRepetitive() || !sel.isRepetitive();
         }
         if(selected instanceof Event){
             startPoint = e.getY() - selected.getY();
