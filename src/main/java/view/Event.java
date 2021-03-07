@@ -9,12 +9,14 @@ import java.time.LocalDateTime;
 class Event extends Entry {
 
     private LocalDateTime timeEnd;
+    static final Color singleColor = new Color(0, 0, 255, 100);
+    static final Color repetitiveColor = new Color(0, 255, 0, 100);
 
     Event(LocalDateTime timeStart, LocalDateTime timeEnd) {
         super(timeStart);
         this.timeEnd = timeEnd;
         label.setTime(this.time, this.timeEnd);
-        this.setBackground(new Color(0, 0, 255, 100));
+        this.setBackground(singleColor);
         this.setBorder(BorderFactory.createLineBorder(Color.RED, 3));
         this.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
         double[] cols = {TableLayout.FILL};

@@ -68,7 +68,7 @@ class Repetitive{
             Event e = (Event) entry;
             long p = e.getTimeStart().until(e.getTimeEnd(), ChronoUnit.MINUTES);
             res = new Event(time, time.plusMinutes(p));
-            res.setBackground(new Color(0, 255, 0, 100));
+            res.setBackground(Event.repetitiveColor);
         }
         res.setTitle(content.getTitle());
         res.setDescription(content.getDescription());

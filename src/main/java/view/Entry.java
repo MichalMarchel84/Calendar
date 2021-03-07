@@ -61,4 +61,14 @@ class Entry extends JPanel {
             return false;
         }
     }
+
+    boolean isFirstRepetitive(){
+        boolean res = false;
+        if(repetitive != null){
+            if(this.time.equals(repetitive.getContent().getTime())){
+                res = true;
+            }
+        }
+        return res;
+    }
 }

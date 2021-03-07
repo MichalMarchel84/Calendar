@@ -74,9 +74,11 @@ class EditWindow extends JFrame implements ActionListener {
 
         if(entry.isRepetitive()){
             repetitive.setSelected(true);
-            repetitive.setEnabled(false);
-            type.setEnabled(false);
-            period.setEnabled(false);
+            if(!entry.isFirstRepetitive()) {
+                repetitive.setEnabled(false);
+                type.setEnabled(false);
+                period.setEnabled(false);
+            }
             type.setSelectedIndex(entry.getRepetitive().getType());
             period.setText(Integer.toString(entry.getRepetitive().getPeriod()));
             options.add(repetitiveOptions, "0 2 2 2 f f");
@@ -160,11 +162,34 @@ class EditWindow extends JFrame implements ActionListener {
                         parent.removeEntry(entry);
                     }
                     else {
-                        entry.getRepetitive().setPeriod(Integer.parseInt(period.getText()));
-                        entry.getRepetitive().setType(type.getSelectedIndex());
+                        int p = Integer.parseInt(period.getText());
+                        if((entry.getRepetitive().getPeriod() != p) || (entry.getRepetitive().getType() != type.getSelectedIndex())) {
+                            entry.getRepetitive().setPeriod(p);
+                            entry.getRepetitive().setType(type.getSelectedIndex());
+                            parent.displayRepetitive(entry.getRepetitive());
+                        }
+                    }
+                }
+                else if(entry.isRepetitive()){
+                    parent.removeRepetitive(entry.getRepetitive());
+                    entry.removeRepetitive();
+                    if(entry instanceof Reminder){
+                        parent.addReminder((Reminder) entry);
+                        parent.setPosition((Reminder) entry, txtFieldTime(from, entry.getTime()));
+                    }
+                    else if(entry instanceof Event){
+                        Event event = (Event) entry;
+                        event.setBackground(Event.singleColor);
+                        LocalDateTime t1 = txtFieldTime(from, event.getTimeStart());
+                        LocalDateTime t2 = txtFieldTime(to, event.getTimeEnd());
+                        parent.setTimeStart(event, t1);
+                        parent.setTimeEnd(event, t2);
+                        parent.addEvent(event);
                     }
                 }
                 this.dispose();
+                parent.revalidate();
+                parent.repaint();
             }
             catch (Exception ex){
                 if(ex instanceof DateTimeParseException) {}

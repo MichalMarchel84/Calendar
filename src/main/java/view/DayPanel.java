@@ -179,7 +179,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         return r;
     }
 
-    private void addReminder(Reminder r){
+    void addReminder(Reminder r){
         if(!r.isRepetitive()) {
             reminders.add(r);
         }
@@ -235,7 +235,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         this.repaint();
     }
 
-    private void displayRepetitive(Repetitive r){
+    void displayRepetitive(Repetitive r){
         for(Entry e : r.getEntries()){
             this.remove(e);
             this.remove(e.label);
@@ -258,7 +258,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         }
     }
 
-    private void removeRepetitive(Repetitive r){
+    void removeRepetitive(Repetitive r){
         for (Entry e : r.getEntries()){
             this.remove(e);
             this.remove(e.label);
