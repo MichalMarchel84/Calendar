@@ -40,7 +40,7 @@ public class Controller implements RequestListener{
             String passwordHash = hash(new String(request.pass));
             try {
                 model = new Model(request.login, passwordHash);
-                window.displayPanel(AppWindow.panels.monthView);
+                window.login();
             }
             catch (LoginPanelException e) {
                 window.displayError(e.getMessage());
