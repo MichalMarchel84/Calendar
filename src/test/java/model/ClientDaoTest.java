@@ -40,7 +40,7 @@ public class ClientDaoTest {
         catch (LoginPanelException e){
             e.printStackTrace();
         }
-        assertEquals(1, client.getClientID());
+        assertEquals(1, client.getID());
     }
 
     @Test
@@ -53,7 +53,7 @@ public class ClientDaoTest {
         catch (LoginPanelException e){
             e.printStackTrace();
         }
-        assertEquals(2, client.getClientID());
+        assertEquals(2, client.getID());
     }
 
     @Test

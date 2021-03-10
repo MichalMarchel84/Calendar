@@ -6,13 +6,13 @@ public class ReminderModel extends EntryModel {
 
     private LocalDateTime time;
 
-    public ReminderModel(LocalDateTime time, String title, String description) {
-        super(1, title, description);
+    public ReminderModel(int entryID, LocalDateTime time, String title, String description) {
+        super(entryID, title, description);
         this.time = time;
     }
 
-    public ReminderModel(LocalDateTime time) {
-        this(time, "", "");
+    public ReminderModel(int entryID, LocalDateTime time) {
+        this(entryID, time, "", "");
     }
 
     public LocalDateTime getTime() {

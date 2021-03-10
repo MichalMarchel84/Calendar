@@ -11,10 +11,6 @@ public class ClientDao {
 
     private final Connection conn;
     private final int clientID;
-    private int lastReminderID;
-    private int lastEventID;
-    private int lastRepetitiveReminderID;
-    private int lastRepetitiveEventID;
 
     public ClientDao(String login, String pass, boolean newClient, Connection conn) throws LoginPanelException{
 
@@ -22,10 +18,6 @@ public class ClientDao {
 
         if(newClient){
             clientID = addUser(login, pass);
-            lastEventID = 0;
-            lastReminderID = 0;
-            lastRepetitiveReminderID = 0;
-            lastRepetitiveEventID = 0;
         }
         else {
             clientID = login(login, pass);
@@ -59,13 +51,13 @@ public class ClientDao {
                 throw new LoginPanelException("error_unknown");
             }
         }
-        return getUserId(login);
+        return getClientIdForLogin(login);
     }
 
     private int login(String login, String pass) throws LoginPanelException{
         int id = -1;
         if(verifyHash(login, pass)){
-            id = getUserId(login);
+            id = getClientIdForLogin(login);
         }
         else {
             throw new LoginPanelException("error_wrong_password");
@@ -73,7 +65,7 @@ public class ClientDao {
         return id;
     }
 
-    private int getUserId(String login){
+    private int getClientIdForLogin(String login){
         int id = -1;
         String sql = "SELECT client_id FROM clients WHERE login=?";
         try{
@@ -111,7 +103,7 @@ public class ClientDao {
         return hash;
     }
 
-    public int getClientID() {
+    public int getID() {
         return clientID;
     }
 }

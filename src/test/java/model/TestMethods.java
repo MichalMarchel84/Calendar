@@ -23,6 +23,11 @@ public class TestMethods {
         executeScript("src/test/resources/clearDB.sql", conn);
     }
 
+    public static void setTestContent(Connection conn){
+        clearDB(conn);
+
+    }
+
     public static void executeScript(String URL, Connection conn){
         try{
             FileReader in = new FileReader(URL);
@@ -36,21 +41,6 @@ public class TestMethods {
             in.close();
             scan.close();
         } catch (IOException | SQLException e){
-            e.printStackTrace();
-        }
-    }
-
-    public static void showClients(Connection conn){
-        String sql = "SELECT * FROM clients";
-        try {
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet res = stmt.executeQuery();
-            while (res.next()){
-                System.out.println(res.getString("client_id") + " " + res.getString("login"));
-            }
-            res.close();
-        }
-        catch (SQLException e){
             e.printStackTrace();
         }
     }
