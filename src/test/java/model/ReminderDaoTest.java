@@ -46,10 +46,11 @@ public class ReminderDaoTest{
     @Test
     public void whenGetLastID_thenReturns_highestID(){
         ReminderDao dao = new ReminderDao(1, conn);
-        for(int i = 0; i < 5; i++){
-            dao.insert(new ReminderModel(dao.getNextID(), LocalDateTime.now()));
+        int rounds = 5;
+        for(int i = 0; i < rounds; i++){
+            dao.create(new ReminderModel(dao.getNextID(), LocalDateTime.now()));
         }
-        Assert.assertEquals(5, dao.getLastID());
+        Assert.assertEquals(rounds, dao.getLastID());
     }
 
     @Test
@@ -63,7 +64,7 @@ public class ReminderDaoTest{
         while (actualTime.isBefore(time.plusDays(2))){
             actualTime = actualTime.plusHours(1);
             ReminderModel r = new ReminderModel(dao.getNextID(), actualTime);
-            dao.insert(r);
+            dao.create(r);
             if((actualTime.isAfter(t1) || actualTime.equals(t1)) && (actualTime.isBefore(t2) || actualTime.equals(t2))){
                 expected.add(r);
             }
@@ -79,4 +80,39 @@ public class ReminderDaoTest{
         assertTrue(contentEqual);
     }
 
+    @Test
+    public void whenDelete_thenGetBetweenReturns_listWithoutDeleted(){
+        LocalDateTime time = LocalDateTime.now();
+        ReminderDao dao = new ReminderDao(1, conn);
+        ArrayList<ReminderModel> expected = new ArrayList<>();
+        expected.add(new ReminderModel(dao.getNextID(), time));
+        expected.add(new ReminderModel(dao.getNextID(), time.plusDays(1)));
+        expected.add(new ReminderModel(dao.getNextID(), time.plusDays(2)));
+        for (ReminderModel r : expected){
+            dao.create(r);
+        }
+        dao.delete(expected.get(1));
+        expected.remove(1);
+        ArrayList<ReminderModel> returned = dao.getBetween(time, time.plusDays(2));
+        boolean contentEqual = true;
+        for (int i = 0; i < expected.size() - 1; i++){
+            if(!modelsEqual(expected.get(i), returned.get(i))){
+                contentEqual = false;
+            }
+        }
+        assertTrue(contentEqual);
+    }
+
+    @Test
+    public void whenUpdate_thenGetBetweenReturns_modifiedModel(){
+        ReminderDao dao = new ReminderDao(1, conn);
+        ReminderModel r = new ReminderModel(dao.getNextID(), LocalDateTime.now());
+        dao.create(r);
+        r.setTime(r.getTime().plusDays(1));
+        r.setTitle("test");
+        r.setDescription("test description");
+        dao.update(r);
+        ReminderModel returned = dao.getBetween(r.getTime(), r.getTime()).get(0);
+        assertTrue(modelsEqual(r, returned));
+    }
 }

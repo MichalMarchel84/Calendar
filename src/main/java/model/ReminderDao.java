@@ -48,7 +48,7 @@ public class ReminderDao {
         return lastID;
     }
 
-    void insert(ReminderModel reminder){
+    void create(ReminderModel reminder){
         String sql = "INSERT INTO reminders VALUES (?, ?, ?, ?, ?)";
         try{
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -58,6 +58,35 @@ public class ReminderDao {
             stmt.setString(4, reminder.getTitle());
             stmt.setString(5, reminder.getDescription());
             stmt.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    void delete(ReminderModel r){
+        String sql = "DELETE FROM reminders WHERE client_id = ? AND entry_id = ?";
+        try {
+            PreparedStatement s = conn.prepareStatement(sql);
+            s.setInt(1, clientID);
+            s.setInt(2, r.getEntryID());
+            s.executeUpdate();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    void update(ReminderModel r){
+        String sql = "UPDATE reminders SET time = ?, title = ?, description = ? WHERE client_id = ? AND entry_id = ?";
+        try {
+            PreparedStatement s = conn.prepareStatement(sql);
+            s.setInt(1, (int)r.getTime().toEpochSecond(ZoneOffset.UTC));
+            s.setString(2, r.getTitle());
+            s.setString(3, r.getDescription());
+            s.setInt(4, clientID);
+            s.setInt(5, r.getEntryID());
+            s.executeUpdate();
         }
         catch (SQLException e){
             e.printStackTrace();
