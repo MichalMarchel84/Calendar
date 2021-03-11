@@ -2,19 +2,19 @@ package model;
 
 import java.time.LocalDateTime;
 
-public class EventModel {//extends EntryModel {
+public class EventModel extends EntryModel {
 
-    /*private LocalDateTime startTime;
+    private LocalDateTime startTime;
     private LocalDateTime endTime;
 
-    public EventModel(LocalDateTime startTime, LocalDateTime endTime, String title, String description) {
+    public EventModel(int entryID, LocalDateTime startTime, LocalDateTime endTime, String title, String description) {
         super(entryID, title, description);
         this.startTime = startTime;
         this.endTime = endTime;
     }
 
-    public EventModel(LocalDateTime startTime, LocalDateTime endTime) {
-        this(startTime, endTime, "", "");
+    public EventModel(int entryID, LocalDateTime startTime, LocalDateTime endTime) {
+        this(entryID, startTime, endTime, "", "");
     }
 
     public LocalDateTime getStartTime() {
@@ -25,14 +25,14 @@ public class EventModel {//extends EntryModel {
         return endTime;
     }
 
-    public void setTime(LocalDateTime startTime, LocalDateTime endTime) {
-        if(startTime.isBefore(endTime)){
-            this.startTime = startTime;
-            this.endTime = endTime;
+    public void setTime(LocalDateTime t1, LocalDateTime t2) {
+        if(t1.isBefore(t2)){
+            this.startTime = t1;
+            this.endTime = t2;
         }
         else{
-            this.startTime = endTime;
-            this.endTime = startTime;
+            this.startTime = t2;
+            this.endTime = t1;
         }
-    }*/
+    }
 }

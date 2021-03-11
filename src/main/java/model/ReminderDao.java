@@ -10,67 +10,26 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.TimeZone;
 
-public class ReminderDao {
-
-    private final int clientID;
-    private final Connection conn;
-    private int lastID;
+public class ReminderDao extends Dao{
 
     public ReminderDao(int clientID, Connection conn) {
-        this.conn = conn;
-        this.clientID = clientID;
-        lastID = getLastID();
+        super("reminders", clientID, conn);
     }
 
     public ReminderDao(int clientID){
         this(clientID, App.conn);
     }
 
-    public int getLastID(){
-        int id = 0;
-        String sql ="SELECT MAX(entry_id) AS id FROM reminders WHERE client_id = ?";
-        try {
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, clientID);
-            ResultSet res = stmt.executeQuery();
-            if(res.next()){
-                id = res.getInt("id");
-            }
-        }
-        catch (SQLException e){
-            e.printStackTrace();
-        }
-        return id;
-    }
-
-    int getNextID(){
-        lastID++;
-        return lastID;
-    }
-
-    void create(ReminderModel reminder){
+    void create(ReminderModel r){
         String sql = "INSERT INTO reminders VALUES (?, ?, ?, ?, ?)";
         try{
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, clientID);
-            stmt.setInt(2, reminder.getEntryID());
-            stmt.setInt(3, (int)reminder.getTime().toEpochSecond(ZoneOffset.UTC));
-            stmt.setString(4, reminder.getTitle());
-            stmt.setString(5, reminder.getDescription());
+            PreparedStatement stmt = super.getConn().prepareStatement(sql);
+            stmt.setInt(1, super.getClientID());
+            stmt.setInt(2, r.getEntryID());
+            stmt.setInt(3, (int)r.getTime().toEpochSecond(ZoneOffset.UTC));
+            stmt.setString(4, r.getTitle());
+            stmt.setString(5, r.getDescription());
             stmt.executeUpdate();
-        }
-        catch (SQLException e){
-            e.printStackTrace();
-        }
-    }
-
-    void delete(ReminderModel r){
-        String sql = "DELETE FROM reminders WHERE client_id = ? AND entry_id = ?";
-        try {
-            PreparedStatement s = conn.prepareStatement(sql);
-            s.setInt(1, clientID);
-            s.setInt(2, r.getEntryID());
-            s.executeUpdate();
         }
         catch (SQLException e){
             e.printStackTrace();
@@ -80,11 +39,11 @@ public class ReminderDao {
     void update(ReminderModel r){
         String sql = "UPDATE reminders SET time = ?, title = ?, description = ? WHERE client_id = ? AND entry_id = ?";
         try {
-            PreparedStatement s = conn.prepareStatement(sql);
+            PreparedStatement s = super.getConn().prepareStatement(sql);
             s.setInt(1, (int)r.getTime().toEpochSecond(ZoneOffset.UTC));
             s.setString(2, r.getTitle());
             s.setString(3, r.getDescription());
-            s.setInt(4, clientID);
+            s.setInt(4, super.getClientID());
             s.setInt(5, r.getEntryID());
             s.executeUpdate();
         }
@@ -97,8 +56,8 @@ public class ReminderDao {
         ArrayList<ReminderModel> list = new ArrayList<>();
         String sql = "SELECT entry_id, time, title, description FROM reminders WHERE client_id = ? AND time BETWEEN ? AND ?";
         try {
-            PreparedStatement s = conn.prepareStatement(sql);
-            s.setInt(1, clientID);
+            PreparedStatement s = super.getConn().prepareStatement(sql);
+            s.setInt(1, super.getClientID());
             s.setInt(2, (int)t1.toEpochSecond(ZoneOffset.UTC));
             s.setInt(3, (int)t2.toEpochSecond(ZoneOffset.UTC));
             ResultSet set = s.executeQuery();
