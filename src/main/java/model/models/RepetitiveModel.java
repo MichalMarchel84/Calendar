@@ -44,10 +44,9 @@ public class RepetitiveModel extends EntryModel {
 
     public LocalDateTime getFirstAfter(LocalDateTime time){
         LocalDateTime res = null;
-        time = time.minusMinutes(1); //counts including given time
         if((finishedAt == null) || time.isBefore(finishedAt)) {
             res = LocalDateTime.from(startAt);
-            while (res.isBefore(time)) {
+            while (res.isBefore(time) || res.equals(time)) {
                 if (interval == -1) {
                     res = res.plusYears(1);
                 } else if (interval == 0) {

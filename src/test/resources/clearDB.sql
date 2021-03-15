@@ -1,14 +1,3 @@
-DROP TABLE IF EXISTS "repetitive_reminders";
-CREATE TABLE IF NOT EXISTS "repetitive_reminders" (
-	"client_id"	INTEGER NOT NULL,
-	"entry_id"	INTEGER NOT NULL,
-	"started_at"	INTEGER NOT NULL,
-	"finished_at"	INTEGER,
-	"interval"	INTEGER NOT NULL,
-	"title"	TEXT,
-	"description"	TEXT,
-	PRIMARY KEY("client_id","entry_id")
-);
 DROP TABLE IF EXISTS "repetitive_events";
 CREATE TABLE IF NOT EXISTS "repetitive_events" (
 	"client_id"	INTEGER NOT NULL,
@@ -16,7 +5,18 @@ CREATE TABLE IF NOT EXISTS "repetitive_events" (
 	"started_at"	INTEGER NOT NULL,
 	"finished_at"	INTEGER,
 	"interval"	INTEGER NOT NULL,
-	"end_time"	INTEGER NOT NULL,
+	"duration"	INTEGER NOT NULL,
+	"title"	TEXT,
+	"description"	TEXT,
+	PRIMARY KEY("client_id","entry_id")
+);
+DROP TABLE IF EXISTS "repetitive_reminders";
+CREATE TABLE IF NOT EXISTS "repetitive_reminders" (
+	"client_id"	INTEGER NOT NULL,
+	"entry_id"	INTEGER NOT NULL,
+	"started_at"	INTEGER NOT NULL,
+	"finished_at"	INTEGER,
+	"interval"	INTEGER NOT NULL,
 	"title"	TEXT,
 	"description"	TEXT,
 	PRIMARY KEY("client_id","entry_id")
