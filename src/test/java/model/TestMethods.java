@@ -1,8 +1,12 @@
 package model;
 
 
+import model.daos.RepetitiveReminderDao;
+import model.models.RepetitiveReminderModel;
+
 import java.io.*;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class TestMethods {
@@ -23,9 +27,9 @@ public class TestMethods {
         executeScript("src/test/resources/clearDB.sql", conn);
     }
 
-    public static void setTestContent(Connection conn){
-        clearDB(conn);
-
+    public static void setRepetitiveReminderContent(Connection conn, LocalDateTime startedAt, LocalDateTime finishedAt, int interval){
+        RepetitiveReminderDao dao = new RepetitiveReminderDao(1, conn);
+        dao.create(new RepetitiveReminderModel(dao.getNextID(), "", "", startedAt, finishedAt, interval));
     }
 
     public static void executeScript(String URL, Connection conn){

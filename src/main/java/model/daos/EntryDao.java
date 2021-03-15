@@ -55,7 +55,7 @@ public class EntryDao {
         }
     }
 
-    int getNextID(){
+    public int getNextID(){
         lastID++;
         return lastID;
     }

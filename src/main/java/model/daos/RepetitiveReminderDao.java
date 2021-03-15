@@ -64,17 +64,16 @@ public class RepetitiveReminderDao extends RepetitiveDao{
         }
     }
 
-    public List<RepetitiveReminderModel> getBetween(LocalDateTime t1, LocalDateTime t2){
+    public ArrayList<RepetitiveReminderModel> getBetween(LocalDateTime t1, LocalDateTime t2){
         if(t1.isAfter(t2)){
             LocalDateTime temp = t1;
             t1 = t2;
             t2 = temp;
         }
         ArrayList<RepetitiveReminderModel> list = new ArrayList<>();
-        ArrayList<RepetitiveModel> instances;
         try{
             //looking for instances valid for given period in DB
-            instances = (ArrayList<RepetitiveModel>) super.getInstancesBetween(t1, t2);
+            ArrayList<RepetitiveModel> instances = (ArrayList<RepetitiveModel>) super.getInstancesBetween(t1, t2);
 
             //generating occurrences in given period
             for(RepetitiveModel model : instances){
