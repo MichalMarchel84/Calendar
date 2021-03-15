@@ -1,5 +1,8 @@
 package model;
 
+import model.ClientDaoObs;
+import model.LoginPanelException;
+
 public class Model {
 
     private final int clientId;

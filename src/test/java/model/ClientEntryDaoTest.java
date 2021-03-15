@@ -1,6 +1,7 @@
 package model;
 
 
+import model.daos.ClientDao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +12,7 @@ import java.sql.SQLException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class ClientDaoTest {
+public class ClientEntryDaoTest {
 
     private static Connection conn = TestMethods.getConnection();
 

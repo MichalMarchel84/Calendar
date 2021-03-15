@@ -1,18 +1,24 @@
-package model;
+package model.daos;
+
+import model.models.EntryModel;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.TimeZone;
 
-public class Dao {
+public class EntryDao {
 
     private final int clientID;
     private final Connection conn;
     private int lastID;
     private final String tableName;
 
-    public Dao(String tableName, int clientID, Connection conn) {
+    public EntryDao(String tableName, int clientID, Connection conn) {
         this.tableName = tableName;
         this.conn = conn;
         this.clientID = clientID;
@@ -52,6 +58,14 @@ public class Dao {
     int getNextID(){
         lastID++;
         return lastID;
+    }
+
+    int toUnixTime(LocalDateTime t){
+        return (int)t.toEpochSecond(ZoneOffset.UTC);
+    }
+
+    LocalDateTime toLocalTime(int t){
+        return LocalDateTime.ofInstant(Instant.ofEpochSecond(t), TimeZone.getTimeZone("UTC").toZoneId());
     }
 
     public int getClientID() {

@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS "repetitive_reminders" (
 	"entry_id"	INTEGER NOT NULL,
 	"started_at"	INTEGER NOT NULL,
 	"finished_at"	INTEGER,
-	"time"	INTEGER NOT NULL,
+	"interval"	INTEGER NOT NULL,
 	"title"	TEXT,
 	"description"	TEXT,
 	PRIMARY KEY("client_id","entry_id")
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS "repetitive_events" (
 	"entry_id"	INTEGER NOT NULL,
 	"started_at"	INTEGER NOT NULL,
 	"finished_at"	INTEGER,
-	"start_time"	INTEGER NOT NULL,
+	"interval"	INTEGER NOT NULL,
 	"end_time"	INTEGER NOT NULL,
 	"title"	TEXT,
 	"description"	TEXT,

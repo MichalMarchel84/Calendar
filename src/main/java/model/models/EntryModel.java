@@ -1,4 +1,4 @@
-package model;
+package model.models;
 
 public class EntryModel {
 

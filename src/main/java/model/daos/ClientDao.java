@@ -1,5 +1,7 @@
-package model;
+package model.daos;
 
+import model.App;
+import model.LoginPanelException;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
@@ -12,7 +14,7 @@ public class ClientDao {
     private final Connection conn;
     private final int clientID;
 
-    public ClientDao(String login, String pass, boolean newClient, Connection conn) throws LoginPanelException{
+    public ClientDao(String login, String pass, boolean newClient, Connection conn) throws LoginPanelException {
 
         this.conn = conn;
 
