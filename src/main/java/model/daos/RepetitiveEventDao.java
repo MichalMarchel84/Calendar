@@ -79,7 +79,7 @@ public class RepetitiveEventDao extends RepetitiveDao{
             //generating occurrences in given period
             for (RepetitiveModel model : instances) {
                 RepetitiveEventModel m = (RepetitiveEventModel) model;
-                LocalDateTime occurrenceTime = m.getFirstAfter(t1.minusMinutes(1)); //including result for t1
+                LocalDateTime occurrenceTime = m.getFirstAfter(t1.minusMinutes(m.getDuration())); //including result when t1 after start but before end of event
                 while ((occurrenceTime != null) && occurrenceTime.isBefore(t2.plusMinutes(1))) { //including result for t2
                     list.add(m.copy(occurrenceTime));
                     occurrenceTime = m.getFirstAfter(occurrenceTime);

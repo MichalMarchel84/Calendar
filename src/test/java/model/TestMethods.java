@@ -1,7 +1,11 @@
 package model;
 
 
+import model.daos.RepetitiveDao;
+import model.daos.RepetitiveEventDao;
 import model.daos.RepetitiveReminderDao;
+import model.models.RepetitiveEventModel;
+import model.models.RepetitiveModel;
 import model.models.RepetitiveReminderModel;
 
 import java.io.*;
@@ -30,6 +34,11 @@ public class TestMethods {
     public static void setRepetitiveReminderContent(Connection conn, LocalDateTime startedAt, LocalDateTime finishedAt, int interval){
         RepetitiveReminderDao dao = new RepetitiveReminderDao(1, conn);
         dao.create(new RepetitiveReminderModel(dao.getNextID(), "", "", startedAt, finishedAt, interval));
+    }
+
+    public static void setRepetitiveEventContent(Connection conn, LocalDateTime startedAt, long duration, int interval){
+        RepetitiveEventDao dao = new RepetitiveEventDao(1, conn);
+        dao.create(new RepetitiveEventModel(dao.getNextID(), "", "", startedAt, null, interval, duration));
     }
 
     public static void executeScript(String URL, Connection conn){
