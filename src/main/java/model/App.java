@@ -3,7 +3,6 @@ package model;
 import controller.Controller;
 import view.AppWindow;
 import view.Comm;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -11,7 +10,6 @@ import java.sql.SQLException;
 public class App {
 
     public static final Connection conn = connect();
-
     private static final Thread onExit = new Thread(App::disconnect);
 
     public static void main(String[] args){

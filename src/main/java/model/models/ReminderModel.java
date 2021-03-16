@@ -1,7 +1,5 @@
 package model.models;
 
-import model.models.EntryModel;
-
 import java.time.LocalDateTime;
 
 public class ReminderModel extends EntryModel {
