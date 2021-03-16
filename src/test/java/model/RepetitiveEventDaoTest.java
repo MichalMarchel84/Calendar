@@ -1,9 +1,8 @@
-package model.daos;
+package model;
 
+import model.RepetitiveEventDao;
 import model.TestMethods;
-import model.models.RepetitiveEventModel;
-import model.models.RepetitiveModel;
-import model.models.RepetitiveReminderModel;
+import model.RepetitiveEventModel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

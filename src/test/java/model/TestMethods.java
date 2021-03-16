@@ -1,13 +1,6 @@
 package model;
 
 
-import model.daos.RepetitiveDao;
-import model.daos.RepetitiveEventDao;
-import model.daos.RepetitiveReminderDao;
-import model.models.RepetitiveEventModel;
-import model.models.RepetitiveModel;
-import model.models.RepetitiveReminderModel;
-
 import java.io.*;
 import java.sql.*;
 import java.time.LocalDateTime;

@@ -1,20 +1,20 @@
-package model.models;
+package model;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class RepetitiveEventModel extends RepetitiveModel {
 
-    LocalDateTime time;
-    long duration;
+    private LocalDateTime time;
+    private long duration;
 
-    public RepetitiveEventModel(int entryID, String title, String description, LocalDateTime startAt, LocalDateTime finishedAt, int interval, long duration, LocalDateTime time) {
+    RepetitiveEventModel(int entryID, String title, String description, LocalDateTime startAt, LocalDateTime finishedAt, int interval, long duration, LocalDateTime time) {
         super(entryID, title, description, startAt, finishedAt, interval);
         this.time = time;
         this.duration = duration;
     }
 
-    public RepetitiveEventModel(int entryID, String title, String description, LocalDateTime startAt, LocalDateTime finishedAt, int interval, long duration){
+    RepetitiveEventModel(int entryID, String title, String description, LocalDateTime startAt, LocalDateTime finishedAt, int interval, long duration){
         this(entryID, title, description, startAt, finishedAt, interval, duration, LocalDateTime.from(startAt));
     }
 
@@ -34,7 +34,7 @@ public class RepetitiveEventModel extends RepetitiveModel {
         this.duration = duration;
     }
 
-    public RepetitiveEventModel copy(LocalDateTime time){
+    RepetitiveEventModel copy(LocalDateTime time){
         return new RepetitiveEventModel(super.getEntryID(), super.getTitle(), super.getDescription(), super.getStartAt(), super.getFinishedAt(), super.getInterval(), duration, LocalDateTime.from(time));
     }
 

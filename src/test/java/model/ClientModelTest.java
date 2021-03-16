@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class ClientTest{
+public class ClientModelTest {
 
     private static Connection conn;
 

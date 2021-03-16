@@ -1,25 +1,22 @@
-package model.daos;
+package model;
 
-import model.App;
-import model.LoginPanelException;
-import org.mindrot.jbcrypt.BCrypt;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ClientDao {
+class ClientDao {
 
     private final Connection conn;
     private final int clientID;
 
-    public ClientDao(Connection conn, String login, String passHash) throws LoginPanelException {
+    ClientDao(Connection conn, String login, String passHash) throws LoginPanelException {
 
         this.conn = conn;
         clientID = create(login, passHash);
     }
 
-    public ClientDao(Connection conn, String login) throws LoginPanelException{
+    ClientDao(Connection conn, String login) throws LoginPanelException{
 
         this.conn = conn;
         clientID = getClientIdForLogin(login);
@@ -60,7 +57,7 @@ public class ClientDao {
         return id;
     }
 
-    public String getPasswordHash(String login) throws LoginPanelException {
+    String getPasswordHash(String login) throws LoginPanelException {
         String sql = "SELECT password FROM clients WHERE login = ?";
         String hash = "";
         try {
@@ -81,7 +78,7 @@ public class ClientDao {
         return hash;
     }
 
-    public int getID() {
+    int getID() {
         return clientID;
     }
 }

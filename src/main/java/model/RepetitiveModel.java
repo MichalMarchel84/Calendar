@@ -1,9 +1,6 @@
-package model.models;
-
-import model.models.EntryModel;
+package model;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class RepetitiveModel extends EntryModel {
 
@@ -11,7 +8,7 @@ public class RepetitiveModel extends EntryModel {
     private LocalDateTime finishedAt;
     private int interval;
 
-    public RepetitiveModel(int entryID, String title, String description, LocalDateTime startAt, LocalDateTime finishedAt, int interval) {
+    RepetitiveModel(int entryID, String title, String description, LocalDateTime startAt, LocalDateTime finishedAt, int interval) {
         super(entryID, title, description);
         this.startAt = startAt;
         this.finishedAt = finishedAt;
@@ -42,7 +39,7 @@ public class RepetitiveModel extends EntryModel {
         this.interval = interval;
     }
 
-    public LocalDateTime getFirstAfter(LocalDateTime time){
+    LocalDateTime getFirstAfter(LocalDateTime time){
         LocalDateTime res = null;
         if((finishedAt == null) || time.isBefore(finishedAt)) {
             res = LocalDateTime.from(startAt);

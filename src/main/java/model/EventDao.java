@@ -1,18 +1,12 @@
-package model.daos;
-
-import model.App;
-import model.models.EventModel;
+package model;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 
 public class EventDao extends EntryDao {
 
@@ -24,7 +18,7 @@ public class EventDao extends EntryDao {
         this(clientID, App.conn);
     }
 
-    void create(EventModel event){
+    public void create(EventModel event){
         String sql = "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?)";
         try{
             PreparedStatement stmt = super.getConn().prepareStatement(sql);
@@ -41,7 +35,7 @@ public class EventDao extends EntryDao {
         }
     }
 
-    void update(EventModel event){
+    public void update(EventModel event){
         String sql = "UPDATE events SET start_time = ?, end_time = ?, title = ?, description = ? WHERE client_id = ? AND entry_id = ?";
         try {
             PreparedStatement s = super.getConn().prepareStatement(sql);

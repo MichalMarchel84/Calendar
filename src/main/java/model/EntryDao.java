@@ -1,6 +1,4 @@
-package model.daos;
-
-import model.models.EntryModel;
+package model;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,14 +9,14 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.TimeZone;
 
-public class EntryDao {
+class EntryDao {
 
     private final int clientID;
     private final Connection conn;
     private int lastID;
     private final String tableName;
 
-    public EntryDao(String tableName, int clientID, Connection conn) {
+    EntryDao(String tableName, int clientID, Connection conn) {
         this.tableName = tableName;
         this.conn = conn;
         this.clientID = clientID;
@@ -55,7 +53,7 @@ public class EntryDao {
         }
     }
 
-    public int getNextID(){
+    int getNextID(){
         lastID++;
         return lastID;
     }
@@ -68,11 +66,11 @@ public class EntryDao {
         return LocalDateTime.ofInstant(Instant.ofEpochSecond(t), TimeZone.getTimeZone("UTC").toZoneId());
     }
 
-    public int getClientID() {
+    int getClientID() {
         return clientID;
     }
 
-    public Connection getConn() {
+    Connection getConn() {
         return conn;
     }
 }

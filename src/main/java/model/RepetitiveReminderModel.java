@@ -1,6 +1,4 @@
-package model.models;
-
-import model.models.RepetitiveModel;
+package model;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,12 +7,12 @@ public class RepetitiveReminderModel extends RepetitiveModel {
 
     private LocalDateTime time;
 
-    public RepetitiveReminderModel(int entryID, String title, String description, LocalDateTime startAt, LocalDateTime finishedAt, int interval, LocalDateTime time) {
+    RepetitiveReminderModel(int entryID, String title, String description, LocalDateTime startAt, LocalDateTime finishedAt, int interval, LocalDateTime time) {
         super(entryID, title, description, startAt, finishedAt, interval);
         this.time = time;
     }
 
-    public RepetitiveReminderModel(int entryID, String title, String description, LocalDateTime startAt, LocalDateTime finishedAt, int interval) {
+    RepetitiveReminderModel(int entryID, String title, String description, LocalDateTime startAt, LocalDateTime finishedAt, int interval) {
         this(entryID, title, description, startAt, finishedAt, interval, LocalDateTime.from(startAt));
     }
 
@@ -26,7 +24,7 @@ public class RepetitiveReminderModel extends RepetitiveModel {
         this.time = time;
     }
 
-    public RepetitiveReminderModel copy(LocalDateTime time){
+    RepetitiveReminderModel copy(LocalDateTime time){
         return new RepetitiveReminderModel(super.getEntryID(), super.getTitle(), super.getDescription(), super.getStartAt(), super.getFinishedAt(), super.getInterval(), LocalDateTime.from(time));
     }
 

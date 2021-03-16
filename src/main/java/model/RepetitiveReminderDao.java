@@ -1,26 +1,16 @@
-package model.daos;
-
-import model.App;
-import model.models.RepetitiveModel;
-import model.models.RepetitiveReminderModel;
+package model;
 
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
 
-public class RepetitiveReminderDao extends RepetitiveDao{
+class RepetitiveReminderDao extends RepetitiveDao{
 
-    public RepetitiveReminderDao(int clientID, Connection conn) {
+    RepetitiveReminderDao(int clientID, Connection conn) {
         super(0, clientID, conn);
     }
 
-    public RepetitiveReminderDao(int clientID) {
-        super(0, clientID);
-    }
-
-    public void create(RepetitiveReminderModel model){
+    void create(RepetitiveReminderModel model){
         String sql = "INSERT INTO repetitive_reminders VALUES(?, ?, ?, ?, ?, ?, ?)";
         try {
             PreparedStatement s = super.getConn().prepareStatement(sql);
@@ -43,7 +33,7 @@ public class RepetitiveReminderDao extends RepetitiveDao{
         }
     }
 
-    public void update(RepetitiveReminderModel model){
+    void update(RepetitiveReminderModel model){
         String sql = "UPDATE repetitive_reminders SET started_at = ?, finished_at = ?, interval = ?, title = ?, description = ?";
         try{
             PreparedStatement s = super.getConn().prepareStatement(sql);
@@ -64,7 +54,7 @@ public class RepetitiveReminderDao extends RepetitiveDao{
         }
     }
 
-    public ArrayList<RepetitiveReminderModel> getBetween(LocalDateTime t1, LocalDateTime t2){
+    ArrayList<RepetitiveReminderModel> getBetween(LocalDateTime t1, LocalDateTime t2){
         if(t1.isAfter(t2)){
             LocalDateTime temp = t1;
             t1 = t2;

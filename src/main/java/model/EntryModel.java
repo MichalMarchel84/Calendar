@@ -1,4 +1,4 @@
-package model.models;
+package model;
 
 public class EntryModel {
 
@@ -6,7 +6,7 @@ public class EntryModel {
     private String title;
     private String description;
 
-    public EntryModel(int entryID, String title, String description) {
+    EntryModel(int entryID, String title, String description) {
         this.entryID = entryID;
         this.title = title;
         this.description = description;

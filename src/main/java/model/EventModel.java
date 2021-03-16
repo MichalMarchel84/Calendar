@@ -1,6 +1,4 @@
-package model.models;
-
-import model.models.EntryModel;
+package model;
 
 import java.time.LocalDateTime;
 
@@ -9,14 +7,10 @@ public class EventModel extends EntryModel {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
-    public EventModel(int entryID, LocalDateTime startTime, LocalDateTime endTime, String title, String description) {
+    EventModel(int entryID, LocalDateTime startTime, LocalDateTime endTime, String title, String description) {
         super(entryID, title, description);
         this.startTime = startTime;
         this.endTime = endTime;
-    }
-
-    public EventModel(int entryID, LocalDateTime startTime, LocalDateTime endTime) {
-        this(entryID, startTime, endTime, "", "");
     }
 
     public LocalDateTime getStartTime() {

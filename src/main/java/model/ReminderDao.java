@@ -1,7 +1,5 @@
-package model.daos;
+package model;
 
-import model.App;
-import model.models.ReminderModel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,14 +8,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReminderDao extends EntryDao {
+class ReminderDao extends EntryDao {
 
-    public ReminderDao(int clientID, Connection conn) {
+    ReminderDao(int clientID, Connection conn) {
         super("reminders", clientID, conn);
-    }
-
-    public ReminderDao(int clientID){
-        this(clientID, App.conn);
     }
 
     void create(ReminderModel r){
