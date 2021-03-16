@@ -1,7 +1,6 @@
 package model;
 
 import org.mindrot.jbcrypt.BCrypt;
-
 import java.sql.Connection;
 import java.time.LocalDateTime;
 
@@ -62,8 +61,44 @@ public class Client {
     }
 
     public RepetitiveReminderModel createRepetitiveReminder(LocalDateTime startedAt, int interval, String title, String description){
-        RepetitiveReminderModel result = new RepetitiveReminderModel(repetitiveReminderDao.getNextID(), title, description, null, startedAt, interval);
+        RepetitiveReminderModel result = new RepetitiveReminderModel(repetitiveReminderDao.getNextID(), title, description, startedAt, null, interval);
         repetitiveReminderDao.create(result);
         return result;
+    }
+
+    public RepetitiveEventModel createRepetitiveEvent(LocalDateTime startedAt, long duration, int interval, String title, String description){
+        RepetitiveEventModel result = new RepetitiveEventModel(repetitiveEventDao.getNextID(), title, description, startedAt, null, interval, duration);
+        repetitiveEventDao.create(result);
+        return result;
+    }
+
+    public void update(EntryModel model){
+        if(model instanceof ReminderModel){
+            reminderDao.update((ReminderModel) model);
+        }
+        else if(model instanceof EventModel){
+            eventDao.update((EventModel) model);
+        }
+        else if(model instanceof RepetitiveReminderModel){
+            repetitiveReminderDao.update((RepetitiveReminderModel) model);
+        }
+        else if(model instanceof RepetitiveEventModel){
+            repetitiveEventDao.update((RepetitiveEventModel) model);
+        }
+    }
+
+    public void delete(EntryModel model){
+        if(model instanceof ReminderModel){
+            reminderDao.delete(model);
+        }
+        else if(model instanceof EventModel){
+            eventDao.delete(model);
+        }
+        else if(model instanceof RepetitiveReminderModel){
+            repetitiveReminderDao.delete(model);
+        }
+        else if(model instanceof RepetitiveEventModel){
+            repetitiveEventDao.delete(model);
+        }
     }
 }
