@@ -11,8 +11,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 
-class EditWindow extends JFrame implements ActionListener {
-    private final Entry entry;
+class EditWindow { //extends JFrame implements ActionListener {
+    /*private final Entry entry;
     private final JTextField title = new JTextField(50);
     private final JTextArea description = new JTextArea();
     private final JButton accept = new JButton(I18n.getPhrase("save_button"));
@@ -270,5 +270,5 @@ class EditWindow extends JFrame implements ActionListener {
             parent.revalidate();
             parent.repaint();
         }
-    }
+    }*/
 }

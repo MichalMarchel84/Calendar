@@ -1,74 +1,34 @@
 package view;
 
+import model.*;
+
 import javax.swing.*;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
-class Entry extends JPanel {
-    protected LocalDateTime time;
+abstract class Entry extends JPanel {
     final EntryLabel label;
-    private String title = "";
-    private String description = "";
-    private Repetitive repetitive = null;
+    private final EntryModel model;
+    final boolean repetitive;
 
-    Entry(LocalDateTime time){
-        this.time = time;
+    Entry(EntryModel model){
+        if(model instanceof RepetitiveModel){
+            repetitive = true;
+        }
+        else {
+            repetitive = false;
+        }
+        this.model = model;
         label = new EntryLabel(this);
     }
 
-    LocalDateTime getTime() {
-        return time;
+    LocalDateTime getTime(){
+        return null;
     }
 
-    void setTime(LocalDateTime time) {
-        this.time = time;
-        label.setTime(time);
-    }
+    void setTime(LocalDateTime t){}
 
-    String getTitle() {
-        return title;
-    }
-
-    void setTitle(String title) {
-        this.title = title;
-        this.label.setTitle(title);
-    }
-
-    String getDescription() {
-        return description;
-    }
-
-    void setDescription(String description) {
-        this.description = description;
-    }
-
-    void addRepetitive(Repetitive r){
-        this.repetitive = r;
-    }
-
-    void removeRepetitive(){
-        this.repetitive = null;
-    }
-
-    Repetitive getRepetitive(){
-        return repetitive;
-    }
-
-    boolean isRepetitive(){
-        if(repetitive != null){
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    boolean isFirstRepetitive(){
-        boolean res = false;
-        if(repetitive != null){
-            if(this.time.equals(repetitive.getContent().getTime())){
-                res = true;
-            }
-        }
-        return res;
+    EntryModel getModel(){
+        return model;
     }
 }

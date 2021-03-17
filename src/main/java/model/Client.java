@@ -3,6 +3,8 @@ package model;
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.Connection;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Client {
 
@@ -100,5 +102,17 @@ public class Client {
         else if(model instanceof RepetitiveEventModel){
             repetitiveEventDao.delete(model);
         }
+    }
+
+    public ArrayList<ReminderModel> getRemindersBetween(LocalDateTime t1, LocalDateTime t2){
+        return reminderDao.getBetween(t1, t2);
+    }
+
+    public ArrayList<EventModel> getEventsBetween(LocalDateTime t1, LocalDateTime t2){
+        return eventDao.getBetween(t1, t2);
+    }
+
+    public HashMap<Integer, ArrayList<RepetitiveReminderModel>> getRepetitiveRemindersBetween(LocalDateTime t1, LocalDateTime t2){
+        return repetitiveReminderDao.getBetween(t1, t2);
     }
 }

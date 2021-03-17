@@ -1,7 +1,7 @@
 package view;
 
-import controller.NewUserRequest;
 import info.clearthought.layout.TableLayout;
+import model.App;
 
 import javax.swing.*;
 import java.awt.*;
@@ -86,7 +86,7 @@ class NewUserPanel extends JPanel implements LanguageListener, ActionListener, E
             String p1 = new String(pass.getPassword());
             String p2 = new String(repeatPass.getPassword());
             if(p1.equals(p2)) {
-                Comm.fireRequestEvent(new NewUserRequest(userName.getText(), pass.getPassword()));
+                App.controller.login(userName.getText(), String.copyValueOf(pass.getPassword()), true);
             }
             else{
                 this.setErrorMessage("error_on_pass_set");

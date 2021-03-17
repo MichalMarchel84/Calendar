@@ -1,62 +1,31 @@
 package controller;
 
+import model.App;
+import model.Client;
 import model.LoginPanelException;
-import model.Model;
-import org.mindrot.jbcrypt.BCrypt;
-import view.AppWindow;
 
-public class Controller implements RequestListener{
+public class Controller {
 
-    Model model;
-    AppWindow window;
+    private Client client = null;
 
-    public Controller(AppWindow window) {
-        this.window = window;
+    public Controller() {
     }
 
-    @Override
-    public void requestReceived(Request req) {
-
-        if(req instanceof LoginRequest){
-            LoginRequest request = (LoginRequest)req;
-            try {
-                String passwordHashed = Model.getPasswordHash(request.login);
-                if(!verifyHash(new String(request.pass), passwordHashed)){
-                    window.displayError("error_wrong_password");
-                }
-                else{
-                    model = new Model(request.login);
-                    window.login();
-                }
-            }
-            catch (LoginPanelException e){
-                window.displayError(e.getMessage());
-            }
+    public void login(String login, String pass, boolean newClient){
+        try {
+            client = new Client(login, pass, newClient);
+            App.appWindow.login();
         }
-
-
-        else if(req instanceof NewUserRequest){
-            NewUserRequest request = (NewUserRequest) req;
-            String passwordHash = hash(new String(request.pass));
-            try {
-                model = new Model(request.login, passwordHash);
-                window.login();
-            }
-            catch (LoginPanelException e) {
-                window.displayError(e.getMessage());
-            }
-        }
-
-
-        else{
-            System.out.println("Unknown request");
+        catch (LoginPanelException e){
+            App.appWindow.displayError(e.getMessage());
         }
     }
-    private String hash(String pass){
-        return BCrypt.hashpw(pass, BCrypt.gensalt(10));
+
+    public void logout(){
+        client = null;
     }
 
-    private boolean verifyHash(String pass, String hash){
-        return BCrypt.checkpw(pass, hash);
+    public Client getClient(){
+        return client;
     }
 }

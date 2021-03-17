@@ -1,6 +1,6 @@
 package model;
 
-public class EntryModel {
+public abstract class EntryModel {
 
     private final int entryID;
     private String title;

@@ -3,6 +3,7 @@ package model;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 class RepetitiveReminderDao extends RepetitiveDao{
 
@@ -54,30 +55,29 @@ class RepetitiveReminderDao extends RepetitiveDao{
         }
     }
 
-    ArrayList<RepetitiveReminderModel> getBetween(LocalDateTime t1, LocalDateTime t2){
+    HashMap<Integer, ArrayList<RepetitiveReminderModel>> getBetween(LocalDateTime t1, LocalDateTime t2){
         if(t1.isAfter(t2)){
             LocalDateTime temp = t1;
             t1 = t2;
             t2 = temp;
         }
-        ArrayList<RepetitiveReminderModel> list = new ArrayList<>();
+        HashMap<Integer, ArrayList<RepetitiveReminderModel>> result = new HashMap<>();
         try{
             //looking for instances valid for given period in DB
-            ArrayList<RepetitiveModel> instances = (ArrayList<RepetitiveModel>) super.getInstancesBetween(t1, t2);
+            ArrayList<RepetitiveModel> instances = super.getInstancesBetween(t1, t2);
 
             //generating occurrences in given period
             for(RepetitiveModel model : instances){
                 RepetitiveReminderModel m = (RepetitiveReminderModel) model;
-                LocalDateTime occurrenceTime = m.getFirstAfter(t1.minusMinutes(1)); //including result for t1
-                while ((occurrenceTime != null) && occurrenceTime.isBefore(t2.plusMinutes(1))){ //including result for t2
-                    list.add(m.copy(occurrenceTime));
-                    occurrenceTime = m.getFirstAfter(occurrenceTime);
+                ArrayList<RepetitiveReminderModel> list = m.getBetween(t1, t2);
+                if(list.size() > 0){
+                    result.put(Integer.valueOf(list.get(0).getEntryID()), list);
                 }
             }
         }
         catch (SQLException e){
             e.printStackTrace();
         }
-        return list;
+        return result;
     }
 }

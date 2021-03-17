@@ -52,7 +52,7 @@ public class EventDao extends EntryDao {
         }
     }
 
-    List<EventModel> getBetween(LocalDateTime t1, LocalDateTime t2){
+    ArrayList<EventModel> getBetween(LocalDateTime t1, LocalDateTime t2){
         ArrayList<EventModel> list = new ArrayList<>();
         String sql = "SELECT entry_id, start_time, end_time, title, description FROM events WHERE client_id = ? AND start_time BETWEEN ? AND ?";
         try {

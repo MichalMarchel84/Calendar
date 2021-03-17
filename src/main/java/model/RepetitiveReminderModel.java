@@ -2,6 +2,7 @@ package model;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 public class RepetitiveReminderModel extends RepetitiveModel {
 
@@ -26,6 +27,16 @@ public class RepetitiveReminderModel extends RepetitiveModel {
 
     RepetitiveReminderModel copy(LocalDateTime time){
         return new RepetitiveReminderModel(super.getEntryID(), super.getTitle(), super.getDescription(), super.getStartAt(), super.getFinishedAt(), super.getInterval(), LocalDateTime.from(time));
+    }
+
+    public ArrayList<RepetitiveReminderModel> getBetween(LocalDateTime t1, LocalDateTime t2){
+        ArrayList<RepetitiveReminderModel> list = new ArrayList<>();
+        LocalDateTime occurrenceTime = getFirstAfter(t1.minusMinutes(1)); //including result for t1
+        while ((occurrenceTime != null) && occurrenceTime.isBefore(t2.plusMinutes(1))){ //including result for t2
+            list.add(copy(occurrenceTime));
+            occurrenceTime = getFirstAfter(occurrenceTime);
+        }
+        return list;
     }
 
     @Override

@@ -1,7 +1,8 @@
 package view;
 
-import controller.LoginRequest;
 import info.clearthought.layout.TableLayout;
+import model.App;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -97,7 +98,8 @@ class LoginPanel extends JPanel implements ActionListener, LanguageListener, Err
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource().equals(signIn)){
-            Comm.fireRequestEvent(new LoginRequest(userName.getText(), pass.getPassword()));
+            AppWindow appWindow = (AppWindow) this.getTopLevelAncestor();
+            App.controller.login(userName.getText(), String.copyValueOf(pass.getPassword()), false);
         }
         else if(e.getSource().equals(newUser)){
             AppWindow app = (AppWindow) this.getTopLevelAncestor();

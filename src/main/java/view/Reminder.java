@@ -1,5 +1,10 @@
 package view;
 
+import model.EntryModel;
+import model.Model;
+import model.ReminderModel;
+import model.RepetitiveReminderModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.GeneralPath;
@@ -7,19 +12,30 @@ import java.time.LocalDateTime;
 
 class Reminder extends Entry {
 
-    public Reminder(LocalDateTime time) {
-        super(time);
-        label.setTime(time);
+    public Reminder(ReminderModel model) {
+        super(model);
+        label.setTime(getModel().getTime());
         this.setOpaque(true);
         this.setBackground(new Color(0,0,0,0));
         this.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
     @Override
+    LocalDateTime getTime(){
+        return getModel().getTime();
+    }
+
+    @Override
+    void setTime(LocalDateTime t){
+        getModel().setTime(t);
+        label.setTime(getModel().getTime());
+    }
+
+    @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        if(super.isRepetitive()) {
+        if(repetitive) {
             g2d.setColor(Color.GREEN);
         }
         else {
@@ -33,5 +49,10 @@ class Reminder extends Entry {
         marker.lineTo(this.getWidth(), this.getHeight());
         marker.closePath();
         g2d.fill(marker);
+    }
+
+    @Override
+    ReminderModel getModel(){
+        return (ReminderModel) super.getModel();
     }
 }

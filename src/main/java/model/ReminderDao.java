@@ -46,7 +46,7 @@ class ReminderDao extends EntryDao {
         }
     }
 
-    List<ReminderModel> getBetween(LocalDateTime t1, LocalDateTime t2){
+    ArrayList<ReminderModel> getBetween(LocalDateTime t1, LocalDateTime t2){
         ArrayList<ReminderModel> list = new ArrayList<>();
         String sql = "SELECT entry_id, time, title, description FROM reminders WHERE client_id = ? AND time BETWEEN ? AND ?";
         try {

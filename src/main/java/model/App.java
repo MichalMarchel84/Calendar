@@ -2,7 +2,7 @@ package model;
 
 import controller.Controller;
 import view.AppWindow;
-import view.Comm;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -11,10 +11,10 @@ public class App {
 
     public static final Connection conn = connect();
     private static final Thread onExit = new Thread(App::disconnect);
+    public static final Controller controller = new Controller();
+    public static final AppWindow appWindow = new AppWindow();
 
     public static void main(String[] args){
-        Controller controller = new Controller(new AppWindow());
-        Comm.addRequestListener(controller);
         Runtime.getRuntime().addShutdownHook(onExit);
     }
 

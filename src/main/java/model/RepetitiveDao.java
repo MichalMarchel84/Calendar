@@ -6,9 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
-class RepetitiveDao extends EntryDao {
+abstract class RepetitiveDao extends EntryDao {
 
     private static final String[] types = {"repetitive_reminders", "repetitive_events"};
     private final int type;
@@ -22,7 +21,7 @@ class RepetitiveDao extends EntryDao {
         this(type, clientID, App.conn);
     }
 
-    List<RepetitiveModel> getInstancesBetween(LocalDateTime t1, LocalDateTime t2) throws SQLException {
+    ArrayList<RepetitiveModel> getInstancesBetween(LocalDateTime t1, LocalDateTime t2) throws SQLException {
         String sql = "SELECT * FROM " + types[type] + " WHERE started_at <= ? AND (finished_at IS NULL OR finished_at >= ?)";
         if(t1.isAfter(t2)){
             LocalDateTime temp = t1;

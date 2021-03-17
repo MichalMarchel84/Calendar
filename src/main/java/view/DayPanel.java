@@ -1,5 +1,9 @@
 package view;
 
+import model.App;
+import model.EventModel;
+import model.ReminderModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -17,7 +21,6 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
 
     private final ArrayList<Reminder> reminders = new ArrayList<>();
     private final ArrayList<Event> events = new ArrayList<>();
-    private final ArrayList<Repetitive> repetitives = new ArrayList<>();
     private JPanel selected = null;
     private int startPoint = 0;
     private int endPoint = -1;
@@ -45,13 +48,32 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         });
     }
 
+    private void getReminders(){
+        if(App.controller.getClient() != null) {
+            ArrayList<ReminderModel> actual = App.controller.getClient().getRemindersBetween(time, time.plusDays(2 * daysInBuffer + 1));
+            for (ReminderModel model : actual) {
+                addReminder(model);
+            }
+        }
+    }
+
+    private void getEvents(){
+        if(App.controller.getClient() != null) {
+            ArrayList<EventModel> actual = App.controller.getClient().getEventsBetween(time, time.plusDays(2 * daysInBuffer + 1));
+            for (EventModel model : actual) {
+                addEvent(model);
+            }
+        }
+    }
+
     void setDate(LocalDate time){
         this.time = time.atStartOfDay();
         this.time = this.time.minusDays(daysInBuffer);
+        reminders.clear();
+        events.clear();
+        getReminders();
+        getEvents();
         this.updatePositions();
-        for(Repetitive r : repetitives){
-            displayRepetitive(r);
-        }
         this.revalidate();
         this.repaint();
     }
@@ -59,9 +81,6 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     void moveBuffer(int val){
         time = time.plusDays(val);
         updatePositions();
-        for(Repetitive r : repetitives){
-            displayRepetitive(r);
-        }
         this.revalidate();
         this.repaint();
     }
@@ -97,20 +116,6 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         for(Event e : events){
             resizeEvent(e);
         }
-        for(Repetitive rep : repetitives){
-            if(rep.getContent() instanceof Reminder){
-                for(Entry entry : rep.getEntries()){
-                    Reminder r = (Reminder) entry;
-                    resizeReminder(r);
-                }
-            }
-            else if(rep.getContent() instanceof Event){
-                for(Entry entry : rep.getEntries()){
-                    Event e = (Event) entry;
-                    resizeEvent(e);
-                }
-            }
-        }
     }
 
     private void updatePositions(){
@@ -132,28 +137,6 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         for(Entry e : forDisposal){
             this.removeEntry(e);
         }
-        ArrayList<Repetitive> repForDisposal = new ArrayList<>();
-        for(Repetitive r : repetitives){
-            if(r.isBetween(time, time.plusDays(2*daysInBuffer + 1))) {
-                for (Entry e : r.getEntries()) {
-                    if (e instanceof Reminder) {
-                        Reminder rem = (Reminder) e;
-                        rem.setLocation(rem.getX(), positionOf(rem.getTime()) - rem.getHeight() / 2);
-                        rem.label.setLocation(rem.label.getX(), rem.getY());
-                    } else if (e instanceof Event) {
-                        Event ev = (Event) e;
-                        ev.setLocation(ev.getX(), positionOf(ev.getTimeStart()));
-                        ev.label.setLocation(ev.label.getX(), ev.getY());
-                    }
-                }
-            }
-            else {
-                repForDisposal.add(r);
-            }
-        }
-        for (Repetitive r : repForDisposal){
-            this.removeRepetitive(r);
-        }
     }
 
     void setPosition(Reminder r, LocalDateTime t){
@@ -163,9 +146,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     }
 
     private void setPosition(Event e, LocalDateTime t){
-        long diff = t.until(e.getTimeStart(), ChronoUnit.MINUTES);
-        e.setTimeStart(e.getTimeStart().minusMinutes(diff));
-        e.setTimeEnd(e.getTimeEnd().minusMinutes(diff));
+        e.setTime(t);
         e.setLocation(e.getX(), positionOf(t));
         e.label.setLocation(e.label.getX(), e.getY());
     }
@@ -189,7 +170,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     }
 
     private Reminder addReminder(LocalDateTime t){
-        Reminder r = new Reminder(t);
+        Reminder r = new Reminder(App.controller.getClient().createReminder(t, "", ""));
         reminders.add(r);
         this.add(r);
         this.add(r.label);
@@ -199,95 +180,36 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         return r;
     }
 
-    void addReminder(Reminder r){
-        if(!r.isRepetitive()) {
-            reminders.add(r);
-        }
+    void addReminder(ReminderModel model){
+        Reminder r = new Reminder(model);
+        reminders.add(r);
         this.add(r);
         this.add(r.label);
         resizeReminder(r);
     }
 
     private Event addEvent(LocalDateTime t1, LocalDateTime t2){
-        Event e;
-        int y1 = positionOf(t1);
-        int y2 = positionOf(t2);
-        if(y1 < y2){
-            e = new Event(t1, t2);
-        }
-        else {
-            e = new Event(t2, t1);
-        }
+        Event e = new Event(App.controller.getClient().createEvent(t1, t2, "", ""));
         events.add(e);
         this.add(e);
         this.add(e.label);
-        e.setSize(new Dimension(timelineWidth, positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
-        e.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, e.getHeight()));
-        if(y1 > y2){
-            y1 = y2;
-        }
-        e.setLocation(timelineOffset, y1);
-        e.label.setLocation(timelineOffset + timelineWidth + labelOffset, e.getY());
+        resizeEvent(e);
         e.label.revalidate();
         e.label.repaint();
         return e;
     }
 
-    void addEvent(Event e){
-        if(!e.isRepetitive()) {
-            events.add(e);
-        }
+    void addEvent(EventModel model){
+        Event e = new Event(model);
+        events.add(e);
         this.add(e);
         this.add(e.label);
-        e.setSize(new Dimension(timelineWidth, positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
-        e.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, e.getHeight()));
-        e.setLocation(timelineOffset, positionOf(e.getTimeStart()));
-        e.label.setLocation(timelineOffset + timelineWidth + labelOffset, e.getY());
-    }
-
-    void addRepetitive(Repetitive r){
-        repetitives.add(r);
-        displayRepetitive(r);
-        this.revalidate();
-        this.repaint();
-    }
-
-    void displayRepetitive(Repetitive r){
-        for(Entry e : r.getEntries()){
-            this.remove(e);
-            this.remove(e.label);
-        }
-        r.setEntriesFor(time, time.plusDays(2*daysInBuffer + 1));
-        ArrayList<Entry> elemnts = r.getEntries();
-        if(elemnts.size() > 0){
-            if(elemnts.get(0) instanceof Reminder){
-                for (Entry e : elemnts){
-                    Reminder reminder = (Reminder) e;
-                    this.addReminder(reminder);
-                }
-            }
-            else if(elemnts.get(0) instanceof Event){
-                for (Entry e : elemnts){
-                    Event event = (Event) e;
-                    this.addEvent(event);
-                }
-            }
-        }
-    }
-
-    void removeRepetitive(Repetitive r){
-        for (Entry e : r.getEntries()){
-            this.remove(e);
-            this.remove(e.label);
-        }
-        repetitives.remove(r);
+        resizeEvent(e);
     }
 
     void removeEntry(Entry entry){
-        if(entry.isRepetitive()){
-            removeRepetitive(entry.getRepetitive());
-        }
-        else if(entry instanceof Reminder){
+
+        if(entry instanceof Reminder){
             Reminder r = (Reminder) entry;
             reminders.remove(r);
             this.remove(r);
@@ -299,6 +221,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
             this.remove(e);
             this.remove(e.label);
         }
+        App.controller.getClient().delete(entry.getModel());
         this.repaint();
     }
 
@@ -311,15 +234,8 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
             this.remove(e);
             this.remove(e.label);
         }
-        for(Repetitive r : repetitives){
-            for (Entry e : r.getEntries()){
-                this.remove(e);
-                this.remove(e.label);
-            }
-        }
         reminders.clear();
         events.clear();
-        repetitives.clear();
     }
 
     LocalDateTime round5min(LocalDateTime t){
@@ -408,7 +324,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         Component c = this.getComponentAt(e.getPoint());
         if(c instanceof DayPanel) {
             Reminder r = addReminder(round5min(timeOf(e.getY())));
-            new EditWindow(r);
+            //new EditWindow(r);
         }
     }
 
@@ -417,7 +333,6 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         selected = (JPanel) this.getComponentAt(e.getPoint());
         if(selected instanceof Entry){
             Entry sel = (Entry) selected;
-            modifyAllowed = sel.isFirstRepetitive() || !sel.isRepetitive();
         }
         if(selected instanceof Event){
             startPoint = e.getY() - selected.getY();
@@ -434,18 +349,13 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     public void mouseReleased(MouseEvent e) {
         if(endPoint > -1){
             Event event = addEvent(round5min(timeOf(startPoint)), round5min(timeOf(endPoint)));
-            new EditWindow(event);
+            //new EditWindow(event);
             endPoint = -1;
             this.repaint();
         }
         if(selected instanceof Entry){
             Entry sel = (Entry) selected;
-            if(sel.isRepetitive() && modifyAllowed){
-                sel.getRepetitive().setContent(sel);
-                this.displayRepetitive(sel.getRepetitive());
-                this.revalidate();
-                this.repaint();
-            }
+            App.controller.getClient().update(sel.getModel());
         }
     }
 
@@ -470,10 +380,6 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
                 }
             }
         }
-        else if(selected instanceof DayPanel){
-            endPoint = e.getY();
-            this.repaint();
-        }
         else if(selected instanceof Event){
             Event event = (Event) selected;
             if(modifyAllowed) {
@@ -493,6 +399,10 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
                     }
                 }
             }
+        }
+        else if(selected instanceof DayPanel){
+            endPoint = e.getY();
+            this.repaint();
         }
     }
 

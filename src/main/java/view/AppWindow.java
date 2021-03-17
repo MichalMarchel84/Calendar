@@ -1,6 +1,9 @@
 package view;
 
+import controller.Controller;
 import info.clearthought.layout.TableLayout;
+import model.App;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -129,6 +132,7 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
             topMenu.remove(logout);
             topMenu.remove(returnButton);
             dayView.clearContent();
+            App.controller.logout();
         }
     }
 

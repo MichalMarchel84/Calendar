@@ -2,7 +2,7 @@ package model;
 
 import java.time.LocalDateTime;
 
-public class RepetitiveModel extends EntryModel {
+public abstract class RepetitiveModel extends EntryModel {
 
     private LocalDateTime startAt;
     private LocalDateTime finishedAt;

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.TimeZone;
 
-class EntryDao {
+abstract class EntryDao {
 
     private final int clientID;
     private final Connection conn;
