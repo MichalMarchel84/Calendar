@@ -54,7 +54,7 @@ class EntryLabel extends JPanel implements ActionListener {
             parent.removeEntry(target);
         }
         else if(e.getSource().equals(edit)){
-            //new EditWindow(target);
+            new EditWindow(target);
         }
     }
 }

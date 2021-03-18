@@ -1,5 +1,7 @@
 package model;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
 
 public class ReminderModel extends EntryModel {
@@ -16,6 +18,10 @@ public class ReminderModel extends EntryModel {
     }
 
     public void setTime(LocalDateTime time) {
+
         this.time = time;
+        for (ActionListener al : listeners){
+            al.actionPerformed(new ActionEvent(this, 2, "time changed"));
+        }
     }
 }

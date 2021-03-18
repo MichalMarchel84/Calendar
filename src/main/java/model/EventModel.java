@@ -1,5 +1,7 @@
 package model;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
 
 public class EventModel extends EntryModel {
@@ -22,6 +24,7 @@ public class EventModel extends EntryModel {
     }
 
     public void setTime(LocalDateTime t1, LocalDateTime t2) {
+
         if(t1.isBefore(t2)){
             this.startTime = t1;
             this.endTime = t2;
@@ -29,6 +32,10 @@ public class EventModel extends EntryModel {
         else{
             this.startTime = t2;
             this.endTime = t1;
+        }
+
+        for (ActionListener al : listeners){
+            al.actionPerformed(new ActionEvent(this, 2, "time changed"));
         }
     }
 }

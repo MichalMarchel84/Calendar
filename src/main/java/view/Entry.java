@@ -31,4 +31,9 @@ abstract class Entry extends JPanel {
     EntryModel getModel(){
         return model;
     }
+
+    void setTitle(String title){
+        getModel().setTitle(title);
+        label.setTitle(title);
+    }
 }

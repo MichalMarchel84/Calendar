@@ -5,7 +5,6 @@ import model.EventModel;
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 class Event extends Entry {

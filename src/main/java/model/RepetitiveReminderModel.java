@@ -1,5 +1,7 @@
 package model;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -22,11 +24,15 @@ public class RepetitiveReminderModel extends RepetitiveModel {
     }
 
     public void setTime(LocalDateTime time) {
+
         this.time = time;
+        for (ActionListener al : listeners){
+            al.actionPerformed(new ActionEvent(this, 2, "time changed"));
+        }
     }
 
     RepetitiveReminderModel copy(LocalDateTime time){
-        return new RepetitiveReminderModel(super.getEntryID(), super.getTitle(), super.getDescription(), super.getStartAt(), super.getFinishedAt(), super.getInterval(), LocalDateTime.from(time));
+        return new RepetitiveReminderModel(getEntryID(), getTitle(), getDescription(), getStartAt(), getFinishedAt(), getInterval(), LocalDateTime.from(time));
     }
 
     public ArrayList<RepetitiveReminderModel> getBetween(LocalDateTime t1, LocalDateTime t2){

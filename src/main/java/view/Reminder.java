@@ -1,11 +1,7 @@
 package view;
 
-import model.EntryModel;
-import model.Model;
 import model.ReminderModel;
-import model.RepetitiveReminderModel;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.time.LocalDateTime;

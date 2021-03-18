@@ -97,7 +97,7 @@ class DayViewPanel extends JPanel implements LanguageListener{
     }
 
     void setDate(LocalDate date){
-        content.setDate(date);
+        content.setDateCentered(date);
         int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
         scroll.getVerticalScrollBar().setValue(sv);
     }

@@ -1,5 +1,7 @@
 package model;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -23,7 +25,11 @@ public class RepetitiveEventModel extends RepetitiveModel {
     }
 
     public void setTime(LocalDateTime time) {
+
         this.time = time;
+        for (ActionListener al : listeners){
+            al.actionPerformed(new ActionEvent(this, 2, "time changed"));
+        }
     }
 
     public long getDuration() {
@@ -31,7 +37,11 @@ public class RepetitiveEventModel extends RepetitiveModel {
     }
 
     public void setDuration(long duration) {
+
         this.duration = duration;
+        for (ActionListener al : listeners){
+            al.actionPerformed(new ActionEvent(this, 6, "duration changed"));
+        }
     }
 
     RepetitiveEventModel copy(LocalDateTime time){
