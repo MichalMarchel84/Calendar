@@ -17,7 +17,7 @@ class RepetitiveReminderDao extends RepetitiveDao{
             PreparedStatement s = super.getConn().prepareStatement(sql);
             s.setInt(1, super.getClientID());
             s.setInt(2, model.getEntryID());
-            s.setInt(3, toUnixTime(model.getStartAt()));
+            s.setInt(3, toUnixTime(model.getTime()));
             if(model.getFinishedAt() == null) {
                 s.setNull(4, Types.NULL);
             }
@@ -38,7 +38,7 @@ class RepetitiveReminderDao extends RepetitiveDao{
         String sql = "UPDATE repetitive_reminders SET started_at = ?, finished_at = ?, interval = ?, title = ?, description = ?";
         try{
             PreparedStatement s = super.getConn().prepareStatement(sql);
-            s.setInt(1, toUnixTime(model.getStartAt()));
+            s.setInt(1, toUnixTime(model.getTime()));
             if(model.getFinishedAt() == null) {
                 s.setNull(2, Types.NULL);
             }
@@ -53,31 +53,5 @@ class RepetitiveReminderDao extends RepetitiveDao{
         catch (SQLException e){
             e.printStackTrace();
         }
-    }
-
-    HashMap<Integer, ArrayList<RepetitiveReminderModel>> getBetween(LocalDateTime t1, LocalDateTime t2){
-        if(t1.isAfter(t2)){
-            LocalDateTime temp = t1;
-            t1 = t2;
-            t2 = temp;
-        }
-        HashMap<Integer, ArrayList<RepetitiveReminderModel>> result = new HashMap<>();
-        try{
-            //looking for instances valid for given period in DB
-            ArrayList<RepetitiveModel> instances = super.getInstancesBetween(t1, t2);
-
-            //generating occurrences in given period
-            for(RepetitiveModel model : instances){
-                RepetitiveReminderModel m = (RepetitiveReminderModel) model;
-                ArrayList<RepetitiveReminderModel> list = m.getBetween(t1, t2);
-                if(list.size() > 0){
-                    result.put(Integer.valueOf(list.get(0).getEntryID()), list);
-                }
-            }
-        }
-        catch (SQLException e){
-            e.printStackTrace();
-        }
-        return result;
     }
 }

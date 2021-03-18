@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 public class EventDao extends EntryDao {
 
@@ -24,8 +23,8 @@ public class EventDao extends EntryDao {
             PreparedStatement stmt = super.getConn().prepareStatement(sql);
             stmt.setInt(1, super.getClientID());
             stmt.setInt(2, event.getEntryID());
-            stmt.setInt(3, toUnixTime(event.getStartTime()));
-            stmt.setInt(4, toUnixTime(event.getEndTime()));
+            stmt.setInt(3, toUnixTime(event.getTime()));
+            stmt.setInt(4, (int)event.getDuration());
             stmt.setString(5, event.getTitle());
             stmt.setString(6, event.getDescription());
             stmt.executeUpdate();
@@ -39,8 +38,8 @@ public class EventDao extends EntryDao {
         String sql = "UPDATE events SET start_time = ?, end_time = ?, title = ?, description = ? WHERE client_id = ? AND entry_id = ?";
         try {
             PreparedStatement s = super.getConn().prepareStatement(sql);
-            s.setInt(1, toUnixTime(event.getStartTime()));
-            s.setInt(2, toUnixTime(event.getEndTime()));
+            s.setInt(1, toUnixTime(event.getTime()));
+            s.setInt(2, (int)event.getDuration());
             s.setString(3, event.getTitle());
             s.setString(4, event.getDescription());
             s.setInt(5, super.getClientID());
@@ -62,7 +61,7 @@ public class EventDao extends EntryDao {
             s.setInt(3, toUnixTime(t2));
             ResultSet set = s.executeQuery();
             while (set.next()){
-                list.add(new EventModel(set.getInt("entry_id"), toLocalTime(set.getInt("start_time")), toLocalTime(set.getInt("end_time")), set.getString("title"), set.getString("description")));
+                list.add(new EventModel(set.getInt("entry_id"), toLocalTime(set.getInt("start_time")), set.getInt("duration"), set.getString("title"), set.getString("description")));
             }
         }
         catch (SQLException e){

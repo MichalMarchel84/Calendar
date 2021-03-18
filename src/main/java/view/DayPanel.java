@@ -102,8 +102,8 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     }
 
     private void resizeEvent(Event e){
-        e.setSize(new Dimension(timelineWidth, positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
-        e.setLocation(timelineOffset, positionOf(e.getTimeStart()));
+        e.setSize(new Dimension(timelineWidth, positionOf(e.getTimeEnd()) - positionOf(e.getTime())));
+        e.setLocation(timelineOffset, positionOf(e.getTime()));
         e.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, e.getHeight()));
         e.label.setLocation(timelineOffset + timelineWidth + labelOffset, e.getY());
     }
@@ -123,7 +123,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
             r.label.setLocation(r.label.getX(), r.getY());
         }
         for(Event e : events){
-            e.setLocation(e.getX(), positionOf(e.getTimeStart()));
+            e.setLocation(e.getX(), positionOf(e.getTime()));
             e.label.setLocation(e.label.getX(), e.getY());
         }
     }
@@ -142,18 +142,18 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
 
     void setTimeStart(Event e, LocalDateTime t){
         if(t.until(e.getTimeEnd(), ChronoUnit.MINUTES) > 5) {
-            e.setTimeStart(t);
+            e.setTime(t);
             e.setLocation(e.getX(), positionOf(t));
-            e.setSize(new Dimension(timelineWidth, positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
+            e.setSize(new Dimension(timelineWidth, positionOf(e.getTimeEnd()) - positionOf(e.getTime())));
             e.label.setLocation(e.label.getX(), e.getY());
             e.label.setSize(new Dimension(e.label.getWidth(), e.getHeight()));
         }
     }
 
     void setTimeEnd(Event e, LocalDateTime t){
-        if(e.getTimeStart().until(t, ChronoUnit.MINUTES) > 5) {
-            e.setTimeEnd(t);
-            e.setSize(new Dimension(timelineWidth, positionOf(e.getTimeEnd()) - positionOf(e.getTimeStart())));
+        if(e.getTime().until(t, ChronoUnit.MINUTES) > 5) {
+            e.setDuration(e.getTime().until(t, ChronoUnit.MINUTES));
+            e.setSize(new Dimension(timelineWidth, positionOf(e.getTimeEnd()) - positionOf(e.getTime())));
             e.label.setSize(new Dimension(e.label.getWidth(), e.getHeight()));
         }
     }
@@ -178,7 +178,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     }
 
     private Event addEvent(LocalDateTime t1, LocalDateTime t2){
-        Event e = new Event(App.controller.getClient().createEvent(t1, t2, "", ""));
+        Event e = new Event(App.controller.getClient().createEvent(t1, t1.until(t2, ChronoUnit.MINUTES), "", ""));
         events.add(e);
         this.add(e);
         this.add(e.label);
@@ -378,12 +378,12 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
                         setTimeEnd(event, t);
                     }
                 } else if (startPoint < 10) {
-                    if (!event.getTimeStart().equals(t)) {
+                    if (!event.getTime().equals(t)) {
                         setTimeStart(event, t);
                     }
                 } else {
                     t = round5min(timeOf(e.getY() - startPoint));
-                    if (!event.getTimeStart().equals(t)) {
+                    if (!event.getTime().equals(t)) {
                         setPosition(event, t);
                     }
                 }

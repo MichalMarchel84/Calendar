@@ -21,39 +21,44 @@ abstract class RepetitiveDao extends EntryDao {
         this(type, clientID, App.conn);
     }
 
-    ArrayList<RepetitiveModel> getInstancesBetween(LocalDateTime t1, LocalDateTime t2) throws SQLException {
-        String sql = "SELECT * FROM " + types[type] + " WHERE started_at <= ? AND (finished_at IS NULL OR finished_at >= ?)";
-        if(t1.isAfter(t2)){
-            LocalDateTime temp = t1;
-            t1 = t2;
-            t2 = temp;
-        }
-        PreparedStatement s = super.getConn().prepareStatement(sql);
-        s.setInt(1, toUnixTime(t2));
-        s.setInt(2, toUnixTime(t1));
-        ResultSet set = s.executeQuery();
+    ArrayList<RepetitiveModel> getInstancesBetween(LocalDateTime t1, LocalDateTime t2) {
+
         ArrayList<RepetitiveModel> instances = new ArrayList<>();
-        while (set.next()){
-            int id = set.getInt("entry_id");
-            LocalDateTime startedAt = toLocalTime(set.getInt("started_at"));
-            LocalDateTime finishedAt;
-            if(set.getInt("finished_at") != 0) {
-                finishedAt = toLocalTime(set.getInt("finished_at"));
+        try {
+            String sql = "SELECT * FROM " + types[type] + " WHERE started_at <= ? AND (finished_at IS NULL OR finished_at >= ?)";
+            if (t1.isAfter(t2)) {
+                LocalDateTime temp = t1;
+                t1 = t2;
+                t2 = temp;
             }
-            else {
-                finishedAt = null;
-            }
-            String title = set.getString("title");
-            String description = set.getString("description");
-            int interval = set.getInt("interval");
-            if(type == 0) {
-                instances.add(new RepetitiveReminderModel(id, title, description, startedAt, finishedAt, interval));
-            }
-            else if(type == 1){
-                long duration = set.getInt("duration");
-                instances.add(new RepetitiveEventModel(id, title, description, startedAt, finishedAt, interval, duration));
+            PreparedStatement s = super.getConn().prepareStatement(sql);
+            s.setInt(1, toUnixTime(t2));
+            s.setInt(2, toUnixTime(t1));
+            ResultSet set = s.executeQuery();
+            while (set.next()) {
+                int id = set.getInt("entry_id");
+                LocalDateTime startedAt = toLocalTime(set.getInt("started_at"));
+                LocalDateTime finishedAt;
+                if (set.getInt("finished_at") != 0) {
+                    finishedAt = toLocalTime(set.getInt("finished_at"));
+                } else {
+                    finishedAt = null;
+                }
+                String title = set.getString("title");
+                String description = set.getString("description");
+                int interval = set.getInt("interval");
+                if (type == 0) {
+                    instances.add(new RepetitiveReminderModel(id, startedAt, finishedAt, interval, title, description));
+                } else if (type == 1) {
+                    long duration = set.getInt("duration");
+                    instances.add(new RepetitiveEventModel(id, startedAt, finishedAt, interval, duration, title, description));
+                }
             }
         }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+
         return instances;
     }
 }

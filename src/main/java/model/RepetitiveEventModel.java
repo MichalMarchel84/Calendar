@@ -4,32 +4,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 public class RepetitiveEventModel extends RepetitiveModel {
 
-    private LocalDateTime time;
     private long duration;
 
-    RepetitiveEventModel(int entryID, String title, String description, LocalDateTime startAt, LocalDateTime finishedAt, int interval, long duration, LocalDateTime time) {
-        super(entryID, title, description, startAt, finishedAt, interval);
-        this.time = time;
+    RepetitiveEventModel(int entryID, LocalDateTime time, LocalDateTime finishedAt, int interval, long duration, String title, String description) {
+        super(entryID, time, finishedAt, interval, title, description);
         this.duration = duration;
-    }
-
-    RepetitiveEventModel(int entryID, String title, String description, LocalDateTime startAt, LocalDateTime finishedAt, int interval, long duration){
-        this(entryID, title, description, startAt, finishedAt, interval, duration, LocalDateTime.from(startAt));
-    }
-
-    public LocalDateTime getTime() {
-        return time;
-    }
-
-    public void setTime(LocalDateTime time) {
-
-        this.time = time;
-        for (ActionListener al : listeners){
-            al.actionPerformed(new ActionEvent(this, 2, "time changed"));
-        }
     }
 
     public long getDuration() {
@@ -39,13 +22,21 @@ public class RepetitiveEventModel extends RepetitiveModel {
     public void setDuration(long duration) {
 
         this.duration = duration;
-        for (ActionListener al : listeners){
-            al.actionPerformed(new ActionEvent(this, 6, "duration changed"));
-        }
+        fireActionEvent(4, "Duration changed");
     }
 
-    RepetitiveEventModel copy(LocalDateTime time){
-        return new RepetitiveEventModel(super.getEntryID(), super.getTitle(), super.getDescription(), super.getStartAt(), super.getFinishedAt(), super.getInterval(), duration, LocalDateTime.from(time));
+    private EventModel getOccurrence(LocalDateTime time){
+        return new EventModel(getEntryID(), time, duration, null, null);
+    }
+
+    public ArrayList<EventModel> getBetween(LocalDateTime t1, LocalDateTime t2){
+        ArrayList<EventModel> list = new ArrayList<>();
+        LocalDateTime occurrenceTime = getFirstAfter(t1.minusMinutes(getDuration())); //including result for ongoing event
+        while ((occurrenceTime != null) && occurrenceTime.isBefore(t2.plusMinutes(1))){ //including result for t2
+            list.add(getOccurrence(occurrenceTime));
+            occurrenceTime = getFirstAfter(occurrenceTime);
+        }
+        return list;
     }
 
     @Override
@@ -58,6 +49,6 @@ public class RepetitiveEventModel extends RepetitiveModel {
         else {
             fin = getFinishedAt().format(dtf);
         }
-        return "id: " + getEntryID() + " started at: " + getStartAt().format(dtf) + " finished at: " + fin + " time: " + time.format(dtf);
+        return "id: " + getEntryID() + " started at: " + getTime().format(dtf) + " finished at: " + fin + " duration: " + duration;
     }
 }

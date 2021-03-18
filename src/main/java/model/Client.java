@@ -56,20 +56,20 @@ public class Client {
         return result;
     }
 
-    public EventModel createEvent(LocalDateTime timeStart, LocalDateTime timeEnd, String title, String description){
-        EventModel result = new EventModel(eventDao.getNextID(), timeStart, timeEnd, title, description);
+    public EventModel createEvent(LocalDateTime time, long duration, String title, String description){
+        EventModel result = new EventModel(eventDao.getNextID(), time, duration, title, description);
         eventDao.create(result);
         return result;
     }
 
     public RepetitiveReminderModel createRepetitiveReminder(LocalDateTime startedAt, int interval, String title, String description){
-        RepetitiveReminderModel result = new RepetitiveReminderModel(repetitiveReminderDao.getNextID(), title, description, startedAt, null, interval);
+        RepetitiveReminderModel result = new RepetitiveReminderModel(repetitiveReminderDao.getNextID(), startedAt, null, interval, title, description);
         repetitiveReminderDao.create(result);
         return result;
     }
 
     public RepetitiveEventModel createRepetitiveEvent(LocalDateTime startedAt, long duration, int interval, String title, String description){
-        RepetitiveEventModel result = new RepetitiveEventModel(repetitiveEventDao.getNextID(), title, description, startedAt, null, interval, duration);
+        RepetitiveEventModel result = new RepetitiveEventModel(repetitiveEventDao.getNextID(), startedAt, null, interval, duration, title, description);
         repetitiveEventDao.create(result);
         return result;
     }
@@ -110,9 +110,5 @@ public class Client {
 
     public ArrayList<EventModel> getEventsBetween(LocalDateTime t1, LocalDateTime t2){
         return eventDao.getBetween(t1, t2);
-    }
-
-    public HashMap<Integer, ArrayList<RepetitiveReminderModel>> getRepetitiveRemindersBetween(LocalDateTime t1, LocalDateTime t2){
-        return repetitiveReminderDao.getBetween(t1, t2);
     }
 }

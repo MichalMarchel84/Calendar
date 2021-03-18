@@ -67,7 +67,7 @@ class EditWindow extends JFrame implements ActionListener {
         else if(entry instanceof Event){
             Event e = (Event) entry;
             options.add(from, "0 0 c c");
-            from.setText(e.getTimeStart().format(dtf));
+            from.setText(e.getTime().format(dtf));
             from.setHorizontalAlignment(SwingConstants.CENTER);
             options.add(new JLabel("-"), "1 0 c c");
             options.add(to, "2 0 c c");
@@ -174,7 +174,7 @@ class EditWindow extends JFrame implements ActionListener {
                 }
                 else if(entry instanceof Event){
                     Event event = (Event) entry;
-                    LocalDateTime t1 = txtFieldTime(from, event.getTimeStart());
+                    LocalDateTime t1 = txtFieldTime(from, event.getTime());
                     LocalDateTime t2 = txtFieldTime(to, event.getTimeEnd());
                     parent.setTimeStart(event, t1);
                     parent.setTimeEnd(event, t2);

@@ -26,12 +26,12 @@ public class TestMethods {
 
     public static void setRepetitiveReminderContent(Connection conn, LocalDateTime startedAt, LocalDateTime finishedAt, int interval){
         RepetitiveReminderDao dao = new RepetitiveReminderDao(1, conn);
-        dao.create(new RepetitiveReminderModel(dao.getNextID(), "", "", startedAt, finishedAt, interval));
+        dao.create(new RepetitiveReminderModel(dao.getNextID(), startedAt, finishedAt, interval, "", ""));
     }
 
     public static void setRepetitiveEventContent(Connection conn, LocalDateTime startedAt, long duration, int interval){
         RepetitiveEventDao dao = new RepetitiveEventDao(1, conn);
-        dao.create(new RepetitiveEventModel(dao.getNextID(), "", "", startedAt, null, interval, duration));
+        dao.create(new RepetitiveEventModel(dao.getNextID(), startedAt, null, interval, duration, "", ""));
     }
 
     public static void executeScript(String URL, Connection conn){
