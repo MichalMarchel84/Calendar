@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 public abstract class EntryModel {
 
-    private boolean repetitive = false;
     private final int entryID;
     private String title;
     private String description;
@@ -21,14 +20,6 @@ public abstract class EntryModel {
         this.time = time;
         this.title = title;
         this.description = description;
-    }
-
-    public boolean isRepetitive(){
-        return repetitive;
-    }
-
-    void setRepetitive(){
-        repetitive = true;
     }
 
     public int getEntryID() {

@@ -40,6 +40,12 @@ public class Controller implements ActionListener {
         return model;
     }
 
+    public RepetitiveReminderModel createRepetitiveReminderModel(ReminderModel in, int interval){
+        RepetitiveReminderModel model = client.createRepetitiveReminder(in.getTime(), interval, in.getTitle(), in.getDescription());
+        model.addActionListener(this, true);
+        return model;
+    }
+
     public ArrayList<ReminderModel> getRemindersBetween(LocalDateTime t1, LocalDateTime t2){
         ArrayList<ReminderModel> list = client.getRemindersBetween(t1, t2);
         for (ReminderModel model : list){
@@ -51,6 +57,22 @@ public class Controller implements ActionListener {
     public ArrayList<EventModel> getEventsBetween(LocalDateTime t1, LocalDateTime t2){
         ArrayList<EventModel> list = client.getEventsBetween(t1, t2);
         for (EventModel model : list){
+            model.addActionListener(this, true);
+        }
+        return list;
+    }
+
+    public ArrayList<RepetitiveReminderModel> getRepetitiveRemindersBetween(LocalDateTime t1, LocalDateTime t2){
+        ArrayList<RepetitiveReminderModel> list = client.getRepetitiveRemindersBetween(t1, t2);
+        for(RepetitiveReminderModel model : list){
+            model.addActionListener(this, true);
+        }
+        return list;
+    }
+
+    public ArrayList<RepetitiveEventModel> getRepetitiveEventsBetween(LocalDateTime t1, LocalDateTime t2){
+        ArrayList<RepetitiveEventModel> list = client.getRepetitiveEventsBetween(t1, t2);
+        for(RepetitiveEventModel model : list){
             model.addActionListener(this, true);
         }
         return list;

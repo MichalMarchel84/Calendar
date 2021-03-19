@@ -67,7 +67,7 @@ class EntryLabel extends JPanel implements ActionListener {
         }
         else if(e.getSource().equals(delete)){
             DayPanel parent = (DayPanel)this.getParent();
-            parent.removeEntry(target);
+            parent.deleteEntry(target);
         }
         else if(e.getSource().equals(edit)){
             new EditWindow(target);

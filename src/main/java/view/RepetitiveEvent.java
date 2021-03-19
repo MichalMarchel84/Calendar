@@ -1,21 +1,18 @@
 package view;
 
 import info.clearthought.layout.TableLayout;
-import model.EventModel;
+import model.RepetitiveEventModel;
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
 
-class Event extends Entry {
+class RepetitiveEvent extends RepetitiveEntry{
 
-    static final Color singleColor = new Color(0, 0, 255, 100);
-    static final Color repetitiveColor = new Color(0, 255, 0, 100);
-
-    Event(EventModel model) {
-        super(model);
-        label.setTime(getModel().getTime(), getModel().getTimeEnd());
+    RepetitiveEvent(RepetitiveEventModel model, LocalDateTime time) {
+        super(model, time);
+        label.setTime(getTime(), getTimeEnd());
         label.setTitle(getModel().getTitle());
-        this.setBackground(new Color(0, 0, 255, 100));
+        this.setBackground(new Color(0, 255, 0, 100));
         this.setBorder(BorderFactory.createLineBorder(Color.RED, 3));
         this.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
         double[] cols = {TableLayout.FILL};
@@ -29,11 +26,11 @@ class Event extends Entry {
 
     @Override
     LocalDateTime getTimeEnd(){
-        return getModel().getTimeEnd();
+        return getTime().plusMinutes(getModel().getDuration());
     }
 
     @Override
-    protected EventModel getModel(){
-        return (EventModel) super.getModel();
+    protected RepetitiveEventModel getModel(){
+        return (RepetitiveEventModel) super.getModel();
     }
 }

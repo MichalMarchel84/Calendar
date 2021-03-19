@@ -4,7 +4,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Client {
 
@@ -110,5 +109,23 @@ public class Client {
 
     public ArrayList<EventModel> getEventsBetween(LocalDateTime t1, LocalDateTime t2){
         return eventDao.getBetween(t1, t2);
+    }
+
+    public ArrayList<RepetitiveReminderModel> getRepetitiveRemindersBetween(LocalDateTime t1, LocalDateTime t2){
+        ArrayList<RepetitiveModel> list =  repetitiveReminderDao.getBetween(t1, t2);
+        ArrayList<RepetitiveReminderModel> result = new ArrayList<>();
+        for (RepetitiveModel model : list){
+            result.add((RepetitiveReminderModel) model);
+        }
+        return result;
+    }
+
+    public ArrayList<RepetitiveEventModel> getRepetitiveEventsBetween(LocalDateTime t1, LocalDateTime t2){
+        ArrayList<RepetitiveModel> list =  repetitiveEventDao.getBetween(t1, t2);
+        ArrayList<RepetitiveEventModel> result = new ArrayList<>();
+        for (RepetitiveModel model : list){
+            result.add((RepetitiveEventModel) model);
+        }
+        return result;
     }
 }

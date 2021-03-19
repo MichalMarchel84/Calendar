@@ -21,7 +21,7 @@ abstract class RepetitiveDao extends EntryDao {
         this(type, clientID, App.conn);
     }
 
-    ArrayList<RepetitiveModel> getInstancesBetween(LocalDateTime t1, LocalDateTime t2) {
+    ArrayList<RepetitiveModel> getBetween(LocalDateTime t1, LocalDateTime t2) {
 
         ArrayList<RepetitiveModel> instances = new ArrayList<>();
         try {

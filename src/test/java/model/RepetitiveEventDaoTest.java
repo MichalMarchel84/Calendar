@@ -43,7 +43,7 @@ public class RepetitiveEventDaoTest{
         RepetitiveEventDao dao = new RepetitiveEventDao(1, conn);
         LocalDateTime t1 = LocalDateTime.of(2021, 01, 15, 12, 30);
         LocalDateTime t2 = LocalDateTime.of(2021, 01, 20, 12, 0);
-        RepetitiveEventModel model = (RepetitiveEventModel) dao.getInstancesBetween(t1, t2).get(0);
+        RepetitiveEventModel model = (RepetitiveEventModel) dao.getBetween(t1, t2).get(0);
         ArrayList<EventModel> result = model.getBetween(t1, t2);
         assertEquals(3, result.size());
         assertEquals(startedAt, result.get(0).getTime());
@@ -58,7 +58,7 @@ public class RepetitiveEventDaoTest{
         RepetitiveEventDao dao = new RepetitiveEventDao(1, conn);
         LocalDateTime t1 = LocalDateTime.of(2020, 01, 15, 12, 0);
         LocalDateTime t2 = LocalDateTime.of(2021, 06, 15, 12, 0);
-        RepetitiveEventModel model = (RepetitiveEventModel) dao.getInstancesBetween(t1, t2).get(0);
+        RepetitiveEventModel model = (RepetitiveEventModel) dao.getBetween(t1, t2).get(0);
         ArrayList<EventModel> result = model.getBetween(t1, t2);
         assertEquals(6, result.size());
         assertEquals(startedAt, result.get(0).getTime());

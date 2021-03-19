@@ -7,7 +7,6 @@ import org.junit.Test;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
@@ -41,10 +40,10 @@ public class RepetitiveReminderDaoTest{
         RepetitiveReminderDao dao = new RepetitiveReminderDao(1, conn);
         LocalDateTime t1 = LocalDateTime.of(2020, 06, 15, 12, 0);
         LocalDateTime t2 = LocalDateTime.of(2021, 01, 20, 12, 0);
-        RepetitiveReminderModel model = (RepetitiveReminderModel) dao.getInstancesBetween(t1, t2).get(0);
-        ArrayList<ReminderModel> result = model.getBetween(t1, t2);
+        RepetitiveReminderModel model = (RepetitiveReminderModel) dao.getBetween(t1, t2).get(0);
+        ArrayList<LocalDateTime> result = model.getBetween(t1, t2);
         assertEquals(3, result.size());
-        assertEquals(startedAt, result.get(0).getTime());
+        assertEquals(startedAt, result.get(0));
     }
 
     @Test
@@ -57,11 +56,11 @@ public class RepetitiveReminderDaoTest{
         RepetitiveReminderDao dao = new RepetitiveReminderDao(1, conn);
         LocalDateTime t1 = LocalDateTime.of(2020, 06, 15, 12, 0);
         LocalDateTime t2 = LocalDateTime.of(2022, 06, 15, 12, 0);
-        RepetitiveReminderModel model = (RepetitiveReminderModel) dao.getInstancesBetween(t1, t2).get(0);
-        ArrayList<ReminderModel> result = model.getBetween(t1, t2);
+        RepetitiveReminderModel model = (RepetitiveReminderModel) dao.getBetween(t1, t2).get(0);
+        ArrayList<LocalDateTime> result = model.getBetween(t1, t2);
         assertEquals(4, result.size());
-        assertEquals(startedAt, result.get(0).getTime());
-        assertEquals(finishedAt, result.get(3).getTime());
+        assertEquals(startedAt, result.get(0));
+        assertEquals(finishedAt, result.get(3));
     }
 
     @Test
@@ -73,10 +72,10 @@ public class RepetitiveReminderDaoTest{
         RepetitiveReminderDao dao = new RepetitiveReminderDao(1, conn);
         LocalDateTime t1 = LocalDateTime.of(2021, 01, 15, 12, 0);
         LocalDateTime t2 = LocalDateTime.of(2021, 06, 15, 12, 0);
-        RepetitiveReminderModel model = (RepetitiveReminderModel) dao.getInstancesBetween(t1, t2).get(0);
-        ArrayList<ReminderModel> result = model.getBetween(t1, t2);
+        RepetitiveReminderModel model = (RepetitiveReminderModel) dao.getBetween(t1, t2).get(0);
+        ArrayList<LocalDateTime> result = model.getBetween(t1, t2);
         assertEquals(6, result.size());
-        assertEquals(startedAt, result.get(0).getTime());
+        assertEquals(startedAt, result.get(0));
     }
 
     @Test
@@ -88,9 +87,9 @@ public class RepetitiveReminderDaoTest{
         RepetitiveReminderDao dao = new RepetitiveReminderDao(1, conn);
         LocalDateTime t1 = LocalDateTime.of(2021, 01, 16, 12, 0);
         LocalDateTime t2 = LocalDateTime.of(2023, 06, 15, 12, 0);
-        RepetitiveReminderModel model = (RepetitiveReminderModel) dao.getInstancesBetween(t1, t2).get(0);
-        ArrayList<ReminderModel> result = model.getBetween(t1, t2);
+        RepetitiveReminderModel model = (RepetitiveReminderModel) dao.getBetween(t1, t2).get(0);
+        ArrayList<LocalDateTime> result = model.getBetween(t1, t2);
         assertEquals(2, result.size());
-        assertEquals(startedAt.plusYears(1), result.get(0).getTime());
+        assertEquals(startedAt.plusYears(1), result.get(0));
     }
 }

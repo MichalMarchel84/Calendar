@@ -1,8 +1,6 @@
 package view;
 
-import model.App;
-import model.EventModel;
-import model.ReminderModel;
+import model.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,19 +10,21 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
 
     private LocalDateTime time = LocalDateTime.now();
+    private LocalDateTime endTime = time.plusDays(2*daysInBuffer + 1);
 
     static final int daysInBuffer = 2;
 
-    private final ArrayList<Reminder> reminders = new ArrayList<>();
-    private final ArrayList<Event> events = new ArrayList<>();
     private JPanel selected = null;
     private int startPoint = 0;
     private int endPoint = -1;
     private boolean modifyAllowed = true;
+    HashMap<Integer, ArrayList<RepetitiveReminder>> repetitiveReminders = new HashMap<>();
+    HashMap<Integer, ArrayList<RepetitiveEvent>> repetitiveEvents = new HashMap<>();
 
     private static final int timelineOffset = 120;
     private static final int fontSize = 20;
@@ -48,24 +48,63 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     }
 
     private void getReminders(){
-        ArrayList<ReminderModel> actual = App.controller.getRemindersBetween(time, time.plusDays(2 * daysInBuffer + 1));
+        ArrayList<ReminderModel> actual = App.controller.getRemindersBetween(time, endTime);
         for (ReminderModel model : actual) {
             addReminder(model);
         }
     }
 
     private void getEvents(){
-        ArrayList<EventModel> actual = App.controller.getEventsBetween(time, time.plusDays(2 * daysInBuffer + 1));
+        ArrayList<EventModel> actual = App.controller.getEventsBetween(time, endTime);
         for (EventModel model : actual) {
             addEvent(model);
         }
     }
 
+    private void getRepetitiveReminders(){
+        var list = App.controller.getRepetitiveRemindersBetween(time, endTime);
+        for(RepetitiveReminderModel model : list){
+            ArrayList<LocalDateTime> occurrences = model.getBetween(time, endTime);
+            if(occurrences.size() > 0){
+                ArrayList<RepetitiveReminder> reminders = new ArrayList<>();
+                for (LocalDateTime time : occurrences){
+                    RepetitiveReminder reminder = new RepetitiveReminder(model, time);
+                    reminders.add(reminder);
+                    this.add(reminder);
+                    this.add(reminder.label);
+                    resizeReminder(reminder);
+                }
+                repetitiveReminders.put(reminders.get(0).getModel().getEntryID(), reminders);
+            }
+        }
+    }
+
+    private void getRepetitiveEvents(){
+        var list = App.controller.getRepetitiveEventsBetween(time, endTime);
+        for(RepetitiveEventModel model : list){
+            ArrayList<LocalDateTime> occurrences = model.getBetween(time, endTime);
+            if(occurrences.size() > 0){
+                ArrayList<RepetitiveEvent> events = new ArrayList<>();
+                for (LocalDateTime time : occurrences){
+                    RepetitiveEvent event = new RepetitiveEvent(model, time);
+                    events.add(event);
+                    this.add(event);
+                    this.add(event.label);
+                    resizeEvent(event);
+                }
+                repetitiveEvents.put(events.get(0).getModel().getEntryID(), events);
+            }
+        }
+    }
+
     void setDate(LocalDate time){
         this.time = time.atStartOfDay();
+        this.endTime = this.time.plusDays(2*daysInBuffer + 1);
         clearContent();
         getReminders();
         getEvents();
+        getRepetitiveReminders();
+        getRepetitiveEvents();
         this.updatePositions();
         this.revalidate();
         this.repaint();
@@ -89,37 +128,44 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         return (int)((double)min* this.getHeight()/((2*daysInBuffer + 1)*1440));
     }
 
-    private void resizeReminder(Reminder r){
-        r.setSize(new Dimension(timelineWidth + 20, 20));
-        r.setLocation(timelineOffset, positionOf(r.getModel().getTime()) - r.getHeight()/2);
-        r.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, r.getHeight()));
-        r.label.setLocation(timelineOffset + timelineWidth + labelOffset, r.getY());
+    private void resizeReminder(Entry reminder){
+        reminder.setSize(new Dimension(timelineWidth + 20, 20));
+        reminder.setLocation(timelineOffset, positionOf(reminder.getModel().getTime()) - reminder.getHeight()/2);
+        reminder.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, reminder.getHeight()));
+        reminder.label.setLocation(timelineOffset + timelineWidth + labelOffset, reminder.getY());
     }
 
-    private void resizeEvent(Event e){
-        e.setSize(new Dimension(timelineWidth, positionOf(e.getModel().getTimeEnd()) - positionOf(e.getModel().getTime())));
-        e.setLocation(timelineOffset, positionOf(e.getModel().getTime()));
-        e.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, e.getHeight()));
-        e.label.setLocation(timelineOffset + timelineWidth + labelOffset, e.getY());
+    private void resizeEvent(Entry event){
+        event.setSize(new Dimension(timelineWidth, positionOf(event.getTimeEnd()) - positionOf(event.getModel().getTime())));
+        event.setLocation(timelineOffset, positionOf(event.getModel().getTime()));
+        event.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, event.getHeight()));
+        event.label.setLocation(timelineOffset + timelineWidth + labelOffset, event.getY());
     }
 
     private void resize(){
-        for(Reminder r : reminders){
-            resizeReminder(r);
-        }
-        for(Event e : events){
-            resizeEvent(e);
+
+        for(Component comp : this.getComponents()){
+            if((comp instanceof Reminder) || (comp instanceof RepetitiveReminder)){
+                resizeReminder((Entry) comp);
+            }
+            else if((comp instanceof Event) || (comp instanceof RepetitiveEvent)){
+                resizeEvent((Entry) comp);
+            }
         }
     }
 
     private void updatePositions(){
-        for(Reminder r : reminders){
-            r.setLocation(r.getX(), positionOf(r.getModel().getTime()) - r.getHeight()/2);
-            r.label.setLocation(r.label.getX(), r.getY());
-        }
-        for(Event e : events){
-            e.setLocation(e.getX(), positionOf(e.getModel().getTime()));
-            e.label.setLocation(e.label.getX(), e.getY());
+        for(Component comp : this.getComponents()){
+            if((comp instanceof Reminder) || (comp instanceof RepetitiveReminder)){
+                Entry entry = (Entry) comp;
+                entry.setLocation(entry.getX(), positionOf(entry.getModel().getTime()) - entry.getHeight()/2);
+                entry.label.setLocation(entry.label.getX(), entry.getY());
+            }
+            else if((comp instanceof Event) || (comp instanceof RepetitiveEvent)){
+                Entry entry = (Entry) comp;
+                entry.setLocation(entry.getX(), positionOf(entry.getModel().getTime()));
+                entry.label.setLocation(entry.label.getX(), entry.getY());
+            }
         }
     }
 
@@ -156,7 +202,6 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
 
     private Reminder addReminder(LocalDateTime t){
         Reminder r = new Reminder(App.controller.createReminderModel(t));
-        reminders.add(r);
         this.add(r);
         this.add(r.label);
         resizeReminder(r);
@@ -167,7 +212,6 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
 
     void addReminder(ReminderModel model){
         Reminder r = new Reminder(model);
-        reminders.add(r);
         this.add(r);
         this.add(r.label);
         resizeReminder(r);
@@ -175,7 +219,6 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
 
     private Event addEvent(LocalDateTime t1, LocalDateTime t2){
         Event e = new Event(App.controller.createEventModel(t1, t1.until(t2, ChronoUnit.MINUTES)));
-        events.add(e);
         this.add(e);
         this.add(e.label);
         resizeEvent(e);
@@ -186,41 +229,43 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
 
     void addEvent(EventModel model){
         Event e = new Event(model);
-        events.add(e);
         this.add(e);
         this.add(e.label);
         resizeEvent(e);
     }
 
-    void removeEntry(Entry entry){
+    void deleteEntry(Entry entry){
 
-        if(entry instanceof Reminder){
-            Reminder r = (Reminder) entry;
-            reminders.remove(r);
-            this.remove(r);
-            this.remove(r.label);
+        if(entry instanceof RepetitiveReminder){
+            for (RepetitiveReminder r : repetitiveReminders.get(entry.getModel().getEntryID())){
+                this.remove(r);
+                this.remove(r.label);
+                repetitiveReminders.remove(entry.getModel().getEntryID());
+            }
         }
-        else if(entry instanceof Event){
-            Event e = (Event) entry;
-            events.remove(e);
-            this.remove(e);
-            this.remove(e.label);
+        else if(entry instanceof RepetitiveEvent){
+            for (RepetitiveEvent e : repetitiveEvents.get(entry.getModel().getEntryID())){
+                this.remove(e);
+                this.remove(e.label);
+                repetitiveEvents.remove(entry.getModel().getEntryID());
+            }
+        }
+        else {
+            this.remove(entry);
+            this.remove(entry.label);
         }
         App.controller.delete(entry.getModel());
         this.repaint();
     }
 
     void clearContent(){
-        for(Reminder r : reminders){
-            this.remove(r);
-            this.remove(r.label);
+        for (Component comp : this.getComponents()){
+            if(comp instanceof Entry){
+                Entry entry = (Entry) comp;
+                this.remove(entry);
+                this.remove(entry.label);
+            }
         }
-        for(Event e : events){
-            this.remove(e);
-            this.remove(e.label);
-        }
-        reminders.clear();
-        events.clear();
     }
 
     LocalDateTime round5min(LocalDateTime t){

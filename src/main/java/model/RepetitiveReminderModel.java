@@ -10,15 +10,11 @@ public class RepetitiveReminderModel extends RepetitiveModel {
         super(entryID, startAt, finishedAt, interval, title, description);
     }
 
-    private ReminderModel getOccurrence(LocalDateTime time){
-        return new ReminderModel(getEntryID(), time, null, null);
-    }
-
-    public ArrayList<ReminderModel> getBetween(LocalDateTime t1, LocalDateTime t2){
-        ArrayList<ReminderModel> list = new ArrayList<>();
+    public ArrayList<LocalDateTime> getBetween(LocalDateTime t1, LocalDateTime t2){
+        ArrayList<LocalDateTime> list = new ArrayList<>();
         LocalDateTime occurrenceTime = getFirstAfter(t1.minusMinutes(1)); //including result for t1
         while ((occurrenceTime != null) && occurrenceTime.isBefore(t2.plusMinutes(1))){ //including result for t2
-            list.add(getOccurrence(occurrenceTime));
+            list.add(occurrenceTime);
             occurrenceTime = getFirstAfter(occurrenceTime);
         }
         return list;

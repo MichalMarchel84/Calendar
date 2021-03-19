@@ -1,7 +1,5 @@
 package model;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -25,15 +23,11 @@ public class RepetitiveEventModel extends RepetitiveModel {
         fireActionEvent(4, "Duration changed");
     }
 
-    private EventModel getOccurrence(LocalDateTime time){
-        return new EventModel(getEntryID(), time, duration, null, null);
-    }
-
-    public ArrayList<EventModel> getBetween(LocalDateTime t1, LocalDateTime t2){
-        ArrayList<EventModel> list = new ArrayList<>();
+    public ArrayList<LocalDateTime> getBetween(LocalDateTime t1, LocalDateTime t2){
+        ArrayList<LocalDateTime> list = new ArrayList<>();
         LocalDateTime occurrenceTime = getFirstAfter(t1.minusMinutes(getDuration())); //including result for ongoing event
         while ((occurrenceTime != null) && occurrenceTime.isBefore(t2.plusMinutes(1))){ //including result for t2
-            list.add(getOccurrence(occurrenceTime));
+            list.add(occurrenceTime);
             occurrenceTime = getFirstAfter(occurrenceTime);
         }
         return list;

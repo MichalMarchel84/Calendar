@@ -16,7 +16,35 @@ abstract class Entry extends JPanel {
         model.addActionListener(label, false);
     }
 
-    EntryModel getModel(){
+    LocalDateTime getTime() {
+        return model.getTime();
+    }
+
+    LocalDateTime getTimeEnd(){
+        return model.getTime();
+    }
+
+    String getTitle(){
+        return getModel().getTitle();
+    }
+
+    String getDescription(){
+        return getModel().getDescription();
+    }
+
+    void setTime(LocalDateTime time){
+        model.setTime(time);
+    }
+
+    void setTitle(String title){
+        getModel().setTitle(title);
+    }
+
+    void setDescription(String description){
+        getModel().setDescription(description);
+    }
+
+    protected EntryModel getModel(){
         return model;
     }
 }
