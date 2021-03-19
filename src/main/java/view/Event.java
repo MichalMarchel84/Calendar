@@ -12,11 +12,13 @@ class Event extends Entry {
 
     Event(EventModel model) {
         super(model);
+        label.setTime(getModel().getTime(), getModel().getTimeEnd());
+        label.setTitle(getModel().getTitle());
         if(getModel().isRepetitive()){
-            this.setBackground(singleColor);
+            this.setBackground(repetitiveColor);
         }
         else {
-            this.setBackground(repetitiveColor);
+            this.setBackground(singleColor);
         }
         this.setBorder(BorderFactory.createLineBorder(Color.RED, 3));
         this.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));

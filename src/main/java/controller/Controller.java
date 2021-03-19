@@ -28,10 +28,6 @@ public class Controller implements ActionListener {
         client = null;
     }
 
-    /*public Client getClient(){
-        return client;
-    }*/
-
     public ReminderModel createReminderModel(LocalDateTime time){
         ReminderModel model = client.createReminder(time, "", "");
         model.addActionListener(this, true);

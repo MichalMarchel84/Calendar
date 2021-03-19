@@ -34,7 +34,6 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     private static final int auxLineThickness = 1;
 
     DayPanel(){
-        //setDate(LocalDate.now());
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
         this.setLayout(null);
