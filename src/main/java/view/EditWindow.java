@@ -61,17 +61,17 @@ class EditWindow extends JFrame implements ActionListener {
         to.setFont(new Font(from.getFont().getName(), Font.BOLD, 20));
         if(entry instanceof Reminder){
             options.add(from, "0 0 2 0 c c");
-            from.setText(entry.getTime().format(dtf));
+            from.setText(entry.getModel().getTime().format(dtf));
             from.setHorizontalAlignment(SwingConstants.CENTER);
         }
         else if(entry instanceof Event){
             Event e = (Event) entry;
             options.add(from, "0 0 c c");
-            from.setText(e.getTime().format(dtf));
+            from.setText(e.getModel().getTime().format(dtf));
             from.setHorizontalAlignment(SwingConstants.CENTER);
             options.add(new JLabel("-"), "1 0 c c");
             options.add(to, "2 0 c c");
-            to.setText(e.getTimeEnd().format(dtf));
+            to.setText(e.getModel().getTimeEnd().format(dtf));
             to.setHorizontalAlignment(SwingConstants.CENTER);
         }
         options.add(new JLabel("Repetitive"), "0 1 1 1 c c");
@@ -164,18 +164,18 @@ class EditWindow extends JFrame implements ActionListener {
                 entry.getRepetitive().setDescription(description.getText());
             }
             else {*/
-                entry.setTitle(title.getText());
+                entry.getModel().setTitle(title.getText());
                 entry.getModel().setDescription(description.getText());
             //}
             try {
                 //boolean firstRepetitive = entry.isFirstRepetitive();
                 if(entry instanceof Reminder){
-                    parent.setPosition((Reminder) entry, txtFieldTime(from, entry.getTime()));
+                    parent.setPosition((Reminder) entry, txtFieldTime(from, entry.getModel().getTime()));
                 }
                 else if(entry instanceof Event){
                     Event event = (Event) entry;
-                    LocalDateTime t1 = txtFieldTime(from, event.getTime());
-                    LocalDateTime t2 = txtFieldTime(to, event.getTimeEnd());
+                    LocalDateTime t1 = txtFieldTime(from, event.getModel().getTime());
+                    LocalDateTime t2 = txtFieldTime(to, event.getModel().getTimeEnd());
                     parent.setTimeStart(event, t1);
                     parent.setTimeEnd(event, t2);
                 }

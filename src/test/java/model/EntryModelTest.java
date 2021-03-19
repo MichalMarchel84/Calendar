@@ -28,7 +28,7 @@ public class EntryModelTest{
 
         Listener listener = new Listener();
         EntryModel model = new EntryModel(1, LocalDateTime.now(), null, null) {};
-        model.addActionListener(listener);
+        model.addActionListener(listener, false);
         model.setTime(LocalDateTime.now());
         assertEquals(1, listener.lastEventID);
         model.setTitle("test");
@@ -55,7 +55,7 @@ public class EntryModelTest{
 
         Listener listener = new Listener();
         EntryModel model = new EntryModel(1, LocalDateTime.now(), null, null) {};
-        model.addActionListener(listener);
+        model.addActionListener(listener, true);
         model.beginTransaction();
         model.setTime(LocalDateTime.now());
         model.setTitle("test");

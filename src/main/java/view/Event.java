@@ -4,7 +4,6 @@ import info.clearthought.layout.TableLayout;
 import model.EventModel;
 import javax.swing.*;
 import java.awt.*;
-import java.time.LocalDateTime;
 
 class Event extends Entry {
 
@@ -13,7 +12,7 @@ class Event extends Entry {
 
     Event(EventModel model) {
         super(model);
-        if(repetitive){
+        if(getModel().isRepetitive()){
             this.setBackground(singleColor);
         }
         else {
@@ -28,28 +27,6 @@ class Event extends Entry {
         center.setBackground(new Color(0, 0, 0, 0));
         center.setCursor(new Cursor(Cursor.HAND_CURSOR));
         this.add(center, "0 1 f f");
-    }
-
-    @Override
-    LocalDateTime getTime(){
-        return getModel().getTime();
-    }
-
-    LocalDateTime getTimeEnd(){
-        return getTime().plusMinutes(getDuration());
-    }
-
-    long getDuration(){
-        return getModel().getDuration();
-    }
-
-    void setDuration(long val){
-        getModel().setDuration(val);
-    }
-
-    @Override
-    void setTime(LocalDateTime t){
-        getModel().setTime(t);
     }
 
     @Override

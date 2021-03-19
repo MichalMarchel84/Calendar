@@ -7,10 +7,12 @@ import java.util.ArrayList;
 
 public abstract class EntryModel {
 
+    private boolean repetitive = false;
     private final int entryID;
     private String title;
     private String description;
     private LocalDateTime time;
+    final ArrayList<ActionListener> transactionListeners = new ArrayList<>();
     final ArrayList<ActionListener> listeners = new ArrayList<>();
     private boolean suspendEvents = false;
 
@@ -19,6 +21,14 @@ public abstract class EntryModel {
         this.time = time;
         this.title = title;
         this.description = description;
+    }
+
+    public boolean isRepetitive(){
+        return repetitive;
+    }
+
+    void setRepetitive(){
+        repetitive = true;
     }
 
     public int getEntryID() {
@@ -55,12 +65,13 @@ public abstract class EntryModel {
         fireActionEvent(3, "Description changed");
     }
 
-    public void addActionListener(ActionListener actionListener){
-        listeners.add(actionListener);
-    }
-
-    public void removeActionListener(ActionListener actionListener){
-        listeners.remove(actionListener);
+    public void addActionListener(ActionListener actionListener, boolean transactionsEnabled){
+        if(transactionsEnabled){
+            transactionListeners.add(actionListener);
+        }
+        else {
+            listeners.add(actionListener);
+        }
     }
 
     public void beginTransaction(){
@@ -74,8 +85,15 @@ public abstract class EntryModel {
 
     protected void fireActionEvent(int id, String text){
 
+        ActionEvent event = new ActionEvent(this, id, text);
         if(!suspendEvents) {
-            ActionEvent event = new ActionEvent(this, id, text);
+
+            for (ActionListener al : transactionListeners) {
+                al.actionPerformed(event);
+            }
+        }
+
+        if(id != 0) {
             for (ActionListener al : listeners) {
                 al.actionPerformed(event);
             }

@@ -1,6 +1,9 @@
 package view;
 
 import info.clearthought.layout.TableLayout;
+import model.EntryModel;
+import model.EventModel;
+import model.ReminderModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,6 +22,7 @@ class EntryLabel extends JPanel implements ActionListener {
 
     EntryLabel(Entry target){
         this.target = target;
+        setTitle(target.getModel().getTitle());
         double[] cols = {0.15, TableLayout.FILL, 50, 50};
         double[] rows = {TableLayout.FILL};
         TableLayout lay = new TableLayout(cols, rows);
@@ -49,7 +53,19 @@ class EntryLabel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource().equals(delete)){
+        if(e.getSource() instanceof EntryModel){
+            if(e.getSource() instanceof ReminderModel){
+                ReminderModel model = (ReminderModel) e.getSource();
+                setTime(model.getTime());
+            }
+            else if(e.getSource() instanceof EventModel){
+                EventModel model = (EventModel) e.getSource();
+                setTime(model.getTime(), model.getTime().plusMinutes(model.getDuration()));
+            }
+            setTitle(((EntryModel) e.getSource()).getTitle());
+            repaint();
+        }
+        else if(e.getSource().equals(delete)){
             DayPanel parent = (DayPanel)this.getParent();
             parent.removeEntry(target);
         }

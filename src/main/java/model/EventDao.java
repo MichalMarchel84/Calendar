@@ -35,7 +35,7 @@ public class EventDao extends EntryDao {
     }
 
     public void update(EventModel event){
-        String sql = "UPDATE events SET start_time = ?, end_time = ?, title = ?, description = ? WHERE client_id = ? AND entry_id = ?";
+        String sql = "UPDATE events SET start_time = ?, duration = ?, title = ?, description = ? WHERE client_id = ? AND entry_id = ?";
         try {
             PreparedStatement s = super.getConn().prepareStatement(sql);
             s.setInt(1, toUnixTime(event.getTime()));
@@ -53,7 +53,7 @@ public class EventDao extends EntryDao {
 
     ArrayList<EventModel> getBetween(LocalDateTime t1, LocalDateTime t2){
         ArrayList<EventModel> list = new ArrayList<>();
-        String sql = "SELECT entry_id, start_time, end_time, title, description FROM events WHERE client_id = ? AND start_time BETWEEN ? AND ?";
+        String sql = "SELECT entry_id, start_time, duration, title, description FROM events WHERE client_id = ? AND start_time BETWEEN ? AND ?";
         try {
             PreparedStatement s = super.getConn().prepareStatement(sql);
             s.setInt(1, super.getClientID());

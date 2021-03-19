@@ -17,21 +17,10 @@ class Reminder extends Entry {
     }
 
     @Override
-    LocalDateTime getTime(){
-        return getModel().getTime();
-    }
-
-    @Override
-    void setTime(LocalDateTime t){
-        getModel().setTime(t);
-        label.setTime(getModel().getTime());
-    }
-
-    @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        if(repetitive) {
+        if(getModel().isRepetitive()) {
             g2d.setColor(Color.GREEN);
         }
         else {

@@ -19,4 +19,8 @@ public class EventModel extends EntryModel {
         this.duration = duration;
         fireActionEvent(4, "Duration changed");
     }
+
+    public LocalDateTime getTimeEnd(){
+        return getTime().plusMinutes(duration);
+    }
 }
