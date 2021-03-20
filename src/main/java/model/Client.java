@@ -13,14 +13,14 @@ public class Client {
     private final RepetitiveReminderDao repetitiveReminderDao;
     private final RepetitiveEventDao repetitiveEventDao;
 
-    public Client(Connection conn, String login, String pass, boolean newClient) throws LoginPanelException {
+    public Client(Connection conn, String login, String pass, boolean newClient) throws LoginException {
         if(newClient){
             clientDao = new ClientDao(conn, login, hash(pass));
         }
         else {
             clientDao = new ClientDao(conn, login);
             if(!verifyHash(login, pass)){
-                throw new LoginPanelException("error_wrong_password");
+                throw new LoginException("error_wrong_password");
             }
         }
         reminderDao = new ReminderDao(clientDao.getID(), conn);
@@ -29,11 +29,11 @@ public class Client {
         repetitiveEventDao = new RepetitiveEventDao(clientDao.getID(), conn);
     }
 
-    public Client(String login, String pass, boolean newClient) throws LoginPanelException{
+    public Client(String login, String pass, boolean newClient) throws LoginException {
         this(App.conn, login, pass, newClient);
     }
 
-    public Client(String login, String pass) throws LoginPanelException{
+    public Client(String login, String pass) throws LoginException {
         this(App.conn, login, pass, false);
     }
 
@@ -41,7 +41,7 @@ public class Client {
         return BCrypt.hashpw(pass, BCrypt.gensalt(10));
     }
 
-    private boolean verifyHash(String login, String pass) throws LoginPanelException{
+    private boolean verifyHash(String login, String pass) throws LoginException {
         return BCrypt.checkpw(pass, clientDao.getPasswordHash(login));
     }
 

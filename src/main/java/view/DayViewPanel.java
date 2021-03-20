@@ -8,7 +8,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.time.LocalDate;
 
-class DayViewPanel extends JPanel implements LanguageListener{
+public class DayViewPanel extends JPanel implements LanguageListener{
 
     private boolean inhibit = true;
 
@@ -17,7 +17,7 @@ class DayViewPanel extends JPanel implements LanguageListener{
     private final DayPanel content = new DayPanel();
     private final JScrollPane scroll = createScroll();
 
-    DayViewPanel(){
+    public DayViewPanel(){
 
         I18n.addLanguageListener(this);
 
@@ -96,7 +96,7 @@ class DayViewPanel extends JPanel implements LanguageListener{
         content.setPreferredSize(new Dimension(w, (int)(24*(2*DayPanel.daysInBuffer + 1)*h)));
     }
 
-    void setDate(LocalDate date){
+    public void setDate(LocalDate date){
         content.setDateCentered(date);
         int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
         scroll.getVerticalScrollBar().setValue(sv);

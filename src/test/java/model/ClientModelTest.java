@@ -40,7 +40,7 @@ public class ClientModelTest {
             new Client(conn, login, pass, true);
             fail("No exception thrown");
         }
-        catch (LoginPanelException e){
+        catch (LoginException e){
             Assert.assertEquals("error_login_in_use", e.getMessage());
         }
     }
@@ -51,7 +51,7 @@ public class ClientModelTest {
             new Client(conn, "test", "1234", false);
             fail("No exception thrown");
         }
-        catch (LoginPanelException e){
+        catch (LoginException e){
             assertEquals("error_wrong_login", e.getMessage());
         }
     }
@@ -63,7 +63,7 @@ public class ClientModelTest {
             new Client(conn, "test", "1234", false);
             fail("No exception thrown");
         }
-        catch (LoginPanelException e){
+        catch (LoginException e){
             assertEquals("error_wrong_password", e.getMessage());
         }
     }
@@ -77,7 +77,7 @@ public class ClientModelTest {
             Client result = new Client(conn, login, pass, false);
             assertEquals(expected.getClientId(), result.getClientId());
         }
-        catch (LoginPanelException e){
+        catch (LoginException e){
             e.printStackTrace();
         }
     }

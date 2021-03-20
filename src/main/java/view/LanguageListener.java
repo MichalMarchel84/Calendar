@@ -1,5 +1,5 @@
 package view;
 
 interface LanguageListener {
-    public void languageChanged();
+    void languageChanged();
 }

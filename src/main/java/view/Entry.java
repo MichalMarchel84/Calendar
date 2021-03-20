@@ -20,10 +20,6 @@ abstract class Entry extends JPanel {
         return model.getTime();
     }
 
-    LocalDateTime getTimeEnd(){
-        return model.getTime();
-    }
-
     String getTitle(){
         return getModel().getTitle();
     }

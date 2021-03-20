@@ -9,12 +9,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 
-class LoginPanel extends JPanel implements ActionListener, LanguageListener, ErrorDisplaying{
+public class LoginPanel extends JPanel implements LanguageListener{
 
-    private final JTextField userName = new JTextField(20);
-    private final JPasswordField pass = new JPasswordField(20);
-    private final JButton signIn = new JButton();
-    private final JButton newUser = new JButton();
+    public final JTextField userName = new JTextField(20);
+    public final JPasswordField pass = new JPasswordField(20);
+    public final JButton signIn = new JButton();
+    public final JButton newUser = new JButton();
     private final JLabel msg = new JLabel();
     private final JLabel username_label = new JLabel();
     private final JLabel pass_label = new JLabel();
@@ -22,7 +22,7 @@ class LoginPanel extends JPanel implements ActionListener, LanguageListener, Err
     private final Dimension txtFieldSize = new Dimension(100, 30);
     private final Dimension buttonSize = new Dimension(120, 40);
 
-    LoginPanel() {
+    public LoginPanel(ActionListener controller) {
 
         setTexts();
         I18n.addLanguageListener(this);
@@ -52,11 +52,11 @@ class LoginPanel extends JPanel implements ActionListener, LanguageListener, Err
         this.add(pass, "1 5 2 5 c c");
 
         signIn.setPreferredSize(buttonSize);
-        signIn.addActionListener(this);
+        signIn.addActionListener(controller);
         this.add(signIn, "1 6 r c");
 
         newUser.setPreferredSize(buttonSize);
-        newUser.addActionListener(this);
+        newUser.addActionListener(controller);
         this.add(newUser, "2 6 l c");
 
         errorMessage.setForeground(Color.RED);
@@ -84,7 +84,6 @@ class LoginPanel extends JPanel implements ActionListener, LanguageListener, Err
         this.repaint();
     }
 
-    @Override
     public void setErrorMessage(String errMsg){
         errorMessage.setText(I18n.getPhrase(errMsg));
         this.repaint();
@@ -95,15 +94,5 @@ class LoginPanel extends JPanel implements ActionListener, LanguageListener, Err
         setTexts();
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource().equals(signIn)){
-            AppWindow appWindow = (AppWindow) this.getTopLevelAncestor();
-            App.controller.login(userName.getText(), String.copyValueOf(pass.getPassword()), false);
-        }
-        else if(e.getSource().equals(newUser)){
-            AppWindow app = (AppWindow) this.getTopLevelAncestor();
-            app.displayPanel(AppWindow.panels.newUser);
-        }
-    }
+
 }

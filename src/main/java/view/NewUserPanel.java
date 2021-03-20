@@ -9,13 +9,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 
-class NewUserPanel extends JPanel implements LanguageListener, ActionListener, ErrorDisplaying {
+public class NewUserPanel extends JPanel implements LanguageListener {
 
-    private final JTextField userName = new JTextField(20);
-    private final JPasswordField pass = new JPasswordField(20);
-    private final JPasswordField repeatPass = new JPasswordField(20);
-    private final JButton create = new JButton();
-    private final JButton cancel = new JButton();
+    public final JTextField userName = new JTextField(20);
+    public final JPasswordField pass = new JPasswordField(20);
+    public final JPasswordField repeatPass = new JPasswordField(20);
+    public final JButton create = new JButton();
+    public final JButton cancel = new JButton();
     private final JLabel username_label = new JLabel();
     private final JLabel pass_label = new JLabel();
     private final JLabel repeatPass_label = new JLabel();
@@ -23,7 +23,7 @@ class NewUserPanel extends JPanel implements LanguageListener, ActionListener, E
     private final Dimension txtFieldSize = new Dimension(100, 30);
     private final Dimension buttonSize = new Dimension(120, 40);
 
-    NewUserPanel() {
+    public NewUserPanel(ActionListener controller) {
         setTexts();
         I18n.addLanguageListener(this);
 
@@ -53,11 +53,11 @@ class NewUserPanel extends JPanel implements LanguageListener, ActionListener, E
         this.add(repeatPass, "1 6 2 6 c c");
 
         create.setPreferredSize(buttonSize);
-        create.addActionListener(this);
+        create.addActionListener(controller);
         this.add(create, "1 7 r c");
 
         cancel.setPreferredSize(buttonSize);
-        cancel.addActionListener(this);
+        cancel.addActionListener(controller);
         this.add(cancel, "2 7 l c");
 
         errorMessage.setForeground(Color.RED);
@@ -74,28 +74,9 @@ class NewUserPanel extends JPanel implements LanguageListener, ActionListener, E
         this.repaint();
     }
 
-    @Override
     public void setErrorMessage(String errMsg){
         errorMessage.setText(I18n.getPhrase(errMsg));
         this.repaint();
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource().equals(create)){
-            String p1 = new String(pass.getPassword());
-            String p2 = new String(repeatPass.getPassword());
-            if(p1.equals(p2)) {
-                App.controller.login(userName.getText(), String.copyValueOf(pass.getPassword()), true);
-            }
-            else{
-                this.setErrorMessage("error_on_pass_set");
-            }
-        }
-        else if(e.getSource().equals(cancel)){
-            AppWindow app = (AppWindow) this.getTopLevelAncestor();
-            app.displayPanel(AppWindow.panels.login);
-        }
     }
 
     @Override

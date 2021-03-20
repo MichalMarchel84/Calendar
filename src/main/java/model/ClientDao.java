@@ -10,19 +10,19 @@ class ClientDao {
     private final Connection conn;
     private final int clientID;
 
-    ClientDao(Connection conn, String login, String passHash) throws LoginPanelException {
+    ClientDao(Connection conn, String login, String passHash) throws LoginException {
 
         this.conn = conn;
         clientID = create(login, passHash);
     }
 
-    ClientDao(Connection conn, String login) throws LoginPanelException{
+    ClientDao(Connection conn, String login) throws LoginException {
 
         this.conn = conn;
         clientID = getClientIdForLogin(login);
     }
 
-    private int create(String login, String passHash) throws LoginPanelException {
+    private int create(String login, String passHash) throws LoginException {
         String sql = "INSERT INTO clients(login, password) VALUES(?, ?)";
         try {
             PreparedStatement s = conn.prepareStatement(sql);
@@ -31,10 +31,10 @@ class ClientDao {
             s.executeUpdate();
         } catch (SQLException e) {
             if (e.getErrorCode() == 19) {
-                throw new LoginPanelException("error_login_in_use");
+                throw new LoginException("error_login_in_use");
             } else {
                 e.printStackTrace();
-                throw new LoginPanelException("error_unknown");
+                throw new LoginException("error_unknown");
             }
         }
         return getClientIdForLogin(login);
@@ -57,7 +57,7 @@ class ClientDao {
         return id;
     }
 
-    String getPasswordHash(String login) throws LoginPanelException {
+    String getPasswordHash(String login) throws LoginException {
         String sql = "SELECT password FROM clients WHERE login = ?";
         String hash = "";
         try {
@@ -68,12 +68,12 @@ class ClientDao {
                 hash = res.getString("password");
             }
             else{
-                throw new LoginPanelException("error_wrong_login");
+                throw new LoginException("error_wrong_login");
             }
         }
         catch (SQLException e){
             e.printStackTrace();
-            throw new LoginPanelException("error_unknown");
+            throw new LoginException("error_unknown");
         }
         return hash;
     }

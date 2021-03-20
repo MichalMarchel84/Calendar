@@ -1,5 +1,6 @@
 package view;
 
+import controller.MonthViewController;
 import info.clearthought.layout.TableLayout;
 
 import javax.swing.*;
@@ -18,8 +19,10 @@ class MonthPanel extends JPanel implements ActionListener {
     private final ArrayList<JButton> dayList = new ArrayList<>();
     private final JPanel label;
     private static final String[] monthNames = {"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"};
+    private final MonthViewController controller;
 
-    MonthPanel(LocalDate date) {
+    MonthPanel(LocalDate date, MonthViewController controller) {
+        this.controller = controller;
         this.date = date;
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, date.getYear());
@@ -118,9 +121,7 @@ class MonthPanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        AppWindow app = (AppWindow) this.getTopLevelAncestor();
         JButton b = (JButton) e.getSource();
-        app.displayPanel(AppWindow.panels.dayView);
-        app.dayView.setDate(date.withDayOfMonth(Integer.parseInt(b.getText())));
+        controller.displayDayView(date.withDayOfMonth(Integer.parseInt(b.getText())));
     }
 }

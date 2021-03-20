@@ -1,7 +1,7 @@
 package view;
 
 import info.clearthought.layout.TableLayout;
-import model.RepetitiveModel;
+import model.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -59,55 +59,23 @@ class EditWindow extends JFrame implements ActionListener {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
         from.setFont(new Font(from.getFont().getName(), Font.BOLD, 20));
         to.setFont(new Font(from.getFont().getName(), Font.BOLD, 20));
-        if((entry instanceof Reminder) || (entry instanceof RepetitiveReminder)){
-            options.add(from, "0 0 2 0 c c");
-            from.setText(entry.getTime().format(dtf));
-            from.setHorizontalAlignment(SwingConstants.CENTER);
-        }
-        else if((entry instanceof Event) || (entry instanceof RepetitiveEvent)){
+        if(entry instanceof EventPattern){
             options.add(from, "0 0 c c");
             from.setText(entry.getTime().format(dtf));
             from.setHorizontalAlignment(SwingConstants.CENTER);
             options.add(new JLabel("-"), "1 0 c c");
             options.add(to, "2 0 c c");
-            to.setText(entry.getTimeEnd().format(dtf));
+            to.setText(((EventPattern)entry).getTimeEnd().format(dtf));
             to.setHorizontalAlignment(SwingConstants.CENTER);
+        }
+        else {
+            options.add(from, "0 0 2 0 c c");
+            from.setText(entry.getTime().format(dtf));
+            from.setHorizontalAlignment(SwingConstants.CENTER);
         }
         options.add(new JLabel("Repetitive"), "0 1 1 1 c c");
         repetitive.addActionListener(this);
         options.add(repetitive, "2 1 c c");
-
-        /*if(entry.isRepetitive()){
-            repetitive.setSelected(true);
-            if(!entry.isFirstRepetitive()) {
-                repetitive.setEnabled(false);
-                type.setEnabled(false);
-                period.setEnabled(false);
-                from.setEnabled(false);
-                to.setEnabled(false);
-                DateTimeFormatter dateDtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-                beginLabel.setText(I18n.getPhrase("startAt") + " " + entry.getRepetitive().getContent().getTime().format(dateDtf));
-                repetitiveOptions.add(beginLabel, "0 4 1 4 c c");
-                if(entry.getRepetitive().getTimeEnd() == null){
-                    endLabel.setText(I18n.getPhrase("ongoing"));
-                }
-                else {
-                    endLabel.setText(I18n.getPhrase("endAt") + " " + entry.getRepetitive().getTimeEnd().format(dateDtf));
-                }
-                repetitiveOptions.add(endLabel, "0 5 1 5 c c");
-                if(entry.getRepetitive().getTimeEnd() == null){
-                    finish.setText(I18n.getPhrase("finish"));
-                }
-                else {
-                    finish.setText(I18n.getPhrase("resume"));
-                }
-                finish.addActionListener(this);
-                repetitiveOptions.add(finish, "0 6 1 6 f f");
-            }
-            type.setSelectedIndex(entry.getRepetitive().getType());
-            period.setText(Integer.toString(entry.getRepetitive().getPeriod()));
-            options.add(repetitiveOptions, "0 2 2 2 f f");
-        }*/
 
         p.add(options, "1 1 1 5 f f");
         p.add(new JLabel("Title"), "2 1 l c");
@@ -157,27 +125,52 @@ class EditWindow extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
         if(e.getSource().equals(accept)){
 
-            entry.getModel().setTitle(title.getText());
-            entry.getModel().setDescription(description.getText());
             try {
-                if(entry instanceof Reminder){
-                    parent.setPosition((Reminder) entry, txtFieldTime(from, entry.getModel().getTime()));
+                LocalDateTime t1 = txtFieldTime(from, entry.getTime());
+                if(entry instanceof EventPattern){
+                    LocalDateTime t2 = txtFieldTime(to, ((EventPattern) entry).getTimeEnd());
+                    if(t2.isBefore(t1)){
+                        throw new DateTimeParseException(null, "", -1);
+                    }
+                    entry.getModel().beginTransaction();
+                    parent.setPosition(entry, t1);
+                    parent.setTimeEnd(entry, t2);
                 }
-                else if(entry instanceof Event){
-                    Event event = (Event) entry;
-                    LocalDateTime t1 = txtFieldTime(from, event.getModel().getTime());
-                    LocalDateTime t2 = txtFieldTime(to, event.getModel().getTimeEnd());
-                    parent.setTimeStart(event, t1);
-                    parent.setTimeEnd(event, t2);
+                else {
+                    entry.getModel().beginTransaction();
+                    parent.setPosition(entry, t1);
                 }
+                entry.setTitle(title.getText());
+                entry.setDescription(description.getText());
+                entry.getModel().commit();
+
+                if(repetitive.isSelected() && !(entry instanceof RepetitiveEntry)){
+                    int interval = Integer.parseInt(period.getText());
+                    if(entry instanceof Reminder){
+                        /*RepetitiveReminderModel model = App.DAY_VIEW_CONTROLLER.createRepetitiveReminderModel(((Reminder) entry).getModel(), interval);
+                        parent.addRepetitiveReminder(model);*/
+                    }
+                    else if(entry instanceof Event){
+                        /*RepetitiveEventModel model = App.DAY_VIEW_CONTROLLER.createRepetitiveEventModel(((Event) entry).getModel(), interval);
+                        parent.addRepetitiveEvent(model);*/
+                    }
+                    parent.deleteEntry(entry);
+                }
+
                 this.dispose();
                 parent.revalidate();
                 parent.repaint();
             }
             catch (Exception ex){
-                if(ex instanceof DateTimeParseException) {}
+                if(ex instanceof DateTimeParseException) {
+                    if(((DateTimeParseException) ex).getErrorIndex() == -1){
+                        from.setForeground(Color.RED);
+                        to.setForeground(Color.RED);
+                    }
+                }
                 else if(ex instanceof NumberFormatException){
                     period.setForeground(Color.RED);
                     period.requestFocus();
@@ -187,9 +180,11 @@ class EditWindow extends JFrame implements ActionListener {
                 }
             }
         }
+
         else if(e.getSource().equals(cancel)){
             this.dispose();
         }
+
         else if(e.getSource().equals(repetitive)){
             if(repetitive.isSelected()){
                 options.add(repetitiveOptions, "0 2 2 2 f f");
@@ -200,6 +195,7 @@ class EditWindow extends JFrame implements ActionListener {
             options.revalidate();
             options.repaint();
         }
+
         else if(e.getSource().equals(type)){
             if(type.getSelectedIndex() == 2){
                 repetitiveOptions.add(period, "0 3 c c");

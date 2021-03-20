@@ -1,5 +1,6 @@
 package view;
 
+import controller.MonthViewController;
 import info.clearthought.layout.TableLayout;
 
 import javax.swing.*;
@@ -9,22 +10,24 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-class MonthViewPanel extends JPanel implements LanguageListener{
+public class MonthViewPanel extends JPanel implements LanguageListener{
 
     private static final String[] daysOfWeek=  {"mon", "tue", "wed", "thu", "fri", "sat", "sun"};
     private final ArrayList<JLabel> dayList = new ArrayList<>();
     private final JPanel content = createContent();
     private final JScrollPane scroll = createScrollPanel();
     private final ArrayList<MonthPanel> monthList = new ArrayList<>();
-    boolean inhibit = true;
+    public boolean inhibit = true;
+    private final MonthViewController controller;
 
     private final int monthsInBuffer = 3;   //amount before and after presented month (total 2*monthsInBuffer + 1)
     private final int weeksOnDisplay = 8;
     private final int gapBetweenMonths = 50;
     private final int bufferUpdate = 2;     //amount of months buffer shifts when reach end
 
-    MonthViewPanel(){
+    public MonthViewPanel(MonthViewController controller){
 
+        this.controller = controller;
         I18n.addLanguageListener(this);
 
         double[] cols = {TableLayout.FILL};
@@ -96,11 +99,11 @@ class MonthViewPanel extends JPanel implements LanguageListener{
         return panel;
     }
 
-    void setContent(){
+    public void setContent(){
         content.removeAll();
         monthList.clear();
         for(int i = 0; i < (2*monthsInBuffer + 1); i++){
-            MonthPanel p = new MonthPanel(LocalDate.now().minusMonths(monthsInBuffer - i));
+            MonthPanel p = new MonthPanel(LocalDate.now().minusMonths(monthsInBuffer - i), controller);
             monthList.add(p);
             content.add(p, "0 " + i + " f f");
         }
@@ -110,7 +113,7 @@ class MonthViewPanel extends JPanel implements LanguageListener{
     private void changeBufferUp(){
         LocalDate date = monthList.get(0).getDate();
         for (int i = 0; i < bufferUpdate; i++){
-            monthList.add(0, new MonthPanel(date.minusMonths(i + 1)));
+            monthList.add(0, new MonthPanel(date.minusMonths(i + 1), controller));
             monthList.remove(monthList.size() - 1);
         }
         content.removeAll();
@@ -129,7 +132,7 @@ class MonthViewPanel extends JPanel implements LanguageListener{
     private void changeBufferDown(){
         LocalDate date = monthList.get(monthList.size() - 1).getDate();
         for (int i = 0; i < bufferUpdate; i++){
-            monthList.add(new MonthPanel(date.plusMonths(i + 1)));
+            monthList.add(new MonthPanel(date.plusMonths(i + 1), controller));
             monthList.remove(0);
         }
         content.removeAll();
@@ -157,7 +160,7 @@ class MonthViewPanel extends JPanel implements LanguageListener{
         content.setPreferredSize(new Dimension(w, totalRows*h + 2*monthsInBuffer*gapBetweenMonths));
     }
 
-    void centerContent(){
+    public void centerContent(){
         int sv = (scroll.getVerticalScrollBar().getMaximum() - scroll.getViewport().getHeight())/2;
         scroll.getVerticalScrollBar().setValue(sv);
     }

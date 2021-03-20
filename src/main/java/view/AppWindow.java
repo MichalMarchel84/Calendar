@@ -1,6 +1,6 @@
 package view;
 
-import controller.Controller;
+import controller.AppWindowController;
 import info.clearthought.layout.TableLayout;
 import model.App;
 
@@ -10,16 +10,11 @@ import java.awt.event.*;
 
 public class AppWindow extends JFrame implements ActionListener, LanguageListener{
 
-    public enum panels {login, newUser, monthView, dayView}
-    private JPanel onDisplay;
-    private final JComboBox<String> languageSelection;
-    private final LoginPanel login = new LoginPanel();
-    private final NewUserPanel newUser = new NewUserPanel();
-    private final MonthViewPanel monthView = new MonthViewPanel();
-    final DayViewPanel dayView = new DayViewPanel();
-    private final JButton returnButton = new JButton(I18n.getPhrase("return"));
-    private final JButton logout = new JButton(I18n.getPhrase("logout"));
-    private final JPanel topMenu = new JPanel();
+
+    public final JComboBox<String> languageSelection;
+    public final JButton returnButton = new JButton(I18n.getPhrase("return"));
+    public final JButton logout = new JButton(I18n.getPhrase("logout"));
+    public final JPanel topMenu = new JPanel();
 
     public AppWindow() {
 
@@ -34,20 +29,29 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
         languageSelection.addActionListener(this);
         I18n.addLanguageListener(this);
 
-        double[] cols = {0.2, TableLayout.FILL, 0.2, TableLayout.PREFERRED};
+        double[] cols = {TableLayout.PREFERRED, TableLayout.FILL, TableLayout.PREFERRED, TableLayout.PREFERRED, 20};
         double[] rows = {TableLayout.FILL};
-        topMenu.setLayout(new TableLayout(cols, rows));
-        returnButton.addActionListener(this);
-        logout.addActionListener(this);
+        TableLayout layout = new TableLayout(cols, rows);
+        layout.setHGap(20);
+        topMenu.setLayout(layout);
         topMenu.add(languageSelection, "3 0 c c");
 
         this.add(topMenu, "0 0 f f");
-        this.displayPanel(panels.login);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setMinimumSize(new Dimension(300, 500));
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+    }
 
+    public void addLogoutButton(){
+        topMenu.add(logout, "2 0 c c");
+    }
+
+    public void addReturnButton(){
+
+        topMenu.add(returnButton, "0 0 c c");
+        topMenu.revalidate();
+        topMenu.repaint();
     }
 
     private static class FlagListRenderer extends DefaultListCellRenderer{
@@ -63,82 +67,15 @@ public class AppWindow extends JFrame implements ActionListener, LanguageListene
         }
     }
 
-    public void login(){
-        monthView.inhibit = true;
-        monthView.setContent();
-        displayPanel(panels.monthView);
-        Thread t = new Thread(() -> {
-            try {
-                Thread.sleep(200);
-                monthView.centerContent();
-                monthView.inhibit = false;
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-        });
-        t.start();
-    }
-
-    public void displayPanel(panels panelName){
-        if(onDisplay != null){
-            this.remove(onDisplay);
-        }
-        switch (panelName){
-            case login:
-                onDisplay = login;
-                this.setSize(new Dimension(300, 500));
-                this.setLocationRelativeTo(null);
-                break;
-            case newUser:
-                onDisplay = newUser;
-                break;
-            case dayView:
-                onDisplay = dayView;
-                topMenu.add(returnButton, "0 0 f f");
-                break;
-            case monthView:
-                onDisplay = monthView;
-                topMenu.add(logout, "2 0 f f");
-                this.setSize(new Dimension(1000, 700));
-                this.setLocationRelativeTo(null);
-                break;
-            default:
-                onDisplay = login;
-                login.setErrorMessage("Unknown panel call");
-        }
-        this.add(onDisplay, "0 1 f f");
-        this.revalidate();
-        this.repaint();
-    }
-
-    public void displayError(String error){
-        if(onDisplay instanceof ErrorDisplaying){
-            ((ErrorDisplaying) onDisplay).setErrorMessage(error);
-        }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e){
-        if(e.getSource().equals(languageSelection)){
-            I18n.setLang(languageSelection.getSelectedIndex());
-        }
-        else if(e.getSource().equals(returnButton)){
-            displayPanel(panels.monthView);
-            topMenu.remove(returnButton);
-        }
-        else if(e.getSource().equals(logout)){
-            displayPanel(panels.login);
-            topMenu.remove(logout);
-            topMenu.remove(returnButton);
-            dayView.clearContent();
-            App.controller.logout();
-        }
-    }
-
     @Override
     public void languageChanged() {
         returnButton.setText(I18n.getPhrase("return"));
         logout.setText(I18n.getPhrase("logout"));
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource().equals(languageSelection)) {
+            I18n.setLang(languageSelection.getSelectedIndex());
+        }
     }
 }

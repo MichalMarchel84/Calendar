@@ -1,31 +1,32 @@
 package controller;
 
 import model.*;
+import view.DayViewPanel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public class Controller implements ActionListener {
+public class DayViewController implements ActionListener {
 
     private Client client = null;
+    public final DayViewPanel dayView;
+    private final MonthViewController parent;
 
-    public Controller() {
+    public DayViewController(MonthViewController parent) {
+        this.parent = parent;
+        dayView = new DayViewPanel();
     }
 
-    public void login(String login, String pass, boolean newClient){
-        try {
-            client = new Client(login, pass, newClient);
-            App.appWindow.login();
-        }
-        catch (LoginPanelException e){
-            App.appWindow.displayError(e.getMessage());
-        }
+    public void setClient(Client client){
+        clearContent();
+        this.client = client;
     }
 
-    public void logout(){
-        client = null;
+    public void setDate(LocalDate date){
+        dayView.setDate(date);
     }
 
     public ReminderModel createReminderModel(LocalDateTime time){
@@ -42,6 +43,12 @@ public class Controller implements ActionListener {
 
     public RepetitiveReminderModel createRepetitiveReminderModel(ReminderModel in, int interval){
         RepetitiveReminderModel model = client.createRepetitiveReminder(in.getTime(), interval, in.getTitle(), in.getDescription());
+        model.addActionListener(this, true);
+        return model;
+    }
+
+    public RepetitiveEventModel createRepetitiveEventModel(EventModel in, int interval){
+        RepetitiveEventModel model = client.createRepetitiveEvent(in.getTime(), in.getDuration(), interval, in.getTitle(), in.getDescription());
         model.addActionListener(this, true);
         return model;
     }
@@ -80,6 +87,11 @@ public class Controller implements ActionListener {
 
     public void delete(EntryModel model){
         client.delete(model);
+    }
+
+    public void clearContent(){
+
+        client = null;
     }
 
     @Override

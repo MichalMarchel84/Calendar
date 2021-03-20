@@ -18,11 +18,6 @@ abstract class RepetitiveEntry extends Entry{
         return time;
     }
 
-    @Override
-    LocalDateTime getTimeEnd() {
-        return time;
-    }
-
     LocalDateTime getStartAt(){
         return getModel().getTime();
     }
