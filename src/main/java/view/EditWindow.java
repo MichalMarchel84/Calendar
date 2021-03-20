@@ -1,39 +1,40 @@
 package view;
 
-import controller.DayViewController;
+import controller.EditWindowController;
 import info.clearthought.layout.TableLayout;
 import model.*;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 
-class EditWindow extends JFrame implements ActionListener {
-    private final Entry entry;
+public class EditWindow extends JFrame implements ActionListener {
+    public final Entry entry;
     private final JTextField title = new JTextField(50);
     private final JTextArea description = new JTextArea();
-    private final JButton accept = new JButton(I18n.getPhrase("save_button"));
-    private final JButton cancel = new JButton(I18n.getPhrase("cancel_button"));
-    private final JTextField from = new JTextField(5);
-    private final JTextField to = new JTextField(5);
+    public final JButton accept = new JButton(I18n.getPhrase("save_button"));
+    public final JButton cancel = new JButton(I18n.getPhrase("cancel_button"));
+    public final JTextField from = new JTextField(5);
+    public final JTextField to = new JTextField(5);
     private final JPanel options = new JPanel();
-    private final JPanel repetitiveOptions = new JPanel();
-    private final JCheckBox repetitive = new JCheckBox();
-    private final JComboBox<String> type = new JComboBox<>(RepetitiveModel.intervalTypes);
+    public final JPanel repetitiveOptions = new JPanel();
+    public final JCheckBox repetitive = new JCheckBox();
+    public final JComboBox<String> type = new JComboBox<>(RepetitiveModel.intervalTypes);
     private final JTextField period = new JTextField(6);
     private final JLabel periodLabel = new JLabel(I18n.getPhrase("days"));
-    private final JButton finish = new JButton();
+    public final JButton finish = new JButton();
     private final JLabel beginLabel = new JLabel();
     private final JLabel endLabel = new JLabel();
     DayPanel parent;
+    private final EditWindowController controller;
+    private LocalDateTime repetitiveClosed = null;
 
     EditWindow(Entry entry){
         parent = (DayPanel) entry.getParent();
+        controller = new EditWindowController(parent.controller, this);
         this.entry = entry;
         title.setText(entry.getModel().getTitle());
         title.setFont(new Font(title.getFont().getName(), Font.BOLD, 20));
@@ -57,6 +58,83 @@ class EditWindow extends JFrame implements ActionListener {
         l.setHGap(5);
         options.setLayout(l);
 
+        setTimeFields();
+        options.add(new JLabel("Repetitive"), "0 1 1 1 c c");
+        setRepetitiveOptions();
+        repetitive.addActionListener(this);
+        options.add(repetitive, "2 1 c c");
+
+        p.add(options, "1 1 1 5 f f");
+        p.add(new JLabel("Title"), "2 1 l c");
+        p.add(title, "2 2 3 2 f c");
+        p.add(new JLabel("Description"), "2 3 l c");
+        p.add(description, "2 4 3 4 f f");
+        p.add(accept, "2 5 f f");
+        p.add(cancel, "3 5 f f");
+        accept.addActionListener(controller);
+        cancel.addActionListener(controller);
+        accept.setFont(new Font(accept.getFont().getName(), Font.BOLD, 15));
+        cancel.setFont(new Font(accept.getFont().getName(), Font.BOLD, 15));
+        this.add(p);
+        this.setSize(new Dimension(600, 400));
+        this.setResizable(false);
+        this.setVisible(true);
+        this.setLocationRelativeTo(entry.label);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setAlwaysOnTop(true);
+    }
+
+    private void createRepetitiveOptions(){
+        double[] cols = {0.5, 0.5};
+        double[] rows = new double[7];
+        Arrays.fill(rows, TableLayout.PREFERRED);
+        TableLayout lay = new TableLayout(cols, rows);
+        lay.setHGap(5);
+        lay.setVGap(10);
+        repetitiveOptions.setLayout(lay);
+        repetitiveOptions.add(new JLabel("Repeat every"), "0 0 1 0 c c");
+        type.addActionListener(this);
+        repetitiveOptions.add(type, "0 1 1 1 c c");
+        period.setText("7");
+        period.setHorizontalAlignment(SwingConstants.CENTER);
+        finish.addActionListener(this);
+    }
+
+    private void setRepetitiveOptions(){
+        if(entry instanceof RepetitiveEntry){
+            RepetitiveEntry re = (RepetitiveEntry) entry;
+            repetitive.setSelected(true);
+            displayRepetitiveOptions();
+            int interval = re.getModel().getInterval();
+            if(interval > 0){
+                type.setSelectedIndex(2);
+                period.setText(Integer.toString(interval));
+                displayPeriod();
+            }
+            else if(interval == 0){
+                type.setSelectedIndex(0);
+            }
+            else if(interval == -1){
+                type.setSelectedIndex(1);
+            }
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            beginLabel.setText("Started: " + re.getStartAt().format(dtf));
+            if(re.getFinishedAt() == null){
+                endLabel.setText("ongoing");
+                finish.setText("Finish");
+            }
+            else {
+                repetitiveClosed = re.getFinishedAt();
+                endLabel.setText("Finished: " + re.getFinishedAt().format(dtf));
+                finish.setText("Resume");
+            }
+            repetitiveOptions.add(beginLabel, "0 3 1 3 c c");
+            repetitiveOptions.add(endLabel, "0 4 1 4 c c");
+            repetitiveOptions.add(finish, "0 5 1 5 c c");
+        }
+    }
+
+    private void setTimeFields(){
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
         from.setFont(new Font(from.getFont().getName(), Font.BOLD, 20));
         to.setFont(new Font(from.getFont().getName(), Font.BOLD, 20));
@@ -74,157 +152,64 @@ class EditWindow extends JFrame implements ActionListener {
             from.setText(entry.getTime().format(dtf));
             from.setHorizontalAlignment(SwingConstants.CENTER);
         }
-        options.add(new JLabel("Repetitive"), "0 1 1 1 c c");
-        repetitive.addActionListener(this);
-        options.add(repetitive, "2 1 c c");
-
-        p.add(options, "1 1 1 5 f f");
-        p.add(new JLabel("Title"), "2 1 l c");
-        p.add(title, "2 2 3 2 f c");
-        p.add(new JLabel("Description"), "2 3 l c");
-        p.add(description, "2 4 3 4 f f");
-        p.add(accept, "2 5 f f");
-        p.add(cancel, "3 5 f f");
-        accept.addActionListener(this);
-        cancel.addActionListener(this);
-        accept.setFont(new Font(accept.getFont().getName(), Font.BOLD, 15));
-        cancel.setFont(new Font(accept.getFont().getName(), Font.BOLD, 15));
-        this.add(p);
-        this.setSize(new Dimension(600, 400));
-        this.setResizable(false);
-        this.setVisible(true);
-        this.setLocationRelativeTo(entry.label);
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setAlwaysOnTop(true);
     }
 
-    void createRepetitiveOptions(){
-        double[] cols = {0.5, 0.5};
-        double[] rows = new double[7];
-        Arrays.fill(rows, TableLayout.PREFERRED);
-        TableLayout lay = new TableLayout(cols, rows);
-        lay.setHGap(5);
-        lay.setVGap(10);
-        repetitiveOptions.setLayout(lay);
-        repetitiveOptions.add(new JLabel("Repeat every"), "0 0 1 0 c c");
-        type.addActionListener(this);
-        repetitiveOptions.add(type, "0 1 1 1 c c");
-        period.setText("7");
-        period.setHorizontalAlignment(SwingConstants.CENTER);
+    private void displayRepetitiveOptions(){
+        options.add(repetitiveOptions, "0 2 2 2");
+        options.revalidate();
+        options.repaint();
     }
 
-    LocalDateTime txtFieldTime(JTextField tf, LocalDateTime date) throws DateTimeParseException{
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String time = date.format(dtf) + " " + tf.getText();
-        tf.setForeground(Color.RED);
-        tf.requestFocus();
-        dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime t = LocalDateTime.parse(time, dtf);
-        tf.setForeground(Color.BLACK);
-        return t;
+    private void hideRepetitiveOptions(){
+        options.remove(repetitiveOptions);
+        options.revalidate();
+        options.repaint();
+    }
+
+    private void displayPeriod(){
+        repetitiveOptions.add(period, "0 2 c c");
+        repetitiveOptions.add(periodLabel, "1 2 l c");
+        repetitiveOptions.revalidate();
+        repetitiveOptions.repaint();
+    }
+
+    private void hidePeriod(){
+        repetitiveOptions.remove(period);
+        repetitiveOptions.remove(periodLabel);
+        options.revalidate();
+        options.repaint();
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-
-        if(e.getSource().equals(accept)){
-
-            try {
-                LocalDateTime t1 = txtFieldTime(from, entry.getTime());
-                if(entry instanceof EventPattern){
-                    LocalDateTime t2 = txtFieldTime(to, ((EventPattern) entry).getTimeEnd());
-                    if(t2.isBefore(t1)){
-                        throw new DateTimeParseException(null, "", -1);
-                    }
-                    entry.getModel().beginTransaction();
-                    parent.setPosition(entry, t1);
-                    parent.setTimeEnd(entry, t2);
-                }
-                else {
-                    entry.getModel().beginTransaction();
-                    parent.setPosition(entry, t1);
-                }
-                entry.setTitle(title.getText());
-                entry.setDescription(description.getText());
-                entry.getModel().commit();
-
-                if(repetitive.isSelected() && !(entry instanceof RepetitiveEntry)){
-                    int interval = Integer.parseInt(period.getText());
-                    if(entry instanceof Reminder){
-                        RepetitiveReminderModel model = parent.controller.createRepetitiveReminderModel(((Reminder) entry).getModel(), interval);
-                        parent.addRepetitiveReminder(model);
-                    }
-                    else if(entry instanceof Event){
-                        RepetitiveEventModel model = parent.controller.createRepetitiveEventModel(((Event) entry).getModel(), interval);
-                        parent.addRepetitiveEvent(model);
-                    }
-                    parent.deleteEntry(entry);
-                }
-
-                this.dispose();
-                parent.revalidate();
-                parent.repaint();
-            }
-            catch (Exception ex){
-                if(ex instanceof DateTimeParseException) {
-                    if(((DateTimeParseException) ex).getErrorIndex() == -1){
-                        from.setForeground(Color.RED);
-                        to.setForeground(Color.RED);
-                    }
-                }
-                else if(ex instanceof NumberFormatException){
-                    period.setForeground(Color.RED);
-                    period.requestFocus();
-                }
-                else {
-                    ex.printStackTrace();
-                }
-            }
-        }
-
-        else if(e.getSource().equals(cancel)){
-            this.dispose();
-        }
-
-        else if(e.getSource().equals(repetitive)){
+    public void actionPerformed(ActionEvent actionEvent) {
+        if(actionEvent.getSource().equals(repetitive)){
             if(repetitive.isSelected()){
-                options.add(repetitiveOptions, "0 2 2 2 f f");
+                displayRepetitiveOptions();
             }
             else {
-                options.remove(repetitiveOptions);
+                hideRepetitiveOptions();
             }
-            options.revalidate();
-            options.repaint();
         }
-
-        else if(e.getSource().equals(type)){
+        else if(actionEvent.getSource().equals(type)){
             if(type.getSelectedIndex() == 2){
-                repetitiveOptions.add(period, "0 3 c c");
-                repetitiveOptions.add(periodLabel, "1 3 l c");
-                type.requestFocus();
-            }
-            else{
-                repetitiveOptions.remove(period);
-                repetitiveOptions.remove(periodLabel);
-            }
-            repetitiveOptions.revalidate();
-            repetitiveOptions.repaint();
-        }
-        /*else if(e.getSource().equals(finish)){
-            if(entry.getRepetitive().getTimeEnd() == null){
-                entry.getRepetitive().setTimeEnd(entry.getTime());
-                finish.setText(I18n.getPhrase("resume"));
-                DateTimeFormatter dateDtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-                endLabel.setText(I18n.getPhrase("endAt") + " " + entry.getRepetitive().getTimeEnd().format(dateDtf));
+                displayPeriod();
             }
             else {
-                entry.getRepetitive().setTimeEnd(null);
-                finish.setText(I18n.getPhrase("finish"));
-                endLabel.setText(I18n.getPhrase("ongoing"));
+                hidePeriod();
             }
-            parent.displayRepetitive(entry.getRepetitive());
-            parent.revalidate();
-            parent.repaint();
-        }*/
+        }
+        else if(actionEvent.getSource().equals(finish)){
+            RepetitiveEntry re = (RepetitiveEntry) entry;
+            if(repetitiveClosed == null){
+                repetitiveClosed = re.getTime();
+                endLabel.setText("Finished");
+                finish.setText("Resume");
+            }
+            else {
+                repetitiveClosed = null;
+                endLabel.setText("ongoing");
+                finish.setText("Finish");
+            }
+        }
     }
 }

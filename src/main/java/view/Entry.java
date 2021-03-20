@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-abstract class Entry extends JPanel {
+public abstract class Entry extends JPanel {
     final EntryLabel label;
     private final EntryModel model;
 
