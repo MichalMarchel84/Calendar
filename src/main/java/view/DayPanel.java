@@ -1,5 +1,6 @@
 package view;
 
+import controller.DayViewController;
 import model.*;
 
 import javax.swing.*;
@@ -16,6 +17,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
 
     private LocalDateTime time = LocalDateTime.now();
     private LocalDateTime endTime = time.plusDays(2*daysInBuffer + 1);
+    final DayViewController controller;
 
     static final int daysInBuffer = 2;
 
@@ -33,7 +35,8 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     private static final int mainLineThickness = 3;
     private static final int auxLineThickness = 1;
 
-    DayPanel(){
+    DayPanel(DayViewController controller){
+        this.controller = controller;
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
         this.setLayout(null);
@@ -48,31 +51,31 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     }
 
     private void getReminders(){
-        /*ArrayList<ReminderModel> actual = App.DAY_VIEW_CONTROLLER.getRemindersBetween(time, endTime);
+        ArrayList<ReminderModel> actual = controller.getRemindersBetween(time, endTime);
         for (ReminderModel model : actual) {
             addReminder(model);
-        }*/
+        }
     }
 
     private void getEvents(){
-        /*ArrayList<EventModel> actual = App.DAY_VIEW_CONTROLLER.getEventsBetween(time, endTime);
+        ArrayList<EventModel> actual = controller.getEventsBetween(time, endTime);
         for (EventModel model : actual) {
             addEvent(model);
-        }*/
+        }
     }
 
     private void getRepetitiveReminders(){
-        /*var list = App.DAY_VIEW_CONTROLLER.getRepetitiveRemindersBetween(time, endTime);
+        var list = controller.getRepetitiveRemindersBetween(time, endTime);
         for(RepetitiveReminderModel model : list){
             addRepetitiveReminder(model);
-        }*/
+        }
     }
 
     private void getRepetitiveEvents(){
-        /*var list = App.DAY_VIEW_CONTROLLER.getRepetitiveEventsBetween(time, endTime);
+        var list = controller.getRepetitiveEventsBetween(time, endTime);
         for(RepetitiveEventModel model : list){
             addRepetitiveEvent(model);
-        }*/
+        }
     }
 
     void setDate(LocalDate time){
@@ -108,14 +111,14 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
 
     private void resizeReminder(Entry reminder){
         reminder.setSize(new Dimension(timelineWidth + 20, 20));
-        reminder.setLocation(timelineOffset, positionOf(reminder.getModel().getTime()) - reminder.getHeight()/2);
+        reminder.setLocation(timelineOffset, positionOf(reminder.getTime()) - reminder.getHeight()/2);
         reminder.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, reminder.getHeight()));
         reminder.label.setLocation(timelineOffset + timelineWidth + labelOffset, reminder.getY());
     }
 
     private void resizeEvent(Entry event){
-        event.setSize(new Dimension(timelineWidth, positionOf(((EventPattern)event).getTimeEnd()) - positionOf(event.getModel().getTime())));
-        event.setLocation(timelineOffset, positionOf(event.getModel().getTime()));
+        event.setSize(new Dimension(timelineWidth, positionOf(((EventPattern)event).getTimeEnd()) - positionOf(event.getTime())));
+        event.setLocation(timelineOffset, positionOf(event.getTime()));
         event.label.setSize(new Dimension(this.getWidth() - timelineOffset - timelineWidth - labelOffset, event.getHeight()));
         event.label.setLocation(timelineOffset + timelineWidth + labelOffset, event.getY());
     }
@@ -136,12 +139,12 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
         for(Component comp : this.getComponents()){
             if((comp instanceof Reminder) || (comp instanceof RepetitiveReminder)){
                 Entry entry = (Entry) comp;
-                entry.setLocation(entry.getX(), positionOf(entry.getModel().getTime()) - entry.getHeight()/2);
+                entry.setLocation(entry.getX(), positionOf(entry.getTime()) - entry.getHeight()/2);
                 entry.label.setLocation(entry.label.getX(), entry.getY());
             }
             else if((comp instanceof Event) || (comp instanceof RepetitiveEvent)){
                 Entry entry = (Entry) comp;
-                entry.setLocation(entry.getX(), positionOf(entry.getModel().getTime()));
+                entry.setLocation(entry.getX(), positionOf(entry.getTime()));
                 entry.label.setLocation(entry.label.getX(), entry.getY());
             }
         }
@@ -179,14 +182,13 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     }
 
     private Reminder addReminder(LocalDateTime t){
-        /*Reminder r = new Reminder(App.DAY_VIEW_CONTROLLER.createReminderModel(t));
+        Reminder r = new Reminder(controller.createReminderModel(t));
         this.add(r);
         this.add(r.label);
         resizeReminder(r);
         r.label.revalidate();
         r.label.repaint();
-        return r;*/
-        return null;
+        return r;
     }
 
     void addReminder(ReminderModel model){
@@ -197,14 +199,13 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
     }
 
     private Event addEvent(LocalDateTime t1, LocalDateTime t2){
-        /*Event e = new Event(App.DAY_VIEW_CONTROLLER.createEventModel(t1, t1.until(t2, ChronoUnit.MINUTES)));
+        Event e = new Event(controller.createEventModel(t1, t1.until(t2, ChronoUnit.MINUTES)));
         this.add(e);
         this.add(e.label);
         resizeEvent(e);
         e.label.revalidate();
         e.label.repaint();
-        return e;*/
-        return null;
+        return e;
     }
 
     void addEvent(EventModel model){
@@ -278,7 +279,7 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
             this.remove(entry);
             this.remove(entry.label);
         }
-        //App.DAY_VIEW_CONTROLLER.delete(entry.getModel());
+        controller.delete(entry.getModel());
         this.repaint();
     }
 
@@ -290,6 +291,8 @@ class DayPanel extends JPanel implements MouseListener, MouseMotionListener{
                 this.remove(entry.label);
             }
         }
+        repetitiveReminders.clear();
+        repetitiveEvents.clear();
     }
 
     LocalDateTime round5min(LocalDateTime t){

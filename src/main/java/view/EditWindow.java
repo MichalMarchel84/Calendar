@@ -1,5 +1,6 @@
 package view;
 
+import controller.DayViewController;
 import info.clearthought.layout.TableLayout;
 import model.*;
 
@@ -150,12 +151,12 @@ class EditWindow extends JFrame implements ActionListener {
                 if(repetitive.isSelected() && !(entry instanceof RepetitiveEntry)){
                     int interval = Integer.parseInt(period.getText());
                     if(entry instanceof Reminder){
-                        /*RepetitiveReminderModel model = App.DAY_VIEW_CONTROLLER.createRepetitiveReminderModel(((Reminder) entry).getModel(), interval);
-                        parent.addRepetitiveReminder(model);*/
+                        RepetitiveReminderModel model = parent.controller.createRepetitiveReminderModel(((Reminder) entry).getModel(), interval);
+                        parent.addRepetitiveReminder(model);
                     }
                     else if(entry instanceof Event){
-                        /*RepetitiveEventModel model = App.DAY_VIEW_CONTROLLER.createRepetitiveEventModel(((Event) entry).getModel(), interval);
-                        parent.addRepetitiveEvent(model);*/
+                        RepetitiveEventModel model = parent.controller.createRepetitiveEventModel(((Event) entry).getModel(), interval);
+                        parent.addRepetitiveEvent(model);
                     }
                     parent.deleteEntry(entry);
                 }

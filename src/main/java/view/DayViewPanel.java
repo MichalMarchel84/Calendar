@@ -1,5 +1,7 @@
 package view;
 
+import controller.DayViewController;
+
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
@@ -14,11 +16,15 @@ public class DayViewPanel extends JPanel implements LanguageListener{
 
     private static final int hoursOnDisplay = 12;
     private static final int bufferUpdate = 2;
-    private final DayPanel content = new DayPanel();
-    private final JScrollPane scroll = createScroll();
+    private final DayPanel content;
+    private final JScrollPane scroll;
+    private final DayViewController controller;
 
-    public DayViewPanel(){
+    public DayViewPanel(DayViewController controller){
 
+        this.controller = controller;
+        content = new DayPanel(controller);
+        scroll = createScroll();
         I18n.addLanguageListener(this);
 
         this.setLayout(new BorderLayout());

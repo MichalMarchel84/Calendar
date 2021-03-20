@@ -17,7 +17,7 @@ public class DayViewController implements ActionListener {
 
     public DayViewController(MonthViewController parent) {
         this.parent = parent;
-        dayView = new DayViewPanel();
+        dayView = new DayViewPanel(this);
     }
 
     public void setClient(Client client){
