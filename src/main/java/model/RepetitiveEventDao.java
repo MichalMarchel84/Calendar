@@ -36,7 +36,7 @@ class RepetitiveEventDao extends RepetitiveDao{
     }
 
     void update(RepetitiveEventModel model){
-        String sql = "UPDATE repetitive_events SET started_at = ?, finished_at = ?, interval = ?, end_time = ?, title = ?, description = ?";
+        String sql = "UPDATE repetitive_events SET started_at = ?, finished_at = ?, interval = ?, duration = ?, title = ?, description = ?";
         try{
             PreparedStatement s = super.getConn().prepareStatement(sql);
             s.setInt(1, toUnixTime(model.getTime()));

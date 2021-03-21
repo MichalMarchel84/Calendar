@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.time.LocalDateTime;
 
-class RepetitiveReminder extends RepetitiveEntry{
+public class RepetitiveReminder extends RepetitiveEntry{
 
     RepetitiveReminder(RepetitiveReminderModel model, LocalDateTime time) {
         super(model, time);
@@ -32,7 +32,7 @@ class RepetitiveReminder extends RepetitiveEntry{
     }
 
     @Override
-    protected RepetitiveReminderModel getModel(){
+    public RepetitiveReminderModel getModel(){
         return (RepetitiveReminderModel) super.getModel();
     }
 }

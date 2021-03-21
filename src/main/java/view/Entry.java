@@ -16,31 +16,31 @@ public abstract class Entry extends JPanel {
         model.addActionListener(label, false);
     }
 
-    LocalDateTime getTime() {
+    public LocalDateTime getTime() {
         return model.getTime();
     }
 
-    String getTitle(){
+    public String getTitle(){
         return getModel().getTitle();
     }
 
-    String getDescription(){
+    public String getDescription(){
         return getModel().getDescription();
     }
 
-    void setTime(LocalDateTime time){
+    public void setTime(LocalDateTime time){
         model.setTime(time);
     }
 
-    void setTitle(String title){
+    public void setTitle(String title){
         getModel().setTitle(title);
     }
 
-    void setDescription(String description){
+    public void setDescription(String description){
         getModel().setDescription(description);
     }
 
-    protected EntryModel getModel(){
+    public EntryModel getModel(){
         return model;
     }
 }

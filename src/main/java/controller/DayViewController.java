@@ -1,7 +1,7 @@
 package controller;
 
 import model.*;
-import view.DayViewPanel;
+import view.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,11 +13,13 @@ public class DayViewController implements ActionListener {
 
     private Client client = null;
     public final DayViewPanel dayView;
+    private final DayPanel content;
     private final MonthViewController parent;
 
     public DayViewController(MonthViewController parent) {
         this.parent = parent;
         dayView = new DayViewPanel(this);
+        content = dayView.content;
     }
 
     public void setClient(Client client){
@@ -83,6 +85,54 @@ public class DayViewController implements ActionListener {
             model.addActionListener(this, true);
         }
         return list;
+    }
+
+    public void updateReminder(Reminder reminder){
+        content.removeSingle(reminder);
+        content.addReminder(reminder.getModel());
+    }
+
+    public void updateEvent(Event event){
+        content.removeSingle(event);
+        content.addEvent(event.getModel());
+    }
+
+    public void updateRepetitive(RepetitiveEntry entry){
+        if(entry instanceof RepetitiveReminder){
+            content.addRepetitiveReminder(((RepetitiveReminder)entry).getModel());
+        }
+        else if(entry instanceof RepetitiveEvent){
+            content.addRepetitiveEvent(((RepetitiveEvent)entry).getModel());
+        }
+    }
+
+    public void convertToRepetitive(Entry entry, int interval){
+        content.deleteEntry(entry);
+        if(entry instanceof Reminder){
+            RepetitiveReminderModel model = createRepetitiveReminderModel(((Reminder) entry).getModel(), interval);
+            content.addRepetitiveReminder(model);
+        }
+        else if(entry instanceof Event){
+            RepetitiveEventModel model = createRepetitiveEventModel(((Event) entry).getModel(), interval);
+            content.addRepetitiveEvent(model);
+        }
+    }
+
+    public void convertToSingle(RepetitiveEntry entry, EntryModel singleModel){
+        LocalDateTime prevDate = entry.getPrevious();
+        if(prevDate == null){
+            content.deleteEntry(entry);
+        }
+        else {
+            entry.setFinishedAt(prevDate);
+            updateRepetitive(entry);
+        }
+        if(singleModel instanceof ReminderModel){
+            content.addReminder((ReminderModel) singleModel);
+        }
+        else if(singleModel instanceof EventModel){
+            content.addEvent((EventModel) singleModel);
+        }
     }
 
     public void delete(EntryModel model){

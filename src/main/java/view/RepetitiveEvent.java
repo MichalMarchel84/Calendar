@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
 
-class RepetitiveEvent extends RepetitiveEntry implements EventPattern{
+public class RepetitiveEvent extends RepetitiveEntry implements EventPattern{
 
     RepetitiveEvent(RepetitiveEventModel model, LocalDateTime time) {
         super(model, time);
@@ -40,7 +40,7 @@ class RepetitiveEvent extends RepetitiveEntry implements EventPattern{
     }
 
     @Override
-    protected RepetitiveEventModel getModel(){
+    public RepetitiveEventModel getModel(){
         return (RepetitiveEventModel) super.getModel();
     }
 }

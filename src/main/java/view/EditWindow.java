@@ -13,33 +13,31 @@ import java.util.Arrays;
 
 public class EditWindow extends JFrame implements ActionListener {
     public final Entry entry;
-    private final JTextField title = new JTextField(50);
-    private final JTextArea description = new JTextArea();
+    public final JTextField title = new JTextField(50);
+    public final JTextArea description = new JTextArea();
     public final JButton accept = new JButton(I18n.getPhrase("save_button"));
     public final JButton cancel = new JButton(I18n.getPhrase("cancel_button"));
     public final JTextField from = new JTextField(5);
     public final JTextField to = new JTextField(5);
     private final JPanel options = new JPanel();
-    public final JPanel repetitiveOptions = new JPanel();
+    private final JPanel repetitiveOptions = new JPanel();
     public final JCheckBox repetitive = new JCheckBox();
     public final JComboBox<String> type;
-    private final JTextField period = new JTextField(6);
+    public final JTextField period = new JTextField(6);
     private final JLabel periodLabel = new JLabel(I18n.getPhrase("days"));
     public final JButton finish = new JButton();
     private final JLabel beginLabel = new JLabel();
     private final JLabel endLabel = new JLabel();
-    DayPanel parent;
+    private final DayPanel parent;
     private final EditWindowController controller;
-    private LocalDateTime repetitiveClosed = null;
+    public LocalDateTime repetitiveClosed = null;
 
     EditWindow(Entry entry){
         parent = (DayPanel) entry.getParent();
-        controller = new EditWindowController(parent.controller, this);
         this.entry = entry;
-        String types[] = new String[RepetitiveModel.intervalTypes.length];
+        String types[] = new String[RepetitiveModel.INTERVAL_TYPES.length];
         for(int i = 0; i < types.length; i++){
-            types[i] = I18n.getPhrase(RepetitiveModel.intervalTypes[i]);
-            System.out.println(types[i]);
+            types[i] = I18n.getPhrase(RepetitiveModel.INTERVAL_TYPES[i]);
         }
         type = new JComboBox<>(types);
         title.setText(entry.getModel().getTitle());
@@ -77,6 +75,7 @@ public class EditWindow extends JFrame implements ActionListener {
         p.add(description, "2 4 3 4 f f");
         p.add(accept, "2 5 f f");
         p.add(cancel, "3 5 f f");
+        controller = new EditWindowController(parent.controller, this);
         accept.addActionListener(controller);
         cancel.addActionListener(controller);
         accept.setFont(new Font(accept.getFont().getName(), Font.BOLD, 15));

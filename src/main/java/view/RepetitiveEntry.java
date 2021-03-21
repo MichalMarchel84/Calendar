@@ -4,7 +4,7 @@ import model.RepetitiveModel;
 
 import java.time.LocalDateTime;
 
-abstract class RepetitiveEntry extends Entry{
+public abstract class RepetitiveEntry extends Entry{
 
     private LocalDateTime time;
 
@@ -14,33 +14,41 @@ abstract class RepetitiveEntry extends Entry{
     }
 
     @Override
-    LocalDateTime getTime(){
+    public LocalDateTime getTime(){
         return time;
     }
 
-    LocalDateTime getStartAt(){
+    public LocalDateTime getStartAt(){
         return getModel().getTime();
     }
 
-    LocalDateTime getFinishedAt(){
+    public LocalDateTime getFinishedAt(){
         return getModel().getFinishedAt();
     }
 
     @Override
-    void setTime(LocalDateTime time){
+    public void setTime(LocalDateTime time){
         this.time = time;
     }
 
-    void setStartAt(LocalDateTime time){
+    public void setStartAt(LocalDateTime time){
         getModel().setTime(time);
     }
 
-    void setFinishedAt(LocalDateTime time){
+    public void setFinishedAt(LocalDateTime time){
         getModel().setFinishedAt(time);
     }
 
+    public LocalDateTime getPrevious(){
+        if(getTime().equals(getStartAt())) return null;
+        else if(getModel().getInterval() > 0) return time.minusDays(getModel().getInterval());
+        else if(getModel().getInterval() == 0) return time.minusMonths(1);
+        else if(getModel().getInterval() == -1) return time.minusYears(1);
+        else return null;
+    }
+
     @Override
-    protected RepetitiveModel getModel(){
+    public RepetitiveModel getModel(){
         return (RepetitiveModel) super.getModel();
     }
 }

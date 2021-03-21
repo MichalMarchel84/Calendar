@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.time.LocalDateTime;
 
-class Reminder extends Entry {
+public class Reminder extends Entry {
 
     public Reminder(ReminderModel model) {
         super(model);
@@ -33,7 +33,7 @@ class Reminder extends Entry {
     }
 
     @Override
-    protected ReminderModel getModel(){
+    public ReminderModel getModel(){
         return (ReminderModel) super.getModel();
     }
 }

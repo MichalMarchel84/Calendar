@@ -16,7 +16,7 @@ public class DayViewPanel extends JPanel implements LanguageListener{
 
     private static final int hoursOnDisplay = 12;
     private static final int bufferUpdate = 2;
-    private final DayPanel content;
+    public final DayPanel content;
     private final JScrollPane scroll;
     private final DayViewController controller;
 

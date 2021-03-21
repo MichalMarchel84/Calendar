@@ -6,7 +6,7 @@ public abstract class RepetitiveModel extends EntryModel {
 
     private LocalDateTime finishedAt;
     private int interval;
-    public static final String[] intervalTypes = {"month", "year", "period"};
+    public static final String[] INTERVAL_TYPES = {"month", "year", "period"};
 
     RepetitiveModel(int entryID, LocalDateTime time, LocalDateTime finishedAt, int interval, String title, String description) {
         super(entryID, time, title, description);

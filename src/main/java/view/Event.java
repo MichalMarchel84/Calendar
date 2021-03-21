@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
 
-class Event extends Entry implements EventPattern{
+public class Event extends Entry implements EventPattern{
 
     static final Color singleColor = new Color(0, 0, 255, 100);
     static final Color repetitiveColor = new Color(0, 255, 0, 100);
@@ -43,7 +43,7 @@ class Event extends Entry implements EventPattern{
     }
 
     @Override
-    protected EventModel getModel(){
+    public EventModel getModel(){
         return (EventModel) super.getModel();
     }
 }
