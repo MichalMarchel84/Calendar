@@ -28,6 +28,10 @@ public abstract class RepetitiveEntry extends Entry{
 
     @Override
     public void setTime(LocalDateTime time){
+
+        if(isFirstOccurrence()){
+            setStartAt(time);
+        }
         this.time = time;
     }
 
@@ -45,6 +49,10 @@ public abstract class RepetitiveEntry extends Entry{
         else if(getModel().getInterval() == 0) return time.minusMonths(1);
         else if(getModel().getInterval() == -1) return time.minusYears(1);
         else return null;
+    }
+
+    public boolean isFirstOccurrence(){
+        return time.equals(getStartAt());
     }
 
     @Override

@@ -199,6 +199,11 @@ public class DayPanel extends JPanel implements MouseListener, MouseMotionListen
     }
 
     private Event addEvent(LocalDateTime t1, LocalDateTime t2){
+        if(t1.isAfter(t2)){
+            LocalDateTime temp = t1;
+            t1 = t2;
+            t2 = temp;
+        }
         Event e = new Event(controller.createEventModel(t1, t1.until(t2, ChronoUnit.MINUTES)));
         this.add(e);
         this.add(e.label);
@@ -399,9 +404,16 @@ public class DayPanel extends JPanel implements MouseListener, MouseMotionListen
         selected = (JPanel) this.getComponentAt(e.getPoint());
         if(selected instanceof Entry){
             Entry sel = (Entry) selected;
-            sel.getModel().beginTransaction();
+            if(sel instanceof RepetitiveEntry){
+                RepetitiveEntry re = (RepetitiveEntry) sel;
+                modifyAllowed = re.isFirstOccurrence();
+            }
+            else modifyAllowed = true;
+            if(modifyAllowed) {
+                sel.getModel().beginTransaction();
+            }
         }
-        if(selected instanceof Event){
+        if((selected instanceof Event) || (selected instanceof RepetitiveEvent)){
             startPoint = e.getY() - selected.getY();
             if((selected.getHeight() - startPoint) < 10){
                 startPoint = startPoint - selected.getHeight();
@@ -420,9 +432,15 @@ public class DayPanel extends JPanel implements MouseListener, MouseMotionListen
             endPoint = -1;
             this.repaint();
         }
-        if(selected instanceof Entry){
+        if((selected instanceof Entry) && modifyAllowed){
             Entry sel = (Entry) selected;
             sel.getModel().commit();
+            if(sel instanceof RepetitiveReminder){
+                addRepetitiveReminder(((RepetitiveReminder)sel).getModel());
+            }
+            else if(sel instanceof RepetitiveEvent){
+                addRepetitiveEvent(((RepetitiveEvent)sel).getModel());
+            }
         }
     }
 
@@ -438,21 +456,21 @@ public class DayPanel extends JPanel implements MouseListener, MouseMotionListen
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if(selected instanceof Reminder){
-            Reminder r = (Reminder) selected;
+        if((selected instanceof Reminder) || (selected instanceof RepetitiveReminder)){
+            Entry r = (Entry) selected;
             if(modifyAllowed) {
                 LocalDateTime t = round5min(timeOf(e.getY()));
-                if (!r.getModel().getTime().equals(t)) {
+                if (!r.getTime().equals(t)) {
                     setPosition(r, t);
                 }
             }
         }
-        else if(selected instanceof Event){
-            Event event = (Event) selected;
+        else if((selected instanceof Event) || (selected instanceof RepetitiveEvent)){
+            Entry event = (Entry) selected;
             if(modifyAllowed) {
                 LocalDateTime t = round5min(timeOf(e.getY()));
                 if (startPoint < 0) {
-                    if (!event.getModel().getTimeEnd().equals(t)) {
+                    if (!((EventPattern)event).getTimeEnd().equals(t)) {
                         setTimeEnd(event, t);
                     }
                 } else if (startPoint < 10) {

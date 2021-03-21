@@ -1,9 +1,7 @@
 package view;
 
 import info.clearthought.layout.TableLayout;
-import model.EntryModel;
-import model.EventModel;
-import model.ReminderModel;
+import model.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,12 +52,16 @@ class EntryLabel extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() instanceof EntryModel){
-            if(e.getSource() instanceof ReminderModel){
-                ReminderModel model = (ReminderModel) e.getSource();
+            if((e.getSource() instanceof ReminderModel) || (e.getSource() instanceof RepetitiveReminderModel)){
+                EntryModel model = (EntryModel) e.getSource();
                 setTime(model.getTime());
             }
             else if(e.getSource() instanceof EventModel){
                 EventModel model = (EventModel) e.getSource();
+                setTime(model.getTime(), model.getTime().plusMinutes(model.getDuration()));
+            }
+            else if(e.getSource() instanceof RepetitiveEventModel){
+                RepetitiveEventModel model = (RepetitiveEventModel) e.getSource();
                 setTime(model.getTime(), model.getTime().plusMinutes(model.getDuration()));
             }
             setTitle(((EntryModel) e.getSource()).getTitle());
