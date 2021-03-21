@@ -13,7 +13,7 @@ public class RepetitiveReminder extends RepetitiveEntry{
         label.setTitle(getModel().getTitle());
         this.setOpaque(true);
         this.setBackground(new Color(0,0,0,0));
-        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        if(isFirstOccurrence()) this.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
     @Override

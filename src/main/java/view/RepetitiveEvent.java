@@ -14,13 +14,13 @@ public class RepetitiveEvent extends RepetitiveEntry implements EventPattern{
         label.setTitle(getModel().getTitle());
         this.setBackground(new Color(0, 255, 0, 100));
         this.setBorder(BorderFactory.createLineBorder(Color.RED, 3));
-        this.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
+        if(isFirstOccurrence()) this.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
         double[] cols = {TableLayout.FILL};
         double[] rows = {10, TableLayout.FILL, 10};
         this.setLayout(new TableLayout(cols, rows));
         JPanel center = new JPanel();
         center.setBackground(new Color(0, 0, 0, 0));
-        center.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        if(isFirstOccurrence()) center.setCursor(new Cursor(Cursor.HAND_CURSOR));
         this.add(center, "0 1 f f");
     }
 
