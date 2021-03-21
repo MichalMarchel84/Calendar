@@ -1,14 +1,13 @@
 package controller;
 
-import model.App;
 import model.Client;
 import model.LoginException;
 import view.LoginPanel;
 import view.NewUserPanel;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
 public class LoginController implements ActionListener {
 
@@ -44,7 +43,7 @@ public class LoginController implements ActionListener {
             parent.displayPanel(newUser);
         }
         else if(e.getSource().equals(newUser.create)){
-            if(newUser.pass.getPassword().equals(newUser.repeatPass.getPassword())){
+            if(Arrays.equals(newUser.pass.getPassword(), newUser.repeatPass.getPassword())){
                 try{
                     login(newUser.userName.getText(), String.copyValueOf(newUser.pass.getPassword()), true);
                 }

@@ -22,7 +22,7 @@ public class EditWindow extends JFrame implements ActionListener {
     private final JPanel options = new JPanel();
     public final JPanel repetitiveOptions = new JPanel();
     public final JCheckBox repetitive = new JCheckBox();
-    public final JComboBox<String> type = new JComboBox<>(RepetitiveModel.intervalTypes);
+    public final JComboBox<String> type;
     private final JTextField period = new JTextField(6);
     private final JLabel periodLabel = new JLabel(I18n.getPhrase("days"));
     public final JButton finish = new JButton();
@@ -36,6 +36,12 @@ public class EditWindow extends JFrame implements ActionListener {
         parent = (DayPanel) entry.getParent();
         controller = new EditWindowController(parent.controller, this);
         this.entry = entry;
+        String types[] = new String[RepetitiveModel.intervalTypes.length];
+        for(int i = 0; i < types.length; i++){
+            types[i] = I18n.getPhrase(RepetitiveModel.intervalTypes[i]);
+            System.out.println(types[i]);
+        }
+        type = new JComboBox<>(types);
         title.setText(entry.getModel().getTitle());
         title.setFont(new Font(title.getFont().getName(), Font.BOLD, 20));
         description.setText(entry.getModel().getDescription());
@@ -59,7 +65,7 @@ public class EditWindow extends JFrame implements ActionListener {
         options.setLayout(l);
 
         setTimeFields();
-        options.add(new JLabel("Repetitive"), "0 1 1 1 c c");
+        options.add(new JLabel(I18n.getPhrase("repetitive")), "0 1 1 1 c c");
         setRepetitiveOptions();
         repetitive.addActionListener(this);
         options.add(repetitive, "2 1 c c");
@@ -92,7 +98,7 @@ public class EditWindow extends JFrame implements ActionListener {
         lay.setHGap(5);
         lay.setVGap(10);
         repetitiveOptions.setLayout(lay);
-        repetitiveOptions.add(new JLabel("Repeat every"), "0 0 1 0 c c");
+        repetitiveOptions.add(new JLabel(I18n.getPhrase("repeat_interval")), "0 0 1 0 c c");
         type.addActionListener(this);
         repetitiveOptions.add(type, "0 1 1 1 c c");
         period.setText("7");
@@ -117,17 +123,8 @@ public class EditWindow extends JFrame implements ActionListener {
             else if(interval == -1){
                 type.setSelectedIndex(1);
             }
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-            beginLabel.setText("Started: " + re.getStartAt().format(dtf));
-            if(re.getFinishedAt() == null){
-                endLabel.setText("ongoing");
-                finish.setText("Finish");
-            }
-            else {
-                repetitiveClosed = re.getFinishedAt();
-                endLabel.setText("Finished: " + re.getFinishedAt().format(dtf));
-                finish.setText("Resume");
-            }
+            setBeginLabel(re.getStartAt());
+            setEndLabel(re.getFinishedAt());
             repetitiveOptions.add(beginLabel, "0 3 1 3 c c");
             repetitiveOptions.add(endLabel, "0 4 1 4 c c");
             repetitiveOptions.add(finish, "0 5 1 5 c c");
@@ -180,6 +177,24 @@ public class EditWindow extends JFrame implements ActionListener {
         options.repaint();
     }
 
+    private void setBeginLabel(LocalDateTime date){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        beginLabel.setText(I18n.getPhrase("startAt") + " " + date.format(dtf));
+    }
+
+    private void setEndLabel(LocalDateTime date){
+        if(date == null){
+            endLabel.setText(I18n.getPhrase("ongoing"));
+            finish.setText(I18n.getPhrase("finish"));
+        }
+        else {
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            endLabel.setText(I18n.getPhrase("endAt") + date.format(dtf));
+            finish.setText(I18n.getPhrase("resume"));
+        }
+        repetitiveClosed = date;
+    }
+
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         if(actionEvent.getSource().equals(repetitive)){
@@ -199,16 +214,11 @@ public class EditWindow extends JFrame implements ActionListener {
             }
         }
         else if(actionEvent.getSource().equals(finish)){
-            RepetitiveEntry re = (RepetitiveEntry) entry;
             if(repetitiveClosed == null){
-                repetitiveClosed = re.getTime();
-                endLabel.setText("Finished");
-                finish.setText("Resume");
+                setEndLabel(entry.getTime());
             }
             else {
-                repetitiveClosed = null;
-                endLabel.setText("ongoing");
-                finish.setText("Finish");
+                setEndLabel(null);
             }
         }
     }
